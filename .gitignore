@@ -1,3 +1,18 @@
+# projcet ignores
+venv/
+__pycache__/
+.vscode/
+*.db
+test*
+
+*.pickle
+token.*
+credentials.json
+
+# ignore jupyter stuff
+*.ipynb*
+
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
