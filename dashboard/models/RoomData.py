@@ -1,18 +1,29 @@
 #!/usr/bin/env python3
 
-from sqlalchemy import Column, Integer, DateTime, Float
-from models.db import Base
+# from sqlalchemy import Column, Integer, DateTime, Float
+# from models.db import Base
+from app import db
 
-class RoomData(Base):
-    __tablename__ = 'temperature'
+class RoomData(db.Model):
+    __tablename__ = 'room-data'
 
-    id = Column(Integer, primary_key=True)
-    date = Column(DateTime, nullable=False)
-    temperature = Column(Float)
-    humidity = Column(Float)
-    pressure = Column(Float)
-    brightness = Column(Float)
-    altitude = Column(Float)
+    id = db.Column(db.Integer, primary_key=True)
+    date = db.Column(db.DateTime, nullable=False)
+    temperature = db.Column(db.Float)
+    humidity = db.Column(db.Float)
+    pressure = db.Column(db.Float)
+    brightness = db.Column(db.Float)
+    altitude = db.Column(db.Float)
+
+    def to_dict(self):
+        return {
+            'date': self.date,
+            'temperature': self.temperature,
+            'humidity': self.humidity,
+            'pressure': self.pressure,
+            'brightness': self.brightness,
+            'altitude': self.altitude,
+        }
 
     def __repr__(self):
         return (

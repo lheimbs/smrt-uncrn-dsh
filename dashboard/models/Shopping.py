@@ -1,42 +1,52 @@
 #!/usr/bin/env python3
 
-from sqlalchemy import ForeignKey
-from sqlalchemy import Column
-from sqlalchemy import Integer
-from sqlalchemy import DateTime
-from sqlalchemy import String
-from sqlalchemy import Float
-from sqlalchemy import Boolean
-from sqlalchemy import Table
-from sqlalchemy.schema import UniqueConstraint
-from sqlalchemy.orm import relationship
+# from sqlalchemy import ForeignKey
+# from sqlalchemy import Column
+# from sqlalchemy import Integer
+# from sqlalchemy import DateTime
+# from sqlalchemy import String
+# from sqlalchemy import Float
+# from sqlalchemy import Boolean
+# from sqlalchemy import Table
+# from sqlalchemy.schema import UniqueConstraint
+# from sqlalchemy.orm import relationship
 
-from models.db import Base
+# from models.db import Base
 
+from app import db
 
-association_table = Table(
+association_table = db.Table(
     'association',
-    Base.metadata,
-    Column('item_id', Integer, ForeignKey('item.id')),
-    Column('list_id', Integer, ForeignKey('list.id'))
+    db.Model.metadata,
+    db.Column('item_id', db.Integer, db.ForeignKey('item.id')),
+    db.Column('list_id', db.Integer, db.ForeignKey('list.id'))
 )
 
-class List(Base):
+class List(db.Model):
     __tablename__ = 'list'
 
-    id = Column(Integer, primary_key=True)
-    date = Column(DateTime, nullable=False)
-    price = Column(Float, nullable=False)
-    shop_id = Column(Integer, ForeignKey('shop.id'), nullable=False)
-    category_id = Column(Integer, ForeignKey('category.id'))
+    id = db.Column(db.Integer, primary_key=True)
+    date = db.Column(db.DateTime, nullable=False)
+    price = db.Column(db.Float, nullable=False)
+    shop_id = db.Column(db.Integer, db.ForeignKey('shop.id'), nullable=False)
+    category_id = db.Column(db.Integer, db.ForeignKey('category.id'))
 
-    items = relationship(
+    items = db.relationship(
         'Item',
         secondary=association_table,
         back_populates='lists',
     )
-    shop = relationship('Shop')
-    category = relationship('Category')
+    shop = db.relationship('Shop')
+    category = db.relationship('Category')
+
+    def to_dict(self):
+        return {
+            'date': self.date,
+            'price': self.price,
+            'shop': self.shop,
+            'category': self.category,
+            'items': [item.to_dict() for item in self.items],
+        }
 
     def __repr__(self):
         return (
@@ -49,10 +59,10 @@ class List(Base):
         )
 
 
-class Item(Base):
+class Item(db.Model):
     __tablename__ = 'item'
     __table_args__ = (
-        UniqueConstraint(
+        db.UniqueConstraint(
             'name',
             'price',
             'volume',
@@ -63,21 +73,32 @@ class Item(Base):
         ),
     )
 
-    id = Column(Integer, primary_key=True)
-    name = Column(String, nullable=False)
-    price = Column(Float, nullable=False)
-    volume = Column(String)
-    price_per_volume = Column(String)
-    sale = Column(Boolean)
-    note = Column(String)
-    category_id = Column(Integer, ForeignKey('category.id'))
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String, nullable=False)
+    price = db.Column(db.Float, nullable=False)
+    volume = db.Column(db.String)
+    price_per_volume = db.Column(db.String)
+    sale = db.Column(db.Boolean)
+    note = db.Column(db.String)
+    category_id = db.Column(db.Integer, db.ForeignKey('category.id'))
 
-    lists = relationship(
+    lists = db.relationship(
         'List',
         secondary=association_table,
         back_populates='items'
     )
-    category = relationship('Category')
+    category = db.relationship('Category')
+
+    def to_dict(self):
+        return {
+            'name': self.name,
+            'price': self.price,
+            'volume': self.volume,
+            'price_per_volume': self.price_per_volume,
+            'sale': self.sale,
+            'note': self.note,
+            'category': self.category,
+        }
 
     def __repr__(self):
         return (
@@ -92,14 +113,20 @@ class Item(Base):
         )
 
 
-class Shop(Base):
+class Shop(db.Model):
     __tablename__ = 'shop'
 
-    id = Column(Integer, primary_key=True)
-    name = Column(String, nullable=False)
-    shop_id = Column(Integer, ForeignKey('shop.id'))
-    category_id = Column(Integer, ForeignKey('category.id'))
-    category = relationship('Category')
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String, nullable=False)
+    shop_id = db.Column(db.Integer, db.ForeignKey('shop.id'))
+    category_id = db.Column(db.Integer, db.ForeignKey('category.id'))
+    category = db.relationship('Category')
+
+    def to_dict(self):
+        return {
+            'name': self.name,
+            'category': self.category,
+        }
 
     def __repr__(self):
         return (
@@ -109,11 +136,16 @@ class Shop(Base):
         )
 
 
-class Category(Base):
+class Category(db.Model):
     __tablename__ = 'category'
 
-    id = Column(Integer, primary_key=True)
-    name = Column(String, nullable=False, unique=True)
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String, nullable=False, unique=True)
+
+    def to_dict(self):
+        return {
+            'name': self.name,
+        }
 
     def __repr__(self):
         return f"<Category(id={self.id}, name='{self.name}')>"
