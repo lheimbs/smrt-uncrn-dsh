@@ -3,20 +3,34 @@
 import logging
 import dash
 from flask import Flask
+from flask_sqlalchemy import SQLAlchemy
 
 logger = logging.getLogger()
 
+external_scripts = [
+    # 'https://raw.githubusercontent.com/kimmobrunfeldt/progressbar.js/master/dist/progressbar.min.js',
+]
+
 # FLASK SETUP
 server = Flask(__name__, static_folder='static')
+server.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:////home/lenny/projects/data_new.db'
+server.config['SQLALCHEMY_BINDS'] = {
+    'probe-requests': 'sqlite:////home/lenny/probe-requests.db'
+}
+server.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 server.logger = logger
+
+db = SQLAlchemy(server)
 
 # DASH SETUP
 app = dash.Dash(
     name='Smrt Uncrn Dsh',
     server=server,
+    external_scripts=external_scripts,
     # routes_pathname_prefix='/graph/'
 )
 app.logger = logger
+app.logger.setLevel(logging.DEBUG)
 app.title = "Smrt Uncrn Dsh"
 app.config['suppress_callback_exceptions'] = True
 
