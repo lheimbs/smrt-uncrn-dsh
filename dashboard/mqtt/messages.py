@@ -24,7 +24,7 @@ layout = html.Div([
                             id="mqtt-select-topics",
                             value=[],
                             labelStyle={'display': 'block'},
-                            options=[{'label': topic, 'value': topic} for topic in sql_data.get_mqtt_topics()],
+                            #options=[{'label': topic, 'value': topic} for topic in sql_data.get_mqtt_topics()],
                             className="mqtt__topic__select",
                         ),
                     ]),

@@ -12,6 +12,10 @@ from dash.dependencies import Input, Output, State, ALL
 from dash.exceptions import PreventUpdate
 
 from app import app
+from shopping.sql import (
+    get_unique_shopping_items,
+    get_unique_shopping_shops,
+)
 
 logger = logging.getLogger()
 
@@ -207,7 +211,7 @@ layout = html.Div(
 )
 def init_shops_store(last_modified, data):
     logger.debug("Updating saved Stores in Database...")
-    return [html.Option(value=val) for val in sql_data.get_unique_shopping_shops().Shop]
+    return [html.Option(value=val) for val in get_unique_shopping_shops().name]
 
 
 @app.callback(
@@ -226,7 +230,7 @@ def get_shopping_shops(data):
 )
 def init_products_store(last_modified, data):
     logger.debug("Updating saved Items in Database...")
-    return [html.Option(value=val) for val in sql_data.get_unique_shopping_items().Product]
+    return [html.Option(value=val) for val in get_unique_shopping_items().name]
 
 
 @app.callback(

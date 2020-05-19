@@ -8,7 +8,7 @@ body {
 
 /*
 div {
-    border: 1px solid #000000;
+    border: 1px solid #dddddd;
 }
 */
 
@@ -36,6 +36,11 @@ div {
 
 .app__general {
     border: 0px solid var(--border-dark);
+}
+
+
+.one_row {
+    height: 100%;
 }
 
 
@@ -282,6 +287,10 @@ div {
         display: flex;
         flex-direction: column;
         justify-content: center;
+    }
+
+    .card {
+        margin: 1%;
     }
 }
 

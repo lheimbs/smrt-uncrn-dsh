@@ -12,8 +12,14 @@ import plotly.graph_objects as go
 from dash.dependencies import Input, Output
 from plotly.subplots import make_subplots
 
-import shopping.graph_helper
+import graph_helper
 from app import app, COLORS
+from shopping.sql import (
+    get_shopping_expenses_by_date,
+    get_unique_shopping_days,
+    get_unique_shopping_shops,
+    get_shopping_expenses_per_shop
+)
 
 layout = html.Div(
     className='row',
@@ -118,25 +124,26 @@ def get_shopping_monthly_overview(state):
     six_months_ago = datetime.now()-relativedelta(months=6)
     six_months_ago = datetime(six_months_ago.year, six_months_ago.month, 1)
 
-    data = sql_data.get_shopping_expenses_by_date(six_months_ago)
-    curr_month = data.Date.dt.month.unique()[-1]
-    unique_months = data.Date.dt.month.unique()
+    data = get_shopping_expenses_by_date(six_months_ago)
+    print(data.head())
+    curr_month = data.date.dt.month.unique()[-1]
+    unique_months = data.date.dt.month.unique()
 
     max_min = list(
         zip(
             *[
-                (x.Payment.cumsum().max(), x.Payment.cumsum().min())
-                for _, x in data[data.Date.dt.month != curr_month].set_index('Date').groupby(lambda x: x.month)
+                (x.price.cumsum().max(), x.price.cumsum().min())
+                for _, x in data[data.date.dt.month != curr_month].set_index('date').groupby(lambda x: x.month)
             ]
         )
     )
 
     y1_max, y1_min = max(max_min[0]), min(max_min[1])
     y2_min, y2_max = (
-        data[data.Date.dt.month == curr_month].Payment.min(),
-        data[data.Date.dt.month == curr_month].Payment.max(),
+        data[data.date.dt.month == curr_month].price.min(),
+        data[data.date.dt.month == curr_month].price.max(),
     )
-    y1_range_min, y1_range_max, y1_dtick, y2_range_min, y2_range_max, y2_dtick = shopping.graph_helper.calculate_ticks(
+    y1_range_min, y1_range_max, y1_dtick, y2_range_min, y2_range_max, y2_dtick = graph_helper.calculate_ticks(
         y1_min, y1_max, y2_min, y2_max
     )
 
@@ -144,15 +151,15 @@ def get_shopping_monthly_overview(state):
 
     for month in unique_months:
         months_data = pd.DataFrame({
-            'Days': data[data.Date.dt.month == month].Date.dt.day,
-            'Payment': data[data.Date.dt.month == month].Payment.cumsum()
+            'Days': data[data.date.dt.month == month].date.dt.day,
+            'price': data[data.date.dt.month == month].price.cumsum()
         })
         months_data.loc[-1] = 0
         months_data.index = months_data.index + 1
         months_data = months_data.sort_index()
         if months_data.Days.iloc[-1] != 31 and (month != unique_months[-1] or month != datetime.now().month):
             months_data = months_data.append(
-                {'Days': 31, 'Payment': np.interp([31], months_data.Days, months_data.Payment)[0]},
+                {'Days': 31, 'price': np.interp([31], months_data.Days, months_data.price)[0]},
                 ignore_index=True
             )
 
@@ -160,7 +167,7 @@ def get_shopping_monthly_overview(state):
             mode='lines',
             hovertemplate='%{y:.2f}€',
             x=months_data.Days,
-            y=months_data.Payment,
+            y=months_data.price,
             name=month_name[month],
             yaxis='y2',
         )
@@ -177,8 +184,8 @@ def get_shopping_monthly_overview(state):
                 go.Bar(
                     opacity=0.5,
                     hovertemplate='%{y:.2f}€',
-                    x=data[data.Date.dt.month == month].Date.dt.day,
-                    y=data[data.Date.dt.month == month].Payment,
+                    x=data[data.date.dt.month == month].date.dt.day,
+                    y=data[data.date.dt.month == month].price,
                     name=month_name[month],
                     marker={
                         'color': COLORS['foreground'],
@@ -338,13 +345,13 @@ def get_shopping_nutrition_type_graph(state):
     [Input("loading-shopping-overview-graph", 'loading_state')]
 )
 def get_shopping_total_overview(state):
-    df_days = sql_data.get_unique_shopping_days()
-    shops = sql_data.get_unique_shopping_shops()
-    shops = shops.sort_values('Shop')
+    df_days = get_unique_shopping_days()
+    shops = get_unique_shopping_shops()
+    shops = shops.sort_values('name')
 
     data = []
-    for shop in shops.Shop:
-        expense = sql_data.get_shopping_expenses_per_shop(shop)
+    for shop in shops.name:
+        expense = get_shopping_expenses_per_shop(shop)
         df_days = df_days.join(expense)
         bar = go.Bar(
             name=shop,
