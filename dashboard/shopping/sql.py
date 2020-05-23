@@ -74,5 +74,11 @@ def get_all_lists():
     return List.query
 
 def add_shopping_list(date, price, shop, items):
+    date = datetime.strptime(date, '%Y-%m-%d')
     logger.info(f"{date, price, shop, items}")
+    new_list = List(date=date, price=price)
+
+    if Shop.query.filter(Shop.name):
+        pass
+
     return True, ''

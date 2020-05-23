@@ -472,7 +472,6 @@ def save_shopping_list(submit_clicks, date, price, shop, items, prices, amounts,
         info = [html.P("Neccessary Shopping tables do not exist in database!")]
 
     else:
-        date = datetime.strptime(date, '%Y-%m-%d')
         logger.debug(f"Save shopping list called. List: {date, price, shop}. Button clicks: {submit_clicks}.")
         prices = [float(price) if price else None for price in prices]
         items_complete = pd.DataFrame(data={
