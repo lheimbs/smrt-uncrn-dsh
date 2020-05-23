@@ -55,7 +55,7 @@ class List(db.Model):
             f"price={self.price}, "
             f"shop='{self.shop}', "
             f"category='{self.category}', "
-            f"items={[item for item in self.items]})>"
+            f"items={[item.name for item in self.items]})>"
         )
 
 
