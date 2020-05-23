@@ -195,6 +195,10 @@ def get_shopping_monthly_overview(state, errors):
     six_months_ago = datetime(six_months_ago.year, six_months_ago.month, 1)
 
     data = get_shopping_expenses_by_date(six_months_ago)
+    if data.empty:
+        logger.warning(f"No shopping entries found since {six_months_ago}.")
+        return fig
+
     curr_month = data.date.dt.month.unique()[-1]
     unique_months = data.date.dt.month.unique()
 
@@ -490,7 +494,6 @@ def get_shopping_total_overview(state, errors):
     shops = get_unique_shopping_shops()
     shops = shops.sort_values('name')
 
-    data = []
     for shop in shops.name:
         expense = get_shopping_expenses_per_shop(shop)
         df_days = df_days.join(expense)
@@ -516,7 +519,6 @@ def get_shopping_total_overview(state, errors):
         elif shop.lower() == 'bike24':
             bar.marker['color'] = COLORS['foreground']
 
-        data.append(bar)
+        fig.add_trace(bar)
 
-    fig.add_trace(data)
     return fig

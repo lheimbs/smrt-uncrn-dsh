@@ -286,8 +286,8 @@ def get_brightness(data):
     [State('error-store', 'data')]
 )
 def update_last_value(n, errors):
-    if errors['room-data']:
-        logger.warning("RoomData table does not exist. Cant fetch latest data.")
+    if errors['room-data'] or db.session.query(RoomData.temperature).first() is None:
+        logger.warning("RoomData table does not exist or has no entries. Cant fetch latest data.")
         last = None
     else:
         last = RoomData.query.filter(
@@ -305,8 +305,8 @@ def update_last_value(n, errors):
     ]
 )
 def update_temperature_store(n, old_data, errors):
-    if errors['room-data']:
-        logger.warning("RoomData table does not exist. Cant fetch latest temperature.")
+    if errors['room-data'] or db.session.query(RoomData.temperature).first() is None:
+        logger.warning("RoomData table does not exist or has no entries. Cant fetch latest temperature.")
         old_data = {
             'new': 0,
             'old': 0,
@@ -347,8 +347,8 @@ def update_temperature_store(n, old_data, errors):
     ]
 )
 def update_pressure_store(n, old_data, errors):
-    if errors['room-data']:
-        logger.warning("RoomData table does not exist. Cant fetch latest pressure.")
+    if errors['room-data'] or db.session.query(RoomData.pressure).first() is None:
+        logger.warning("RoomData table does not exist or has no entries. Cant fetch latest pressure.")
         old_data = {
             'new': 0,
             'old': 0,
@@ -389,8 +389,8 @@ def update_pressure_store(n, old_data, errors):
     ]
 )
 def update_humidity_store(n, old_data, errors):
-    if errors['room-data']:
-        logger.warning("RoomData table does not exist. Cant fetch latest humidity.")
+    if errors['room-data'] or db.session.query(RoomData.humidity).first() is None:
+        logger.warning("RoomData table does not exist or has no entries. Cant fetch latest humidity.")
         old_data = {
             'new': '?',
             'old': 0,
