@@ -4,6 +4,7 @@ __pycache__/
 .vscode/
 *.db
 test*
+alembic/*
 
 *.pickle
 token.*
