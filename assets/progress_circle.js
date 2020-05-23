@@ -25,6 +25,7 @@ window.dash_clientside = Object.assign({}, window.dash_clientside, {
                 maxValue: temperature.max,
                 initValue : temperature.old,
                 roundCorner : true,
+                displayNumber: ((temperature.display) ? true : false),
                 format: '#### ' + options.unit
             }); 
 

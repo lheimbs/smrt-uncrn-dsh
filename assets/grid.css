@@ -31,6 +31,8 @@
     .columns:first-child {
       margin-left: 0; }
   
+    .half.column,
+    .half.columns                   { width: 2%; }
     .one.column,
     .one.columns                    { width: 4.66666666667%; }
     .two.columns                    { width: 13.3333333333%; }

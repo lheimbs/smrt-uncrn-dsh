@@ -11,11 +11,14 @@ external_scripts = [
     # 'https://raw.githubusercontent.com/kimmobrunfeldt/progressbar.js/master/dist/progressbar.min.js',
 ]
 
+DATABASE_PATH = '/home/lenny/projects/data_new.db'
+DATABASE_PROBES_PATH = '/home/lenny/probe-requests.db'
+
 # FLASK SETUP
 server = Flask(__name__, static_folder='static')
-server.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:////home/lenny/projects/data_new.db'
+server.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite:///{DATABASE_PATH}'
 server.config['SQLALCHEMY_BINDS'] = {
-    'probe-requests': 'sqlite:////home/lenny/probe-requests.db'
+    'probe-requests': f'sqlite:///{DATABASE_PROBES_PATH}'
 }
 server.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 server.logger = logger

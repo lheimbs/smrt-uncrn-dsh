@@ -7,6 +7,53 @@ on small devices, paste the mobile query code up in the buttons section and styl
 there.
 */
 
+@media only screen and (max-width: 600px) {
+    .app__content {
+        display: block;
+    }
+    .app__header {
+        display: flex;
+        flex-direction: column;
+    }
+    .app__header__desc {
+        order: 1;
+        text-align: center;
+    }
+    .app__header__title {
+        font-size: 1.5em;
+        padding-top: 1%;
+    }
+
+    .general__services__states {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .general__services {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .data__current {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+    }
+
+    .data__overview {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+    }
+
+    .card {
+        margin: 1%;
+    }
+}
+
+.form__header {
+    text-align: right;
+}
 
 /* Larger than mobile */
 @media (min-width: 400px) {}

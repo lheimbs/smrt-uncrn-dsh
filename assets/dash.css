@@ -38,6 +38,28 @@ SingleDatePicker
     background-color: var(--background);
 }
 
+
+/* 
+Bootstraps Components
+Alert
+*/
+button.close {
+    position:absolute; top:0; right:0;
+    padding: 0 10px;
+}
+#shopping-status-alert {
+    width: max-content;
+    height: max-content;
+    max-height: -moz-max-content;
+    height: -moz-max-content;
+    position: fixed;
+    z-index: 2;
+    top: 40%;
+    left: 40%;
+    background: var(--background);
+    overflow: auto;
+}
+
 /* 
 Bootstraps Components
 Toast
