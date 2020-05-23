@@ -31,12 +31,6 @@ layout = html.Div([
                 className='custom__main__sub__tab',
                 selected_className='custom__main__sub__tab____selected',
             ),
-            # dcc.Tab(
-            #     label="Settings",
-            #     value="data-settings-tab",
-            #     className='custom__main__sub__tab',
-            #     selected_className='custom__main__sub__tab____selected',
-            # ),
         ]
     ),
     html.Div(

@@ -9,7 +9,7 @@ import scipy.signal as signal
 import dash_core_components as dcc
 import dash_html_components as html
 import plotly.graph_objects as go
-from dash.dependencies import Input, Output
+from dash.dependencies import Input, Output, State
 from plotly.subplots import make_subplots
 
 from app import app, COLORS
@@ -20,7 +20,10 @@ logger = logging.getLogger()
 layout = html.Div(
     className="row one_row",
     children=[
+        dcc.Store(id='data-history-settings-state'),
         html.Div(
+            id='data-history-overlay',
+            className="overlay",
             children=[
                 html.H6("Choose display data:"),
                 dcc.Checklist(
@@ -52,16 +55,18 @@ layout = html.Div(
                     updatemode='bothdates',
                     with_full_screen_portal=True,
                 ),
+                html.Hr(),
+                html.Button('Show graph', id='data-history-show-data'),
             ],
-            className="two columns",
         ),
+        html.Button('Settings', id='data-history-show-settings'),
         html.Div(
-            className="ten columns one_row",
+            className="one_row",
             children=[
                 dcc.Store(id='data-history-graph-current-width'),
                 dcc.Loading(id="loading-1", color=COLORS['foreground'], children=[
                     dcc.Graph(
-                        style={'height': '90vh'},
+                        style={'height': '80vh'},
                         id="data-history-graph",
                         config={
                             'staticPlot': False,
@@ -100,6 +105,24 @@ layout = html.Div(
 )
 
 
+@app.callback(
+    [
+        Output('data-history-overlay', 'style'),
+        Output('data-history-settings-state', 'data'),
+    ],
+    [
+        Input('data-history-overlay', 'loading_state'),
+        Input('data-history-show-data', 'n_clicks'),
+        Input('data-history-show-settings', 'n_clicks'),
+    ],
+    [State('data-history-settings-state', 'data')]
+)
+def display_data_history_overlay(state, data_clicks, hist_clicks, settings_state):
+    if settings_state:
+        return {'display': 'none'}, False
+    return {'display': 'block'}, True
+
+
 app.clientside_callback(
     '''
     window.onload = function getGraphWidth() {
@@ -119,15 +142,20 @@ app.clientside_callback(
 
 @app.callback(
     Output('data-history-graph', 'figure'),
-    [Input('data-history-date-picker', 'start_date'),
-     Input('data-history-date-picker', 'end_date'),
-     Input('data-history-values', 'value'),
-     Input('data-history-graph-current-width', 'data')])
-def update_history_graph(start_date, end_date, chosen_values, current_width):
+    [
+        Input('data-history-date-picker', 'start_date'),
+        Input('data-history-date-picker', 'end_date'),
+        Input('data-history-values', 'value'),
+        Input('data-history-graph-current-width', 'data')
+    ],
+    [State('error-store', 'data')],
+)
+def update_history_graph(start_date, end_date, chosen_values, current_width, errors):
+    n_chosen = len(chosen_values) if len(chosen_values) else 1
     fig = make_subplots(
-            rows=len(chosen_values),
-            cols=1,
-        )
+        rows=n_chosen,
+        cols=1,
+    )
     fig.update_layout({
         'autosize': True,
         'coloraxis': {
@@ -235,34 +263,36 @@ def update_history_graph(start_date, end_date, chosen_values, current_width):
     else:
         current_width = 1
 
-    if start_date is not None and end_date is not None:
-        start_date = datetime.strptime(start_date, '%Y-%m-%d')
-        end_date = datetime.strptime(end_date, '%Y-%m-%d')
-        data_query = RoomData.query.filter(RoomData.date.between(start_date, end_date))
+    if (start_date is None and end_date is None) or errors['room-data']:
+        return fig
 
-        data_count = data_query.count()
-        nth_row = floor(data_count / current_width) if data_count > current_width else 1
-        nth_row = 60 if nth_row > 60 else nth_row
+    start_date = datetime.strptime(start_date, '%Y-%m-%d')
+    end_date = datetime.strptime(end_date, '%Y-%m-%d')
+    data_query = RoomData.query.filter(RoomData.date.between(start_date, end_date))
 
-        logger.debug(f"current_width: {current_width}, data_count {data_count}, nth {nth_row}")
-        data = pd.DataFrame([room_data.to_dict() for room_data in data_query.filter(RoomData.id % nth_row == 0)])
+    data_count = data_query.count()
+    nth_row = floor(data_count / current_width) if data_count > current_width else 1
+    nth_row = 60 if nth_row > 60 else nth_row
 
-        for i, value in enumerate(chosen_values):
-            # Design of Buterworth filter
-            filter_order = 2    # Filter order
-            cutoff_freq = 0.2   # Cutoff frequency
-            B, A = signal.butter(filter_order, cutoff_freq, output='ba')
+    logger.debug(f"current_width: {current_width}, data_count {data_count}, nth {nth_row}")
+    data = pd.DataFrame([room_data.to_dict() for room_data in data_query.filter(RoomData.id % nth_row == 0)])
 
-            # Apply filter
-            tempf = signal.filtfilt(B, A, data[value], axis=0)
+    for i, value in enumerate(chosen_values):
+        # Design of Buterworth filter
+        filter_order = 2    # Filter order
+        cutoff_freq = 0.2   # Cutoff frequency
+        B, A = signal.butter(filter_order, cutoff_freq, output='ba')
 
-            fig.add_trace(
-                go.Scatter(
-                    mode='lines',
-                    name=value,
-                    x=data['date'],
-                    y=tempf,
-                ),
-                row=i+1, col=1,
-            )
+        # Apply filter
+        tempf = signal.filtfilt(B, A, data[value], axis=0)
+
+        fig.add_trace(
+            go.Scatter(
+                mode='lines',
+                name=value,
+                x=data['date'],
+                y=tempf,
+            ),
+            row=i+1, col=1,
+        )
     return fig
