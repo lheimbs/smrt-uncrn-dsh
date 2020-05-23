@@ -4,6 +4,7 @@ import logging
 import dash
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
+# from flask_migrate import Migrate
 
 logger = logging.getLogger()
 
@@ -11,7 +12,7 @@ external_scripts = [
     # 'https://raw.githubusercontent.com/kimmobrunfeldt/progressbar.js/master/dist/progressbar.min.js',
 ]
 
-DATABASE_PATH = '/home/lenny/projects/data_new.db'
+DATABASE_PATH = '/home/lenny/projects/smrt-uncrn-dsh/dashboard/data_prod.db'  # '/home/lenny/projects/data_new.db'
 DATABASE_PROBES_PATH = '/home/lenny/probe-requests.db'
 
 # FLASK SETUP
@@ -24,6 +25,12 @@ server.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 server.logger = logger
 
 db = SQLAlchemy(server)
+# from models.RoomData import RoomData
+# from models.Shopping import Shop, List, Item, Category
+# from models.RfData import RfData
+# from models.ProbeRequest import ProbeRequest
+# from models.Mqtt import Mqtt
+# migrate = Migrate(server, db)
 
 # DASH SETUP
 app = dash.Dash(
@@ -51,6 +58,7 @@ COLORS = {
     'green': 'green',
     'error': '#960c0c',
     'success': '#17960c',
+    'warning': '#f7b731',
     'colorway': [
         '#fc5c65',
         '#26de81',
