@@ -117,9 +117,10 @@ class Shop(db.Model):
     __tablename__ = 'shop'
 
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String, nullable=False)
+    name = db.Column(db.String, nullable=False, unique=True)
     shop_id = db.Column(db.Integer, db.ForeignKey('shop.id'))
-    category_id = db.Column(db.Integer, db.ForeignKey('category.id'))
+    # category_id = db.Column(db.Integer, db.ForeignKey('category.id'))
+    category_name = db.Column(db.String, db.ForeignKey('category.name'))
     category = db.relationship('Category')
 
     def to_dict(self):
