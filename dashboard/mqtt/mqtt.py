@@ -15,7 +15,8 @@ logger = logging.getLogger()
 layout = html.Div([
     dcc.Tabs(
         id="mqtt-main-tabs",
-        value="mqtt-messages-tab",
+        persistence=True,
+        # value="mqtt-messages-tab",
         parent_className='custom__main__tabs',
         className='custom__main__tabs__container',
         children=[
@@ -49,4 +50,6 @@ def render_mqtt_content(tab):
         layout = mqtt.live.layout
     elif tab == 'mqtt-settings-tab':
         layout = html.Div("Settings")
+    else:
+        layout = mqtt.messages.layout
     return layout

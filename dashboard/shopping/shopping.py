@@ -23,7 +23,8 @@ layout = html.Div([
     ),
     dcc.Tabs(
         id="shopping-main-tabs",
-        value="shopping-overview-tab",
+        persistence=True,
+        # value="shopping-overview-tab",
         parent_className='custom__main__tabs',
         className='custom__main__tabs__container',
         children=[
@@ -52,8 +53,10 @@ layout = html.Div([
               [Input('shopping-main-tabs', 'value')])
 def render_shopping_content(tab):
     logger.debug(f"'render_shopping_tab' called with tab '{tab}'.'")
-    if tab == 'shopping-overview-tab':
-        layout = shopping.overview.layout
-    elif tab == 'shopping-add-tab':
+    if tab == 'shopping-add-tab':
         layout = shopping.add.layout
+    elif tab == 'shopping-overview-tab':
+        layout = shopping.overview.layout
+    else:
+        layout = shopping.overview.layout
     return layout

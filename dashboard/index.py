@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 
+import os
 import argparse
 import logging
 
@@ -20,72 +21,110 @@ parser.add_argument(
     help="Be verbose",
     action="store_const", dest="loglevel", const=logging.INFO,
 )
+
 args = parser.parse_args()
 logging.basicConfig(
     format="%(module)15s - %(levelname)-8s : %(message)s",
     level=args.loglevel
 )
 logger = logging.getLogger()
-logger.debug('index - debug')
-logger.info('index - info')
-logger.warning('index - warning')
 
 
 # page import here, to get the supplied log level in modules
-from app import app                 # noqa: E402
+from app import app, db, DATABASE_PATH, DATABASE_PROBES_PATH    # noqa: E402
 from general import general       # noqa: E402
 from data import data       # noqa: E402
 from mqtt import mqtt       # noqa: E402
 from shopping import shopping       # noqa: E402
 
 
+def precheck_errors():
+    tables = ['room-data', 'rf-data', 'mqtt-message', 'probe-request', 'list', 'item', 'shop', 'category']
+    errors_str = []
+    errors_dict = {
+        'database': False,
+        'database-probes': False,
+    }
+    if not os.path.exists(DATABASE_PATH):
+        logger.warning(f"Database not found under '{DATABASE_PATH}.")
+        errors_str.append(f"ERROR: Database not found under '{DATABASE_PATH}.")
+        errors_dict['database'] = True
+    if not os.path.exists(DATABASE_PROBES_PATH):
+        logger.warning(f"Database not found under '{DATABASE_PROBES_PATH}.")
+        errors_str.append(f"ERROR: Database for Probe Requests not found under '{DATABASE_PROBES_PATH}.")
+        errors_dict['database-probes'] = True
+    for table in tables:
+        if db.engine.has_table(table):
+            errors_dict[table] = False
+        else:
+            logger.warning(f"Table {table} not found in database.")
+            errors_str.append(f"ERROR: Table {table} not found in database.")
+            errors_dict.update({table: True})
+    return errors_str, errors_dict
+
+
+errors, errors_dict = precheck_errors()
+
 app.layout = html.Div(
-    className="app__container",
+    className="wrapper",
     children=[
         # store site's settings
-        # dcc.Store(id='local', storage_type='local'),
-        dcc.Tabs(
-            id="main-tabs",
-            value="data-tab",
-            parent_className='custom__main__tabs',
-            className='custom__main__tabs__container',
-            children=[
-                dcc.Tab(
-                    label="General",
-                    value="general-tab",
-                    className='custom__main__tab',
-                    selected_className='custom__main__tab____selected',
-                ),
-                dcc.Tab(
-                    label="Data",
-                    value="data-tab",
-                    className='custom__main__tab',
-                    selected_className='custom__main__tab____selected',
-                ),
-                dcc.Tab(
-                    label="MQTT",
-                    value="mqtt-tab",
-                    className='custom__main__tab',
-                    selected_className='custom__main__tab____selected',
-                ),
-                dcc.Tab(
-                    label="Shopping",
-                    value="shopping-tab",
-                    className='custom__main__tab',
-                    selected_className='custom__main__tab____selected',
-                ),
-            ]
-        ),
+        dcc.Store(id='error-store', storage_type='local'),
         html.Div(
-            id="main-tabs-content",
-            className="app__tab__content"
+            className='content',
+            children=[
+                dcc.Tabs(
+                    persistence=True,
+                    id="main-tabs",
+                    parent_className='custom__main__tabs',
+                    className='custom__main__tabs__container',
+                    children=[
+                        dcc.Tab(
+                            label="General",
+                            value="general-tab",
+                            className='custom__main__tab',
+                            selected_className='custom__main__tab____selected',
+                        ),
+                        dcc.Tab(
+                            label="Data",
+                            value="data-tab",
+                            className='custom__main__tab',
+                            selected_className='custom__main__tab____selected',
+                        ),
+                        dcc.Tab(
+                            label="MQTT",
+                            value="mqtt-tab",
+                            className='custom__main__tab',
+                            selected_className='custom__main__tab____selected',
+                        ),
+                        dcc.Tab(
+                            label="Shopping",
+                            value="shopping-tab",
+                            className='custom__main__tab',
+                            selected_className='custom__main__tab____selected',
+                        ),
+                    ]
+                ),
+
+                html.Div(
+                    id="main-tabs-content",
+                    className="content"
+                ),
+            ],
+        ),
+        html.Footer(
+            id='errors-footer',
+            className='errors-div footer',
+            children=[] if not errors else [html.P(error) for error in errors],
         ),
     ],
 )
 
 
-@app.callback(Output('main-tabs-content', 'children'),
-              [Input('main-tabs', 'value')])
+@app.callback(
+    Output('main-tabs-content', 'children'),
+    [Input('main-tabs', 'value')],
+)
 def render_main_content(tab):
     if tab == 'general-tab':
         layout = general.layout
@@ -93,9 +132,19 @@ def render_main_content(tab):
         layout = data.layout
     elif tab == 'mqtt-tab':
         layout = mqtt.layout
-    else:
+    elif tab == 'shopping-tab':
         layout = shopping.layout
+    else:
+        layout = data.layout
     return layout
+
+
+@app.callback(
+    Output('error-store', 'data'),
+    [Input('main-tabs', 'loading_state')]
+)
+def update_error_store(_):
+    return errors_dict
 
 
 if __name__ == "__main__":

@@ -15,7 +15,8 @@ logger = logging.getLogger()
 layout = html.Div([
     dcc.Tabs(
         id="data-main-tabs",
-        value="data-overview-tab",
+        persistence=True,
+        # value="data-overview-tab",
         parent_className='custom__main__tabs',
         className='custom__main__tabs__container',
         children=[
@@ -49,4 +50,6 @@ def render_data_content(tab):
         layout = data.graph.layout
     elif tab == 'data-settings-tab':
         layout = html.Div("Settings")
+    else:
+        layout = data.overview.layout
     return layout
