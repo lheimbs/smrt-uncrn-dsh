@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 
+import logging
 from datetime import datetime
 from calendar import month_name
 from dateutil.relativedelta import relativedelta
@@ -9,7 +10,7 @@ import pandas as pd
 import dash_core_components as dcc
 import dash_html_components as html
 import plotly.graph_objects as go
-from dash.dependencies import Input, Output
+from dash.dependencies import Input, Output, State
 from plotly.subplots import make_subplots
 
 import graph_helper
@@ -18,14 +19,18 @@ from shopping.sql import (
     get_shopping_expenses_by_date,
     get_unique_shopping_days,
     get_unique_shopping_shops,
-    get_shopping_expenses_per_shop
+    get_shopping_expenses_per_shop,
+    get_all_lists
 )
+
+logger = logging.getLogger()
 
 layout = html.Div(
     className='row',
     children=[
         html.Div(
             className='row',
+            style={'height': '50vh'},
             children=[
                 html.Div(
                     className='six columns',
@@ -44,45 +49,53 @@ layout = html.Div(
                     ],
                 ),
                 html.Div(
-                    className='three columns',
+                    className='six columns',
                     children=[
-                        dcc.Loading(
-                            id="loading-shopping-expenses-type-graph",
-                            color=COLORS['foreground'],
+                        html.Div(
+                            className='row',
                             children=[
-                                dcc.Graph(
-                                    id="shopping-expenses-type-graph",
-                                    clear_on_unhover=True,
-                                    config={
-                                        'staticPlot': False,
-                                        'displayModeBar': False,
-                                        'displaylogo': False,
-                                    },
-                                    className="shopping__expenses__type_graph graph",
+                                dcc.Loading(
+                                    id="loading-shopping-category-month-graph",
+                                    color=COLORS['foreground'],
+                                    children=[
+                                        dcc.Graph(
+                                            id="shopping-category-month-graph",
+                                            clear_on_unhover=True,
+                                            config={
+                                                'staticPlot': False,
+                                                'displayModeBar': False,
+                                                'displaylogo': False,
+                                                'responsive': True,
+                                            },
+                                            style={'height': '25vh'},
+                                            className="shopping__category__type_graph graph",
+                                        ),
+                                    ],
+                                    type="default"
                                 ),
                             ],
-                            type="default"
                         ),
-                    ],
-                ),
-                html.Div(
-                    className='three columns',
-                    children=[
-                        dcc.Loading(
-                            id="loading-shopping-nutrition-type-graph",
-                            color=COLORS['foreground'],
+                        html.Div(
+                            className='row',
                             children=[
-                                dcc.Graph(
-                                    id="shopping-nutrition-type-graph",
-                                    clear_on_unhover=True,
-                                    config={
-                                        'staticPlot': False,
-                                        'displayModeBar': False,
-                                    },
-                                    className="shopping__nutrition__type_graph graph",
+                                dcc.Loading(
+                                    id="loading-shopping-category-total-graph",
+                                    color=COLORS['foreground'],
+                                    children=[
+                                        dcc.Graph(
+                                            id="shopping-category-total-graph",
+                                            clear_on_unhover=True,
+                                            config={
+                                                'staticPlot': False,
+                                                'displayModeBar': False,
+                                                'displaylogo': False,
+                                            },
+                                            className="",
+                                        ),
+                                    ],
+                                    type="default"
                                 ),
                             ],
-                            type="default"
                         ),
                     ],
                 ),
@@ -90,6 +103,7 @@ layout = html.Div(
         ),
         html.Div(
             className='row',
+            style={'height': '40vh'},
             children=[
                 dcc.Loading(id="loading-shopping-overview-graph", color=COLORS['foreground'], children=[
                     dcc.Graph(
@@ -118,14 +132,69 @@ layout = html.Div(
 
 @app.callback(
     Output('shopping-month-graph', 'figure'),
-    [Input("loading-shopping-overview-graph", 'loading_state')]
+    [Input("loading-shopping-overview-graph", 'loading_state')],
+    [State('error-store', 'data')]
 )
-def get_shopping_monthly_overview(state):
+def get_shopping_monthly_overview(state, errors):
+    fig = make_subplots(specs=[[{"secondary_y": True}]])
+
+    fig.update_layout({
+        'autosize': True,
+        'barmode': 'overlay',
+        'coloraxis': {
+            'colorbar': {
+                'outlinewidth': 0,
+                'bordercolor': COLORS['background'],
+                'bgcolor': COLORS['background'],
+            },
+        },
+        'colorway': COLORS['colorway'],
+        'dragmode': False,
+        'font': {
+            'color': COLORS['foreground'],
+        },
+        'legend': {
+            'orientation': 'h',
+        },
+        'margin': {
+            'l': 10, 'r': 10, 'b': 0, 't': 40, 'pad': 0,
+        },
+        'paper_bgcolor': COLORS['background'],
+        'plot_bgcolor': COLORS['background'],
+        'title': {
+            'text': "Monthly expenses Overview",
+        },
+        'xaxis': {
+            'fixedrange': True, 'rangemode': 'tozero',
+            'showline': True, 'linewidth': 1, 'linecolor': COLORS['border-medium'],
+            'showgrid': True, 'gridwidth': 1, 'gridcolor': COLORS['border-medium'],
+            'zeroline': True, 'zerolinewidth': 1, 'zerolinecolor': COLORS['border-medium'],
+        },
+        'yaxis': {
+            'side': 'right',
+            'fixedrange': True, 'rangemode': 'tozero',
+            'showline': True, 'linewidth': 1, 'linecolor': COLORS['border-medium'],
+            'showgrid': True, 'gridwidth': 1, 'gridcolor': COLORS['border-medium'],
+            'zeroline': True, 'zerolinewidth': 1, 'zerolinecolor': COLORS['border-medium'],
+        },
+        'yaxis2': {
+            'side': 'left',
+            'overlaying': 'y',
+            'fixedrange': True, 'rangemode': 'tozero',
+            'showline': True, 'linewidth': 1, 'linecolor': COLORS['border-medium'],
+            'showgrid': True, 'gridwidth': 1, 'gridcolor': COLORS['border-medium'],
+            'zeroline': True, 'zerolinewidth': 1, 'zerolinecolor': COLORS['border-medium'],
+        },
+    })
+
+    if errors['list'] or errors['category'] or errors['shop'] or errors['item']:
+        logger.warning("Neccessary Shopping tables do not exist in database!")
+        return fig
+
     six_months_ago = datetime.now()-relativedelta(months=6)
     six_months_ago = datetime(six_months_ago.year, six_months_ago.month, 1)
 
     data = get_shopping_expenses_by_date(six_months_ago)
-    print(data.head())
     curr_month = data.date.dt.month.unique()[-1]
     unique_months = data.date.dt.month.unique()
 
@@ -147,7 +216,22 @@ def get_shopping_monthly_overview(state):
         y1_min, y1_max, y2_min, y2_max
     )
 
-    fig = make_subplots(specs=[[{"secondary_y": True}]])
+    fig.update_layout({
+        'yaxis': {
+            'range': [y2_range_min, y2_range_max],
+            'dtick': y2_dtick,
+        },
+        'yaxis2': {
+            'side': 'left',
+            'range': [y1_range_min, y1_range_max],
+            'dtick': y1_dtick,
+            'overlaying': 'y',
+            'fixedrange': True, 'rangemode': 'tozero',
+            'showline': True, 'linewidth': 1, 'linecolor': COLORS['border-medium'],
+            'showgrid': True, 'gridwidth': 1, 'gridcolor': COLORS['border-medium'],
+            'zeroline': True, 'zerolinewidth': 1, 'zerolinecolor': COLORS['border-medium'],
+        },
+    })
 
     for month in unique_months:
         months_data = pd.DataFrame({
@@ -165,7 +249,7 @@ def get_shopping_monthly_overview(state):
 
         trace = go.Scatter(
             mode='lines',
-            hovertemplate='%{y:.2f}€',
+            hovertemplate='%{x}.: %{y:.2f}€',
             x=months_data.Days,
             y=months_data.price,
             name=month_name[month],
@@ -183,7 +267,7 @@ def get_shopping_monthly_overview(state):
             fig.add_trace(
                 go.Bar(
                     opacity=0.5,
-                    hovertemplate='%{y:.2f}€',
+                    hovertemplate="%{x}.: %{y:.2f}€",
                     x=data[data.date.dt.month == month].date.dt.day,
                     y=data[data.date.dt.month == month].price,
                     name=month_name[month],
@@ -193,67 +277,16 @@ def get_shopping_monthly_overview(state):
                 ),
                 secondary_y=False,
             )
-
-    fig.update_layout({
-        'autosize': True,
-        'barmode': 'overlay',
-        'coloraxis': {
-            'colorbar': {
-                'outlinewidth': 0,
-                'bordercolor': COLORS['background'],
-                'bgcolor': COLORS['background'],
-            },
-        },
-        'colorway': COLORS['colorway'],
-        'dragmode': False,
-        'font': {
-            'color': COLORS['foreground'],
-        },
-        'legend': {
-            'orientation': 'h',
-        },
-        'margin': {
-            'l': 10, 'r': 10, 't': 10, 'b': 10, 'pad': 0,
-        },
-        'paper_bgcolor': COLORS['background'],
-        'plot_bgcolor': COLORS['background'],
-        'xaxis': {
-            'fixedrange': True, 'rangemode': 'tozero',
-            'showline': True, 'linewidth': 1, 'linecolor': COLORS['border-medium'],
-            'showgrid': True, 'gridwidth': 1, 'gridcolor': COLORS['border-medium'],
-            'zeroline': True, 'zerolinewidth': 1, 'zerolinecolor': COLORS['border-medium'],
-        },
-        'yaxis': {
-            'side': 'right',
-            'range': [y2_range_min, y2_range_max],
-            'dtick': y2_dtick,
-            'fixedrange': True, 'rangemode': 'tozero',
-            'showline': True, 'linewidth': 1, 'linecolor': COLORS['border-medium'],
-            'showgrid': True, 'gridwidth': 1, 'gridcolor': COLORS['border-medium'],
-            'zeroline': True, 'zerolinewidth': 1, 'zerolinecolor': COLORS['border-medium'],
-        },
-        'yaxis2': {
-            'side': 'left',
-            'range': [y1_range_min, y1_range_max],
-            'dtick': y1_dtick,
-            'overlaying': 'y',
-            'fixedrange': True, 'rangemode': 'tozero',
-            'showline': True, 'linewidth': 1, 'linecolor': COLORS['border-medium'],
-            'showgrid': True, 'gridwidth': 1, 'gridcolor': COLORS['border-medium'],
-            'zeroline': True, 'zerolinewidth': 1, 'zerolinecolor': COLORS['border-medium'],
-        },
-    })
     return fig
 
 
 @app.callback(
-    Output('shopping-expenses-type-graph', 'figure'),
-    [Input('loading-shopping-expenses-type-graph', 'loading_state')]
+    Output('shopping-category-month-graph', 'figure'),
+    [Input('loading-shopping-category-month-graph', 'loading_state')],
+    [State('error-store', 'data')]
 )
-def get_shopping_expenses_type_overview(state):
-    # this_month = datetime(datetime.now().year, datetime.now().month, 1)
-    # expenses_this_month = sql_data.get_shopping_expenses_by_date(this_month)
-    fig = go.Figure()
+def get_shopping_expenses_type_overview(state, errors):
+    fig = make_subplots(rows=1, cols=2, specs=[[{'type': 'domain'}, {'type': 'domain'}]])
 
     fig.update_layout({
         'autosize': True,
@@ -270,37 +303,79 @@ def get_shopping_expenses_type_overview(state):
         'font': {
             'color': COLORS['foreground'],
         },
+        'height': 250,
         'legend': {
-            'orientation': 'h',
+            'orientation': 'v',
         },
         'margin': {
-            'l': 10, 'r': 10, 't': 10, 'b': 10, 'pad': 0,
+            'l': 10, 'r': 10, 'b': 40, 't': 40, 'pad': 0,
         },
         'paper_bgcolor': COLORS['background'],
         'plot_bgcolor': COLORS['background'],
+        'title': {
+            'text': "Shopping categories",
+        },
         'xaxis': {
-            'fixedrange': True, 'rangemode': 'tozero',
-            'showline': True, 'linewidth': 1, 'linecolor': COLORS['border-medium'],
-            'showgrid': True, 'gridwidth': 1, 'gridcolor': COLORS['border-medium'],
-            'zeroline': True, 'zerolinewidth': 1, 'zerolinecolor': COLORS['border-medium'],
+            'fixedrange': True,
+            'showline': False,
+            'showgrid': False,
+            'zeroline': False,
         },
         'yaxis': {
-            'fixedrange': True, 'rangemode': 'tozero',
-            'showline': True, 'linewidth': 1, 'linecolor': COLORS['border-medium'],
-            'showgrid': True, 'gridwidth': 1, 'gridcolor': COLORS['border-medium'],
-            'zeroline': True, 'zerolinewidth': 1, 'zerolinecolor': COLORS['border-medium'],
+            'fixedrange': True,
+            'showline': False,
+            'showgrid': False,
+            'zeroline': False,
         },
     })
+
+    if errors['list'] or errors['category'] or errors['shop'] or errors['item']:
+        logger.warning("Neccessary Shopping tables do not exist in database!")
+        return fig
+
+    expenses = get_all_lists()
+    expenses = pd.DataFrame(
+        [(liste.date, liste.price, liste.shop.category.name) for liste in expenses.all()],
+        columns=['date', 'price', 'category']
+    )
+    labels = expenses.category
+    fig.add_trace(
+        go.Pie(
+            labels=labels,
+            values=expenses.price,
+            name='This months categories',
+        ),
+        1, 2,
+    )
+
+    this_month = datetime(datetime.now().year, datetime.now().month, 1)
+    expenses.loc[expenses.date < this_month, "price"] = 0
+    fig.add_trace(
+        go.Pie(
+            labels=labels,
+            values=expenses.price,
+            name='This months categories',
+            textposition='inside'
+        ),
+        1, 1,
+    )
+
+    fig.update_traces(
+        hovertemplate="%{label}: %{value:.2f}€ (%{percent})<extra></extra>",
+        marker=dict(
+            colors=[COLORS['foreground']]+COLORS['colorway'],
+        )
+    )
     return fig
 
 
 @app.callback(
-    Output('shopping-nutrition-type-graph', 'figure'),
-    [Input('loading-shopping-nutrition-type-graph', 'loading_state')]
+    Output('shopping-category-total-graph', 'figure'),
+    [Input('loading-shopping-category-total-graph', 'loading_state')],
+    [State('error-store', 'data')]
 )
-def get_shopping_nutrition_type_graph(state):
+def get_shopping_category_total_overview(state, errors):
     fig = go.Figure()
-
     fig.update_layout({
         'autosize': True,
         'barmode': 'overlay',
@@ -316,35 +391,101 @@ def get_shopping_nutrition_type_graph(state):
         'font': {
             'color': COLORS['foreground'],
         },
+        'height': 250,
         'legend': {
-            'orientation': 'h',
+            'orientation': 'v',
         },
         'margin': {
-            'l': 10, 'r': 10, 't': 10, 'b': 10, 'pad': 0,
+            'l': 10, 'r': 10, 'b': 40, 't': 40, 'pad': 0,
         },
         'paper_bgcolor': COLORS['background'],
         'plot_bgcolor': COLORS['background'],
+        'title': {
+            'text': "Total category Overview",
+        },
         'xaxis': {
-            'fixedrange': True, 'rangemode': 'tozero',
-            'showline': True, 'linewidth': 1, 'linecolor': COLORS['border-medium'],
-            'showgrid': True, 'gridwidth': 1, 'gridcolor': COLORS['border-medium'],
-            'zeroline': True, 'zerolinewidth': 1, 'zerolinecolor': COLORS['border-medium'],
+            'fixedrange': True,
+            'showline': False,
+            'showgrid': False,
+            'zeroline': False,
         },
         'yaxis': {
-            'fixedrange': True, 'rangemode': 'tozero',
-            'showline': True, 'linewidth': 1, 'linecolor': COLORS['border-medium'],
-            'showgrid': True, 'gridwidth': 1, 'gridcolor': COLORS['border-medium'],
-            'zeroline': True, 'zerolinewidth': 1, 'zerolinecolor': COLORS['border-medium'],
+            'fixedrange': True,
+            'showline': False,
+            'showgrid': False,
+            'zeroline': False,
         },
     })
+
+    if errors['list'] or errors['category'] or errors['shop'] or errors['item']:
+        logger.warning("Neccessary Shopping tables do not exist in database!")
+        return fig
+
+    expenses = get_all_lists()
+    expenses = pd.DataFrame(
+        [(liste.price, liste.shop.category.name) for liste in expenses.all()],
+        columns=['price', 'category']
+    )
+    fig.add_trace(go.Pie(labels=expenses.category, values=expenses.price))
+
+    fig.update_traces(
+        hoverinfo='label+percent',
+        textinfo='value', textfont_size=20,
+        marker=dict(
+            colors=COLORS['colorway'],
+            line=dict(color='#000000', width=2)
+        )
+    )
     return fig
 
 
 @app.callback(
     Output('shopping-overview-graph', 'figure'),
-    [Input("loading-shopping-overview-graph", 'loading_state')]
+    [Input("loading-shopping-overview-graph", 'loading_state')],
+    [State('error-store', 'data')]
 )
-def get_shopping_total_overview(state):
+def get_shopping_total_overview(state, errors):
+    fig = go.Figure()
+    fig.update_layout({
+        'autosize': True,
+        'barmode': 'stack',
+        'coloraxis': {
+            'colorbar': {
+                'outlinewidth': 0,
+                'bordercolor': COLORS['background'],
+                'bgcolor': COLORS['background'],
+            },
+        },
+        'colorway': COLORS['colorway'][3:],
+        'font': {
+            'color': COLORS['foreground'],
+        },
+        'legend': {
+            'orientation': 'h',
+        },
+        'margin': {
+            'l': 10, 'r': 10, 't': 10, 'b': 10, 'pad': 0,
+        },
+        'paper_bgcolor': COLORS['background'],
+        'plot_bgcolor': COLORS['background'],
+        'xaxis': {
+            'type': 'date',
+            'range': [datetime(datetime.now().year-1, datetime.now().month, datetime.now().day), datetime.now()],
+            'showline': True, 'linewidth': 1, 'linecolor': COLORS['border-medium'],
+            'showgrid': True, 'gridwidth': 1, 'gridcolor': COLORS['border-medium'],
+            'zeroline': True, 'zerolinewidth': 1, 'zerolinecolor': COLORS['border-medium'],
+        },
+        'yaxis': {
+            'showline': True, 'linewidth': 1, 'linecolor': COLORS['border-medium'],
+            'showgrid': True, 'gridwidth': 1, 'gridcolor': COLORS['border-medium'],
+            'zeroline': True, 'zerolinewidth': 1, 'zerolinecolor': COLORS['border-medium'],
+        },
+    })
+
+    if errors['list'] or errors['category'] or errors['shop'] or errors['item']:
+        logger.warning("Neccessary Shopping tables do not exist in database!")
+        return fig
+
     df_days = get_unique_shopping_days()
     shops = get_unique_shopping_shops()
     shops = shops.sort_values('name')
@@ -377,42 +518,5 @@ def get_shopping_total_overview(state):
 
         data.append(bar)
 
-    fig = go.Figure(
-        data=data,
-        layout={
-            'autosize': True,
-            'barmode': 'stack',
-            'coloraxis': {
-                'colorbar': {
-                    'outlinewidth': 0,
-                    'bordercolor': COLORS['background'],
-                    'bgcolor': COLORS['background'],
-                },
-            },
-            'colorway': COLORS['colorway'][3:],
-            'font': {
-                'color': COLORS['foreground'],
-            },
-            'legend': {
-                'orientation': 'h',
-            },
-            'margin': {
-                'l': 10, 'r': 10, 't': 10, 'b': 10, 'pad': 0,
-            },
-            'paper_bgcolor': COLORS['background'],
-            'plot_bgcolor': COLORS['background'],
-            'xaxis': {
-                'type': 'date',
-                'range': [datetime(datetime.now().year-1, datetime.now().month, datetime.now().day), datetime.now()],
-                'showline': True, 'linewidth': 1, 'linecolor': COLORS['border-medium'],
-                'showgrid': True, 'gridwidth': 1, 'gridcolor': COLORS['border-medium'],
-                'zeroline': True, 'zerolinewidth': 1, 'zerolinecolor': COLORS['border-medium'],
-            },
-            'yaxis': {
-                'showline': True, 'linewidth': 1, 'linecolor': COLORS['border-medium'],
-                'showgrid': True, 'gridwidth': 1, 'gridcolor': COLORS['border-medium'],
-                'zeroline': True, 'zerolinewidth': 1, 'zerolinecolor': COLORS['border-medium'],
-            },
-        }
-    )
+    fig.add_trace(data)
     return fig

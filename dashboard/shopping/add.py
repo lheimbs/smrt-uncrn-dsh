@@ -15,6 +15,7 @@ from app import app
 from shopping.sql import (
     get_unique_shopping_items,
     get_unique_shopping_shops,
+    add_shopping_list
 )
 
 logger = logging.getLogger()
@@ -26,6 +27,13 @@ layout = html.Div(
     className='shopping__add__container',
     children=[
         dcc.Store(id='shopping-save-clear-clicks'),
+        dbc.Alert(
+            id='shopping-status-alert',
+            duration=10000*5,
+            dismissable=True,
+            fade=True,
+            is_open=False,
+        ),
         html.Br(),
         html.Div(
             className='row shopping__add__header',
@@ -112,7 +120,7 @@ layout = html.Div(
                     className='row add__items',
                     children=[
                         html.Div(
-                            className='offset-by-two two columns',
+                            className='offset-by-one two columns',
                             children=[
                                 dcc.Input(
                                     id={
@@ -125,15 +133,67 @@ layout = html.Div(
                             ]
                         ),
                         html.Div(
-                            className='two columns',
+                            className='one column',
                             children=[
                                 dcc.Input(
                                     id={
                                         'type': 'shopping-new-item-price',
                                         'id': n,
                                     },
-                                    placeholder="Item Price...",
+                                    placeholder="Price...",
                                     type='number',
+                                )
+                            ]
+                        ),
+                        html.Div(
+                            className='one column',
+                            children=[
+                                dcc.Input(
+                                    id={
+                                        'type': 'shopping-new-item-amount',
+                                        'id': n,
+                                    },
+                                    min=1,
+                                    value=1,
+                                    placeholder="Amount...",
+                                    type='number',
+                                )
+                            ]
+                        ),
+                        html.Div(
+                            className='one column',
+                            children=[
+                                dcc.Input(
+                                    id={
+                                        'type': 'shopping-new-item-volume',
+                                        'id': n,
+                                    },
+                                    placeholder="Volume...",
+                                )
+                            ]
+                        ),
+                        html.Div(
+                            className='one column',
+                            children=[
+                                dcc.Input(
+                                    id={
+                                        'type': 'shopping-new-item-ppv',
+                                        'id': n,
+                                    },
+                                    placeholder="€/Vol...",
+                                )
+                            ]
+                        ),
+                        html.Div(
+                            className='one column',
+                            children=[
+                                dcc.Checklist(
+                                    id={
+                                        'type': 'shopping-new-item-sale',
+                                        'id': n,
+                                    },
+                                    options=[{'label': 'Sale', 'value': 'sale'}],
+                                    value=[],
                                 )
                             ]
                         ),
@@ -150,7 +210,7 @@ layout = html.Div(
                             ]
                         ),
                         html.Div(
-                            className='offset-by-one column one column',
+                            className='one column',
                             children=[
                                 html.Button(
                                     "Remove Item",
@@ -191,11 +251,7 @@ layout = html.Div(
                 html.Div(
                     className='three columns',
                     children=[
-                        dbc.Alert(
-                            id='shopping-status-alert',
-                            duration=10000,
-                            fade=True,
-                        ),
+
                     ]
                 ),
             ]
@@ -207,10 +263,16 @@ layout = html.Div(
 @app.callback(
     Output('shopping-shops-store', 'data'),
     [Input('shopping-shops-store', 'modified_timestamp')],
-    [State('shopping-shops-store', 'data')],
+    [
+        State('shopping-shops-store', 'data'),
+        State('error-store', 'data'),
+    ]
 )
-def init_shops_store(last_modified, data):
+def init_shops_store(last_modified, data, errors):
     logger.debug("Updating saved Stores in Database...")
+    if errors['shop']:
+        logger.warning("Shops table does not exist.")
+        return []
     return [html.Option(value=val) for val in get_unique_shopping_shops().name]
 
 
@@ -226,10 +288,16 @@ def get_shopping_shops(data):
 @app.callback(
     Output('shopping-products-store', 'data'),
     [Input('shopping-products-store', 'modified_timestamp')],
-    [State('shopping-products-store', 'data')],
+    [
+        State('shopping-products-store', 'data'),
+        State('error-store', 'data'),
+    ],
 )
-def init_products_store(last_modified, data):
+def init_products_store(last_modified, data, errors):
     logger.debug("Updating saved Items in Database...")
+    if errors['shop']:
+        logger.warning("Items table does not exist.")
+        return []
     return [html.Option(value=val) for val in get_unique_shopping_items().name]
 
 
@@ -249,7 +317,7 @@ def get_shopping_products(data):
 )
 def shopping_manage_items(n_clicks, indexes, old_shopping_add_list):
     logger.info("Update Shopping items list called.")
-    logger.info(f"      Indexes: {indexes}.")
+    logger.info(f"Indexes: {indexes}.")
 
     if any(indexes):
         # Remove item from list
@@ -267,7 +335,7 @@ def shopping_manage_items(n_clicks, indexes, old_shopping_add_list):
             className='row add__items',
             children=[
                 html.Div(
-                    className='offset-by-two two columns',
+                    className='offset-by-one two columns',
                     children=[
                         dcc.Input(
                             id={
@@ -280,15 +348,67 @@ def shopping_manage_items(n_clicks, indexes, old_shopping_add_list):
                     ]
                 ),
                 html.Div(
-                    className='two columns',
+                    className='one column',
                     children=[
                         dcc.Input(
                             id={
                                 'type': 'shopping-new-item-price',
                                 'id': n_clicks+N_SHOPPING_ITEMS-1,
                             },
-                            placeholder="Item Price...",
+                            placeholder="Price...",
                             type='number',
+                        )
+                    ]
+                ),
+                html.Div(
+                    className='one column',
+                    children=[
+                        dcc.Input(
+                            id={
+                                'type': 'shopping-new-item-amount',
+                                'id': n_clicks+N_SHOPPING_ITEMS-1,
+                            },
+                            min=1,
+                            value=1,
+                            placeholder="Amount...",
+                            type='number',
+                        )
+                    ]
+                ),
+                html.Div(
+                    className='one column',
+                    children=[
+                        dcc.Input(
+                            id={
+                                'type': 'shopping-new-item-volume',
+                                'id': n_clicks+N_SHOPPING_ITEMS-1,
+                            },
+                            placeholder="Volume...",
+                        )
+                    ]
+                ),
+                html.Div(
+                    className='one column',
+                    children=[
+                        dcc.Input(
+                            id={
+                                'type': 'shopping-new-item-ppv',
+                                'id': n_clicks+N_SHOPPING_ITEMS-1,
+                            },
+                            placeholder="Price/Volume...",
+                        )
+                    ]
+                ),
+                html.Div(
+                    className='one column',
+                    children=[
+                        dcc.Checklist(
+                            id={
+                                'type': 'shopping-new-item-sale',
+                                'id': n_clicks+N_SHOPPING_ITEMS-1,
+                            },
+                            options=[{'label': 'Sale', 'value': 'sale'}],
+                            value=[],
                         )
                     ]
                 ),
@@ -305,7 +425,7 @@ def shopping_manage_items(n_clicks, indexes, old_shopping_add_list):
                     ]
                 ),
                 html.Div(
-                    className='offset-by-one column one column',
+                    className='one column',
                     children=[
                         html.Button(
                             "Remove Item",
@@ -322,61 +442,83 @@ def shopping_manage_items(n_clicks, indexes, old_shopping_add_list):
 
 
 @app.callback(
-    [Output('shopping-status-alert', 'children'),
-     Output('shopping-status-alert', 'className'),
-     Output('shopping-status-alert', 'is_open')],
+    [
+        Output('shopping-status-alert', 'children'),
+        Output('shopping-status-alert', 'className'),
+        Output('shopping-status-alert', 'is_open')
+    ],
     [Input('shopping-submit-list', 'n_clicks')],
-    [State('shopping-new-list-date', 'date'),
-     State('shopping-new-price', 'value'),
-     State('shopping-new-shop', 'value'),
-     State({'type': 'shopping-new-item', 'id': ALL}, 'value'),
-     State({'type': 'shopping-new-item-price', 'id': ALL}, 'value'),
-     State({'type': 'shopping-new-item-note', 'id': ALL}, 'value')]
+    [
+        State('shopping-new-list-date', 'date'),
+        State('shopping-new-price', 'value'),
+        State('shopping-new-shop', 'value'),
+        State({'type': 'shopping-new-item', 'id': ALL}, 'value'),
+        State({'type': 'shopping-new-item-price', 'id': ALL}, 'value'),
+        State({'type': 'shopping-new-item-amount', 'id': ALL}, 'value'),
+        State({'type': 'shopping-new-item-volume', 'id': ALL}, 'value'),
+        State({'type': 'shopping-new-item-ppv', 'id': ALL}, 'value'),
+        State({'type': 'shopping-new-item-sale', 'id': ALL}, 'value'),
+        State({'type': 'shopping-new-item-note', 'id': ALL}, 'value'),
+        State('error-store', 'data')
+    ]
 )
-def save_shopping_list(submit_clicks, date, price, shop, items, prices, notes):
-    logger.debug(f"Save shopping list called. button clicks: {submit_clicks}.")
-    logger.debug(f"Items: {date, price, shop, items, prices, notes}.")
+def save_shopping_list(submit_clicks, date, price, shop, items, prices, amounts, volumes, ppvs, sales, notes, errors):
     if submit_clicks is None:
-        return "", "", False
+        return '', '', False
 
-    shopping_list_prelim = pd.DataFrame(data={
-        'Date': datetime.strptime(date, '%Y-%m-%d') if date else None,
-        'Payment': float(price) if price else None,
-        'Shop': shop,
-        'Product': items,
-        'Price': prices,
-        'Note': notes,
-    })
-    logger.debug(f"prelim: {shopping_list_prelim}.")
-    shopping_list = shopping_list_prelim.replace(r'^\s*$', np.nan, regex=True, inplace=True)
-    shopping_list = shopping_list_prelim.dropna(subset=['Product', 'Price'], how='all')
-    logger.debug(f"after drop: {shopping_list}.")
-    if shopping_list.empty:
-        return "Pelase add at least one product to the list.", "shopping_status_alert_warning", True
+    elif errors['list'] or errors['category'] or errors['shop'] or errors['item']:
+        logger.warning("Neccessary Shopping tables do not exist in database!")
+        success = False
+        info = [html.P("Neccessary Shopping tables do not exist in database!")]
 
-    bad_entry_list = []
-    if shopping_list.Date.isna().any():
-        bad_entry_list.append(html.Li("Date is missing."))
-    if shopping_list.Payment.isna().any():
-        bad_entry_list.append(html.Li("Sum total is missing."))
-    if shopping_list.Shop.isna().any():
-        bad_entry_list.append(html.Li("Shop is missing."))
-    if shopping_list.Product.isna().any():
-        missing_products = shopping_list.Product.isna()
-        bad_prices = [str(pproduct) for pproduct in shopping_list.Price[missing_products].tolist()]
-        bad_entry_list.append(html.Li("These Products' price is missing: " + ", ".join(bad_prices)))
-    if shopping_list.Price.isna().any():
-        missing_prices = shopping_list.Price.isna()
-        bad_products = [str(pprice) for pprice in shopping_list.Product[missing_prices].tolist()]
-        bad_entry_list.append(html.Li("These Products' price is missing: " + ", ".join(bad_products)))
-
-    if bad_entry_list:
-        children = [html.H6("Can't add shopping list:"), html.Ul(bad_entry_list)]
-        return children, "shopping_status_alert_fail", True
     else:
-        logger.debug(f"Pandas Dataframe Shopping List: {shopping_list}")
-        sql_data.add_shopping_list(shopping_list)
-        return "Successfully added shopping list", "shopping_status_alert_success", True
+        date = datetime.strptime(date, '%Y-%m-%d')
+        logger.debug(f"Save shopping list called. List: {date, price, shop}. Button clicks: {submit_clicks}.")
+        prices = [float(price) if price else None for price in prices]
+        items_complete = pd.DataFrame(data={
+            'Product': items,
+            'Price': prices,
+            'Amount': amounts,
+            'Volume': volumes,
+            'PPV': ppvs,
+            'Sale': [True if sale else False for sale in sales],
+            'Note': notes,
+        })
+
+        logger.debug(f"prelim:\n{items_complete}.")
+        shopping_list = items_complete.replace(r'^\s*$', np.nan, regex=True, inplace=True)
+        shopping_list = items_complete.dropna(subset=['Product', 'Price'], how='all')
+        logger.debug(f"after drop:\n{shopping_list}.")
+
+        missing = []
+        if not price:
+            missing.append(html.Li("Please add a total Payment for this shopping list."))
+        if not shop:
+            missing.append(html.Li("Please add a shop for this shopping list."))
+        if not date:
+            missing.append(html.Li("Please select a date for this shopping list."))
+
+        missing += parse_add_items(shopping_list)
+
+        if missing:
+            children = [html.H6("Can't add shopping list:"), html.Hr(), html.Ul(missing)]
+            success = False
+            info = children
+        else:
+            success, info = add_shopping_list(date, price, shop, shopping_list)
+
+    if success:
+        return [
+            html.H6('Success'),
+            html.Hr(),
+            html.P('Successfully added provided list to database.')
+        ], 'shopping_status_alert_success', True
+    else:
+        return [
+            html.H6('Error'),
+            html.Hr(),
+            *info
+        ], 'shopping_status_alert_fail', True
 
 
 @app.callback(
@@ -407,3 +549,24 @@ def init_shopping_clear_clicks_store(n_clicks):
         return {'clicks': 0}
     else:
         return {'clicks': n_clicks}
+
+
+def parse_add_items(shopping_list):
+    missing = []
+
+    if shopping_list.empty:
+        missing.append(html.Li("Please supply at least one item with a price for this shopping list."))
+    else:
+        if shopping_list.Product.isna().any():
+            missing_products = shopping_list.Product.isna()
+            bad_prices = [str(pproduct) for pproduct in shopping_list.Price[missing_products].tolist()]
+            missing.append(html.Li("These Products' price is missing: " + ", ".join(bad_prices)))
+        if shopping_list.Price.isna().any():
+            missing_prices = shopping_list.Price.isna()
+            bad_products = [str(pprice) for pprice in shopping_list.Product[missing_prices].tolist()]
+            missing.append(html.Li("These Products' price is missing: " + ", ".join(bad_products)))
+        if shopping_list.Amount.isna().any():
+            missing_amounts = shopping_list.Amount.isna()
+            bad_products = [str(amount) for amount in shopping_list.Product[missing_amounts].tolist()]
+            missing.append(html.Li("These Products' amount is invalid: " + ", ".join(bad_products)))
+    return missing
