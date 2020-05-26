@@ -2,7 +2,7 @@
 
 # from sqlalchemy import Column, Integer, DateTime, String
 # from models.db import ProbeBase
-from app import db
+from ..app import db
 
 class ProbeRequest(db.Model):
     __tablename__ = 'probe-request'

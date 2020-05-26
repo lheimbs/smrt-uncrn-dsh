@@ -13,9 +13,9 @@ import plotly.graph_objects as go
 from dash.dependencies import Input, Output, State
 from plotly.subplots import make_subplots
 
-import graph_helper
-from app import app, COLORS
-from shopping.sql import (
+from .. import graph_helper
+from ..app import app, COLORS
+from .sql import (
     get_shopping_expenses_by_date,
     get_unique_shopping_days,
     get_unique_shopping_shops,

@@ -11,8 +11,8 @@ import dash_bootstrap_components as dbc
 from dash.dependencies import Input, Output, State, ALL
 from dash.exceptions import PreventUpdate
 
-from app import app
-from shopping.sql import (
+from ..app import app
+from .sql import (
     get_unique_shopping_items,
     get_unique_shopping_shops,
     add_shopping_list
@@ -316,8 +316,8 @@ def get_shopping_products(data):
     [State('shopping-add-items-list', 'children')]
 )
 def shopping_manage_items(n_clicks, indexes, old_shopping_add_list):
-    logger.info("Update Shopping items list called.")
-    logger.info(f"Indexes: {indexes}.")
+    logger.debug("Update Shopping items list called.")
+    logger.debug(f"Indexes: {indexes}.")
 
     if any(indexes):
         # Remove item from list
@@ -531,7 +531,7 @@ def save_shopping_list(submit_clicks, date, price, shop, items, prices, amounts,
      State('shopping-save-clear-clicks', 'data')]
 )
 def clear_shopping_list(n_clicks, items, old_clicks):
-    logger.info(f"Clear Shopping item values called. clicks: new: {n_clicks} old: {old_clicks}.")
+    logger.debug(f"Clear Shopping item values called. clicks: new: {n_clicks} old: {old_clicks}.")
     if n_clicks is None or n_clicks <= old_clicks['clicks']:
         raise PreventUpdate
     empty = ['' for _ in items]

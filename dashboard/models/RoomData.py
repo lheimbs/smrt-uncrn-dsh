@@ -2,7 +2,7 @@
 
 # from sqlalchemy import Column, Integer, DateTime, Float
 # from models.db import Base
-from app import db
+from ..app import db
 
 class RoomData(db.Model):
     __tablename__ = 'room-data'

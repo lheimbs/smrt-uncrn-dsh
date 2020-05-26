@@ -5,8 +5,8 @@ from datetime import datetime
 
 import pandas as pd
 
-from app import db
-from models.Shopping import List, Shop
+from ..app import db
+from ..models.Shopping import List, Shop
 
 logger = logging.getLogger()
 

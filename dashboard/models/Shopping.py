@@ -13,7 +13,7 @@
 
 # from models.db import Base
 
-from app import db
+from ..app import db
 
 association_table = db.Table(
     'association',

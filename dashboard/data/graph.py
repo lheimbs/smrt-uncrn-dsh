@@ -12,8 +12,8 @@ import plotly.graph_objects as go
 from dash.dependencies import Input, Output, State
 from plotly.subplots import make_subplots
 
-from app import app, COLORS
-from models.RoomData import RoomData
+from ..app import app, COLORS
+from ..models.RoomData import RoomData
 
 logger = logging.getLogger()
 

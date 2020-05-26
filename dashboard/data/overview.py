@@ -13,8 +13,8 @@ import dash_html_components as html
 import plotly.graph_objects as go
 from dash.dependencies import Input, Output, State, ClientsideFunction
 
-from app import app, db, COLORS
-from models.RoomData import RoomData
+from ..app import app, db, COLORS
+from ..models.RoomData import RoomData
 
 logger = logging.getLogger()
 
@@ -266,6 +266,7 @@ app.clientside_callback(
 )
 def get_altitude(data):
     if data:
+        logger.debug(f"Updating altitude display ({round(data['altitude'], 2)} m).")
         return f"{round(data['altitude'], 2)} m"
     return ''
 
@@ -276,6 +277,7 @@ def get_altitude(data):
 )
 def get_brightness(data):
     if data:
+        logger.debug(f"Updating brightness display ({round(data['brightness'], 2)} lx).")
         return f"{round(data['brightness'], 2)} lx"
     return ''
 
@@ -293,6 +295,7 @@ def update_last_value(n, errors):
         last = RoomData.query.filter(
             RoomData.id == db.session.query(db.func.max(RoomData.id)).scalar()
         ).scalar().to_dict()
+        logger.debug(f"Updating last values store ({last}).")
     return last
 
 
@@ -315,25 +318,26 @@ def update_temperature_store(n, old_data, errors):
             'display': 0
         }
     else:
-        last_temp = db.session.query(RoomData.temperature).filter(
+        last = db.session.query(RoomData.temperature).filter(
             RoomData.id == db.session.query(db.func.max(RoomData.id)).scalar()
         ).scalar()
+        logger.debug(f"Updating temperature store ({round(last, 2)}).")
         if n == 0:
             old_data = {
                 'display': 1,
-                'new': last_temp,
+                'new': last,
                 'old': 0,
                 'min': floor(db.session.query(db.func.min(RoomData.temperature)).scalar()),
                 'max': ceil(db.session.query(db.func.max(RoomData.temperature)).scalar()),
             }
         else:
-            if last_temp > old_data['max']:
-                old_data['max'] = last_temp
-            elif last_temp < old_data['min']:
-                old_data['min'] = last_temp
+            if last > old_data['max']:
+                old_data['max'] = last
+            elif last < old_data['min']:
+                old_data['min'] = last
 
             old_data['old'] = old_data['new']
-            old_data['new'] = last_temp
+            old_data['new'] = last
 
     return old_data
 
@@ -357,25 +361,26 @@ def update_pressure_store(n, old_data, errors):
             'display': 0
         }
     else:
-        last_temp = db.session.query(RoomData.pressure).filter(
+        last = db.session.query(RoomData.pressure).filter(
             RoomData.id == db.session.query(db.func.max(RoomData.id)).scalar()
         ).scalar()
+        logger.debug(f"Updating pressure store ({round(last, 2)}).")
         if n == 0:
             old_data = {
                 'display': 1,
-                'new': last_temp,
+                'new': last,
                 'old': 0,
                 'min': floor(db.session.query(db.func.min(RoomData.pressure)).scalar()),
                 'max': ceil(db.session.query(db.func.max(RoomData.pressure)).scalar()),
             }
         else:
-            if last_temp > old_data['max']:
-                old_data['max'] = last_temp
-            elif last_temp < old_data['min']:
-                old_data['min'] = last_temp
+            if last > old_data['max']:
+                old_data['max'] = last
+            elif last < old_data['min']:
+                old_data['min'] = last
 
             old_data['old'] = old_data['new']
-            old_data['new'] = last_temp
+            old_data['new'] = last
 
     return old_data
 
@@ -399,25 +404,26 @@ def update_humidity_store(n, old_data, errors):
             'display': 0
         }
     else:
-        last_temp = db.session.query(RoomData.humidity).filter(
+        last = db.session.query(RoomData.humidity).filter(
             RoomData.id == db.session.query(db.func.max(RoomData.id)).scalar()
         ).scalar()
+        logger.debug(f"Updating humidity store ({round(last, 2)}).")
         if n == 0:
             old_data = {
                 'display': 1,
-                'new': last_temp,
+                'new': last,
                 'old': 0,
                 'min': floor(db.session.query(db.func.min(RoomData.humidity)).scalar()),
                 'max': ceil(db.session.query(db.func.max(RoomData.humidity)).scalar()),
             }
         else:
-            if last_temp > old_data['max']:
-                old_data['max'] = last_temp
-            elif last_temp < old_data['min']:
-                old_data['min'] = last_temp
+            if last > old_data['max']:
+                old_data['max'] = last
+            elif last < old_data['min']:
+                old_data['min'] = last
 
             old_data['old'] = old_data['new']
-            old_data['new'] = last_temp
+            old_data['new'] = last
 
     return old_data
 

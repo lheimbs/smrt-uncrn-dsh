@@ -1,41 +1,21 @@
 #!/usr/bin/env python3
 
 import os
-import argparse
 import logging
 
 import dash_core_components as dcc
 import dash_html_components as html
 from dash.dependencies import Input, Output
 
-# setup logging
-parser = argparse.ArgumentParser()
-parser.add_argument(
-    '-d', '--debug',
-    help="Print debugging statements",
-    action="store_const", dest="loglevel", const=logging.DEBUG,
-    default=logging.WARNING,
-)
-parser.add_argument(
-    '-v', '--verbose',
-    help="Be verbose",
-    action="store_const", dest="loglevel", const=logging.INFO,
-)
+# page import here, to get the supplied log level in modules (# noqa E420?)
+from .app import app, db, DATABASE_PATH, DATABASE_PROBES_PATH
+from . import shopping
+from . import general
+from . import data
+from . import mqtt
+# from .shopping 
 
-args = parser.parse_args()
-logging.basicConfig(
-    format="%(module)15s - %(levelname)-8s : %(message)s",
-    level=args.loglevel
-)
 logger = logging.getLogger()
-
-
-# page import here, to get the supplied log level in modules
-from app import app, db, DATABASE_PATH, DATABASE_PROBES_PATH    # noqa: E402
-from general import general       # noqa: E402
-from data import data       # noqa: E402
-from mqtt import mqtt       # noqa: E402
-from shopping import shopping       # noqa: E402
 
 
 def precheck_errors():
@@ -65,7 +45,7 @@ def precheck_errors():
 
 errors, errors_dict = precheck_errors()
 
-app.layout = html.Div(
+layout = html.Div(
     className="wrapper",
     children=[
         # store site's settings
@@ -148,6 +128,7 @@ def update_error_store(_):
 
 
 if __name__ == "__main__":
+    app.layout = layout
     app.run_server(debug=True, port=5002, host='0.0.0.0', threaded=True)
     # Deleted 'self.logger.setLevel' from dash.py so debug messages are getting logged in callbacks
     # logging.getLogger('werkzeug').setLevel(logging.ERROR)

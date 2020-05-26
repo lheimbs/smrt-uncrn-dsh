@@ -2,7 +2,7 @@
 
 # from sqlalchemy import Column, Integer, DateTime, String, Boolean
 # from models.db import Base
-from app import db
+from ..app import db
 
 class Mqtt(db.Model):
     __tablename__ = 'mqtt-message'

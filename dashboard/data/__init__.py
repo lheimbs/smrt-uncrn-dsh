@@ -6,9 +6,9 @@ import dash_core_components as dcc
 import dash_html_components as html
 from dash.dependencies import Input, Output
 
-from app import app
-import data.overview
-import data.graph
+from ..app import app
+from . import overview
+from . import graph
 
 logger = logging.getLogger()
 
@@ -45,11 +45,11 @@ layout = html.Div([
               [Input('data-main-tabs', 'value')])
 def render_data_content(tab):
     if tab == 'data-overview-tab':
-        layout = data.overview.layout
+        layout = overview.layout
     elif tab == 'data-graph-tab':
-        layout = data.graph.layout
+        layout = graph.layout
     elif tab == 'data-settings-tab':
         layout = html.Div("Settings")
     else:
-        layout = data.overview.layout
+        layout = overview.layout
     return layout

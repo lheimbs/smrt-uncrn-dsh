@@ -8,8 +8,8 @@ import dash_core_components as dcc
 import dash_html_components as html
 from dash.dependencies import Input, Output
 
-from app import app
-from general import pi_data
+from ..app import app
+from . import pi_data
 
 STATS_INTERVAL = os.environ.get("STATS_INTERVAL", 5000)
 

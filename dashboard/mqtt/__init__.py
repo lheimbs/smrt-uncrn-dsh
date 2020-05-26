@@ -7,8 +7,8 @@ import dash_core_components as dcc
 import dash_html_components as html
 from dash.dependencies import Input, Output, State
 
-from app import app, COLORS
-from mqtt.sql import (
+from ..app import app, COLORS
+from .sql import (
     get_mqtt_topics_as_options,
     get_mqtt_messages_by_topic,
 )

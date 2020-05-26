@@ -2,7 +2,7 @@
 
 # from sqlalchemy import Column, Integer, DateTime, String
 # from models.db import Base
-from app import db
+from ..app import db
 
 class RfData(db.Model):
     __tablename__ = 'rf-data'

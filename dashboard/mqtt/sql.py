@@ -3,8 +3,8 @@
 import logging
 import pandas as pd
 
-from app import db
-from models.Mqtt import Mqtt
+from ..app import db
+from ..models.Mqtt import Mqtt
 
 logger = logging.getLogger()
 
@@ -17,7 +17,7 @@ def get_mqtt_topics_as_options():
 
 def get_mqtt_messages_by_topic(topics, limit):
     messages_dict = []
-    messages = Mqtt.query.filter(Mqtt.topic.in_(topics)).order_by(Mqtt.date).limit(limit)
+    messages = Mqtt.query.filter(Mqtt.topic.in_(topics)).order_by(Mqtt.date.desc()).limit(limit)
     for message in messages:
         message = message.to_dict()
         message.update({'time': message['date'].time()})
