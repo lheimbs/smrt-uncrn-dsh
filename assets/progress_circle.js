@@ -1,3 +1,5 @@
+// source: http://ignitersworld.com/lab/radialIndicator.html#example
+
 window.dash_clientside = Object.assign({}, window.dash_clientside, {
     clientside_2: {
         make_radial_indicator: function(bar_div_id, temperature) {
@@ -26,7 +28,7 @@ window.dash_clientside = Object.assign({}, window.dash_clientside, {
                 initValue : temperature.old,
                 roundCorner : true,
                 displayNumber: ((temperature.display) ? true : false),
-                format: '#### ' + options.unit
+                format: '####.## ' + options.unit
             }); 
 
             //Using Instance
