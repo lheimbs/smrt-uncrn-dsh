@@ -59,21 +59,20 @@ html, body { margin: 0; padding: 0 }
   /* General appearance 
   background-color: #99BB5E;*/
 }
+
 .footer {
-  grid-area: footer;
+    grid-area: footer;
 
-  /* Stick footer to bottom of grid */
-  position: sticky;
-  bottom: 0;
+    /* Stick footer to bottom of grid */
+    position: sticky;
+    bottom: 0;
 
-  /* General appearance 
-  background-color: #FCFF34;
-  text-align: center;*/
-  font-size: 1.2rem;
-  line-height: 1.5;
-  padding: .5rem;
-  height: 7vh;
-  overflow: scroll;
+    /* General appearance 
+    padding: .5rem;
+    text-align: center;*/
+    font-size: 1.2rem;
+    line-height: 1.5;
+    overflow: scroll;
 }
 /* Save footer height to properly set `bottom` and `min-height` for sticky content */
 :root {
