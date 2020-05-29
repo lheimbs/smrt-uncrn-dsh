@@ -1,13 +1,12 @@
 #!/usr/bin/env python3
 # coding=utf-8
 
-import time
 import logging
 import json
 from datetime import datetime
 
 import mqtthandler.sql as sql
-from mqtthandler.detached import detachify
+# from mqtthandler.detached import detachify
 
 logger = logging.getLogger()
 
@@ -16,7 +15,12 @@ def temp_message_to_db(client, userdata, msg):
     logger.debug(f"Add new RoomData reading into database: {payload}.")
 
     curr_time = datetime.now()
-    room_data = json.loads(payload)
+    try:
+        room_data = json.loads(payload)
+    except json.decoder.JSONDecodeError:
+        logger.error("Badly formed payload could not get parsed by json-lib.")
+        return
+
     if 'brightness' not in room_data.keys():
         room_data['brightness'] = 0
 
@@ -28,7 +32,12 @@ def handle_rf_transmission(client, userdata, msg):
     logger.debug(f"Add new RF transmission into database: {payload}.")
 
     curr_time = datetime.now()
-    rf_data = json.loads(payload)
+    try:
+        rf_data = json.loads(payload)
+    except json.decoder.JSONDecodeError:
+        logger.error("Badly formed payload could not get parsed by json-lib.")
+        return
+
     rf_data['pulse_length'] = rf_data.pop('pulse-length')
 
     sql.add_rf_data_to_db(curr_time, **rf_data)
@@ -74,7 +83,10 @@ def handle_probes(client, userdata, msg):
         logger.error("Badly formed payload could not get parsed by json-lib.")
         return
 
-    probe_request['time'] = datetime.fromisoformat(probe_request['time'])
+    try:
+        probe_request['time'] = datetime.fromisoformat(probe_request['time'])
+    except KeyError:
+        logger.error("Badly formed payload. Key 'time' missing from probe request!.")
     sql.add_probe_request(**probe_request)
 
 
