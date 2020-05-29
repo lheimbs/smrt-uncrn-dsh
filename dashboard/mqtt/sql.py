@@ -4,9 +4,10 @@ import logging
 import pandas as pd
 
 from ..app import db
-from ..models.Mqtt import Mqtt
+from models.Mqtt import Mqtt
 
 logger = logging.getLogger()
+
 
 def get_mqtt_topics_as_options():
     topics = []
