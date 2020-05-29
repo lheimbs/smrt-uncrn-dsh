@@ -17,7 +17,7 @@ parser.add_argument(
     action="store_const", dest="loglevel", const=logging.INFO,
 )
 
-args = parser.parse_args()
+args, _ = parser.parse_known_args()
 logging.basicConfig(
     format="%(module)15s - %(levelname)-8s : %(message)s",
     level=args.loglevel
