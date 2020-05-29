@@ -15,13 +15,7 @@ from plotly.subplots import make_subplots
 
 from .. import graph_helper
 from ..app import app, COLORS
-from .sql import (
-    get_shopping_expenses_by_date,
-    get_unique_shopping_days,
-    get_unique_shopping_shops,
-    get_shopping_expenses_per_shop,
-    get_all_lists
-)
+from . import sql
 
 logger = logging.getLogger()
 
@@ -194,7 +188,7 @@ def get_shopping_monthly_overview(state, errors):
     six_months_ago = datetime.now()-relativedelta(months=6)
     six_months_ago = datetime(six_months_ago.year, six_months_ago.month, 1)
 
-    data = get_shopping_expenses_by_date(six_months_ago)
+    data = sql.get_shopping_expenses_by_date(six_months_ago)
     if data.empty:
         logger.warning(f"No shopping entries found since {six_months_ago}.")
         return fig
@@ -211,31 +205,33 @@ def get_shopping_monthly_overview(state, errors):
         )
     )
 
-    y1_max, y1_min = max(max_min[0]), min(max_min[1])
-    y2_min, y2_max = (
-        data[data.date.dt.month == curr_month].price.min(),
-        data[data.date.dt.month == curr_month].price.max(),
-    )
-    y1_range_min, y1_range_max, y1_dtick, y2_range_min, y2_range_max, y2_dtick = graph_helper.calculate_ticks(
-        y1_min, y1_max, y2_min, y2_max
-    )
+    use_max_min = True
+    if max_min:
+        y1_max, y1_min = max(max_min[0]), min(max_min[1])
+        y2_min, y2_max = (
+            data[data.date.dt.month == curr_month].price.min(),
+            data[data.date.dt.month == curr_month].price.max(),
+        )
+        y1_range_min, y1_range_max, y1_dtick, y2_range_min, y2_range_max, y2_dtick = graph_helper.calculate_ticks(
+            y1_min, y1_max, y2_min, y2_max
+        )
 
-    fig.update_layout({
-        'yaxis': {
-            'range': [y2_range_min, y2_range_max],
-            'dtick': y2_dtick,
-        },
-        'yaxis2': {
-            'side': 'left',
-            'range': [y1_range_min, y1_range_max],
-            'dtick': y1_dtick,
-            'overlaying': 'y',
-            'fixedrange': True, 'rangemode': 'tozero',
-            'showline': True, 'linewidth': 1, 'linecolor': COLORS['border-medium'],
-            'showgrid': True, 'gridwidth': 1, 'gridcolor': COLORS['border-medium'],
-            'zeroline': True, 'zerolinewidth': 1, 'zerolinecolor': COLORS['border-medium'],
-        },
-    })
+        fig.update_layout({
+            'yaxis': {
+                'range': [y2_range_min, y2_range_max],
+                'dtick': y2_dtick,
+            },
+            'yaxis2': {
+                'side': 'left',
+                'range': [y1_range_min, y1_range_max],
+                'dtick': y1_dtick,
+                'overlaying': 'y',
+                'fixedrange': True, 'rangemode': 'tozero',
+                'showline': True, 'linewidth': 1, 'linecolor': COLORS['border-medium'],
+                'showgrid': True, 'gridwidth': 1, 'gridcolor': COLORS['border-medium'],
+                'zeroline': True, 'zerolinewidth': 1, 'zerolinecolor': COLORS['border-medium'],
+            },
+        })
 
     for month in unique_months:
         months_data = pd.DataFrame({
@@ -337,11 +333,16 @@ def get_shopping_expenses_type_overview(state, errors):
         logger.warning("Neccessary Shopping tables do not exist in database!")
         return fig
 
-    expenses = get_all_lists()
+    expenses = sql.get_all_lists()
+
+    if not expenses.count():
+        return fig
+
     expenses = pd.DataFrame(
-        [(liste.date, liste.price, liste.shop.category.name) for liste in expenses.all()],
+        [(liste.date, liste.price, liste.shop.category.name) for liste in expenses],
         columns=['date', 'price', 'category']
     )
+
     labels = expenses.category
     fig.add_trace(
         go.Pie(
@@ -425,9 +426,12 @@ def get_shopping_category_total_overview(state, errors):
         logger.warning("Neccessary Shopping tables do not exist in database!")
         return fig
 
-    expenses = get_all_lists()
+    expenses = sql.get_all_lists()
+    if not expenses.count():
+        return fig
+
     expenses = pd.DataFrame(
-        [(liste.price, liste.shop.category.name) for liste in expenses.all()],
+        [(liste.price, liste.shop.category.name) for liste in expenses],
         columns=['price', 'category']
     )
     fig.add_trace(go.Pie(labels=expenses.category, values=expenses.price))
@@ -490,12 +494,12 @@ def get_shopping_total_overview(state, errors):
         logger.warning("Neccessary Shopping tables do not exist in database!")
         return fig
 
-    df_days = get_unique_shopping_days()
-    shops = get_unique_shopping_shops()
+    df_days = sql.get_unique_shopping_days()
+    shops = sql.get_unique_shopping_shops()
     shops = shops.sort_values('name')
 
     for shop in shops.name:
-        expense = get_shopping_expenses_per_shop(shop)
+        expense = sql.get_shopping_expenses_per_shop(shop)
         df_days = df_days.join(expense)
         bar = go.Bar(
             name=shop,
