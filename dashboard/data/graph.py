@@ -13,7 +13,7 @@ from dash.dependencies import Input, Output, State
 from plotly.subplots import make_subplots
 
 from ..app import app, COLORS
-from ..models.RoomData import RoomData
+from models.RoomData import RoomData
 
 logger = logging.getLogger()
 
@@ -23,47 +23,64 @@ layout = html.Div(
         dcc.Store(id='data-history-settings-state'),
         html.Div(
             id='data-history-overlay',
-            className="overlay",
+            className="sidebar",
             children=[
-                html.H6("Choose display data:"),
-                dcc.Checklist(
-                    id="data-history-values",
-                    options=[
-                        {'label': 'Temperature', 'value': 'temperature'},
-                        {'label': 'Humidity', 'value': 'humidity'},
-                        {'label': 'Pressure', 'value': 'pressure'},
-                        {'label': 'Altitude', 'value': 'altitude', 'disabled': False},
-                        {'label': 'Brightness', 'value': 'brightness'},
+                html.Div(
+                    className='card',
+                    children=[
+                        html.H6("Choose display data:"),
+                        dcc.Checklist(
+                            id="data-history-values",
+                            options=[
+                                {'label': 'Temperature', 'value': 'temperature'},
+                                {'label': 'Humidity', 'value': 'humidity'},
+                                {'label': 'Pressure', 'value': 'pressure'},
+                                {'label': 'Altitude', 'value': 'altitude', 'disabled': False},
+                                {'label': 'Brightness', 'value': 'brightness'},
+                            ],
+                            value=['temperature', 'humidity', 'pressure'],
+                            labelStyle={'display': 'block'},
+                            persistence_type='memory',
+                            className='checklist',
+                        ),
+                    ]
+                ),
+                html.Div(
+                    className='card',
+                    style={'paddingBottom': '10px'},
+                    children=[
+                        html.H6("Choose Daterange:"),
+                        dcc.DatePickerRange(
+                            id="data-history-date-picker",
+                            start_date_placeholder_text="Start Period",
+                            end_date_placeholder_text="End Period",
+                            # minimum_nights=1,
+                            display_format='DD MM Y',
+                            month_format='MM YYYY',
+                            day_size=35,
+                            first_day_of_week=1,
+                            persistence=True,
+                            persistence_type='session',
+                            updatemode='bothdates',
+                            with_full_screen_portal=True,
+                        ),
                     ],
-                    value=['temperature', 'humidity', 'pressure'],
-                    labelStyle={'display': 'block'},
-                    persistence_type='memory',
-                    className='checklist',
                 ),
-                html.H6("Choose Daterange:"),
-                dcc.DatePickerRange(
-                    id="data-history-date-picker",
-                    start_date_placeholder_text="Start Period",
-                    end_date_placeholder_text="End Period",
-                    # minimum_nights=1,
-                    display_format='DD MM Y',
-                    month_format='MM YYYY',
-                    day_size=35,
-                    first_day_of_week=1,
-                    persistence=True,
-                    persistence_type='session',
-                    updatemode='bothdates',
-                    with_full_screen_portal=True,
+                html.Br(),
+                html.Div(
+                    style={'display': 'flex', 'justifyContent': 'center'},
+                    children=[
+                        html.Button('Show graph', id='data-history-show-data', style={'marginTop': '10px'}),
+                    ],
                 ),
-                html.Hr(),
-                html.Button('Show graph', id='data-history-show-data'),
             ],
         ),
-        html.Button('Settings', id='data-history-show-settings'),
         html.Div(
+            id='data-hist-sidebar-content',
             className="one_row",
             children=[
                 dcc.Store(id='data-history-graph-current-width'),
+                html.Button('Settings', id='data-history-show-settings', style={'marginTop': '10px'}),
                 dcc.Loading(id="loading-1", color=COLORS['foreground'], children=[
                     dcc.Graph(
                         style={'height': '80vh'},
@@ -108,6 +125,7 @@ layout = html.Div(
 @app.callback(
     [
         Output('data-history-overlay', 'style'),
+        Output('data-hist-sidebar-content', 'style'),
         Output('data-history-settings-state', 'data'),
     ],
     [
@@ -119,8 +137,8 @@ layout = html.Div(
 )
 def display_data_history_overlay(state, data_clicks, hist_clicks, settings_state):
     if settings_state:
-        return {'display': 'none'}, False
-    return {'display': 'block'}, True
+        return {'width': '0'}, {'marginLeft': '0'}, False
+    return {'width': '15vw'}, {'marginLeft': '15vw'}, True
 
 
 app.clientside_callback(
@@ -271,6 +289,9 @@ def update_history_graph(start_date, end_date, chosen_values, current_width, err
     data_query = RoomData.query.filter(RoomData.date.between(start_date, end_date))
 
     data_count = data_query.count()
+    if not data_count:
+        return fig
+
     nth_row = floor(data_count / current_width) if data_count > current_width else 1
     nth_row = 60 if nth_row > 60 else nth_row
 
@@ -278,13 +299,16 @@ def update_history_graph(start_date, end_date, chosen_values, current_width, err
     data = pd.DataFrame([room_data.to_dict() for room_data in data_query.filter(RoomData.id % nth_row == 0)])
 
     for i, value in enumerate(chosen_values):
-        # Design of Buterworth filter
-        filter_order = 2    # Filter order
-        cutoff_freq = 0.2   # Cutoff frequency
-        B, A = signal.butter(filter_order, cutoff_freq, output='ba')
+        if data[value].count() > 10:
+            # Design of Buterworth filter
+            filter_order = 2    # Filter order
+            cutoff_freq = 0.2   # Cutoff frequency
+            B, A = signal.butter(filter_order, cutoff_freq, output='ba')
 
-        # Apply filter
-        tempf = signal.filtfilt(B, A, data[value], axis=0)
+            # Apply filter
+            tempf = signal.filtfilt(B, A, data[value])
+        else:
+            tempf = data[value]
 
         fig.add_trace(
             go.Scatter(
