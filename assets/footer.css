@@ -1,0 +1,11 @@
+
+.footer {
+    background-color: var(--error);
+    color: var(--background);
+    text-align: center;
+    border-radius: 15px 15px 0px 0px;
+    scrollbar-width: none;
+    height: -moz-fit-content;
+    max-height: 7vh;
+    z-index: 5;
+}
