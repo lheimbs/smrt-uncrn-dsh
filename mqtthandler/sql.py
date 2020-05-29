@@ -1,21 +1,15 @@
-
-import os
-import sys
-import inspect
+#!/usr/bin/env python3
 
 from sqlalchemy import exc
 
-currentdir = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
-parentdir = os.path.dirname(currentdir)
-sys.path.insert(0, parentdir+'/dashboard')
+from dashboard.app import app, db      # noqa: E402
+from models.Mqtt import Mqtt      # noqa: E402
+from models.State import State      # noqa: E402
+from models.RfData import RfData      # noqa: E402
+from models.RoomData import RoomData      # noqa: E402
+from models.Tablet import TabletBattery      # noqa: E402
+from models.ProbeRequest import ProbeRequest      # noqa: E402
 
-from dashboard.app import app, db              # noqa: E402
-from dashboard.models.Mqtt import Mqtt      # noqa: E402
-from dashboard.models.RfData import RfData      # noqa: E402
-from dashboard.models.RoomData import RoomData      # noqa: E402
-from dashboard.models.Tablet import TabletBattery      # noqa: E402
-from dashboard.models.ProbeRequest import ProbeRequest      # noqa: E402
-from dashboard.models.State import State      # noqa: E402
 
 def add_mqtt_to_db(time, topic, payload, qos, retain):
     new_data = Mqtt(
@@ -54,7 +48,7 @@ def add_rf_data_to_db(curr_time, decimal, length, binary, pulse_length, protocol
     new_data = RfData(
         date=curr_time,
         decimal=decimal,
-        length=length,
+        bits=length,
         binary=binary,
         pulse_length=pulse_length,
         protocol=protocol
