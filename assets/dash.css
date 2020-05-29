@@ -148,7 +148,7 @@ DateMonthPicker
 
 .DateRangePickerInput__withBorder {
     border-radius: 2px;
-    border: 1px solid var(--border-light);
+    /* border: 1px solid var(--border-light); */
 }
 
 .DateInput_input {
