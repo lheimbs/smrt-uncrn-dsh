@@ -4,7 +4,9 @@ import logging
 import dash
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
-# from flask_migrate import Migrate
+
+from werkzeug.utils import import_string
+from flask_migrate import Migrate
 
 logger = logging.getLogger()
 
@@ -12,25 +14,39 @@ external_scripts = [
     # 'https://raw.githubusercontent.com/kimmobrunfeldt/progressbar.js/master/dist/progressbar.min.js',
 ]
 
-DATABASE_PATH = '/home/lenny/projects/smrt-uncrn-dsh/dashboard/data_prod.db'  # '/home/lenny/projects/data_new.db'
-DATABASE_PROBES_PATH = '/home/lenny/probe-requests.db'
-
 # FLASK SETUP
 server = Flask(__name__, static_folder='static')
-server.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite:///{DATABASE_PATH}'
-server.config['SQLALCHEMY_BINDS'] = {
-    'probe-requests': f'sqlite:///{DATABASE_PROBES_PATH}'
-}
+
+if server.config['ENV'] == 'development':
+    cfg = import_string('config.config.DevelopmentConfig')()
+elif server.config['ENV'] == 'testing':
+    cfg = import_string('config.config.TestingConfig')()
+else:
+    cfg = import_string('config.config.ProductionConfig')()
+server.config.from_object(cfg)
+# server.config.from_pyfile('config/config.py')
+# server.config.from_envvar('APP_CONFIG_FILE')
+
+# server.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite:///{DATABASE_PATH}'
+# server.config['SQLALCHEMY_BINDS'] = {
+#     'probe-requests': f'sqlite:///probe_requests.db'
+# }
 server.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 server.logger = logger
 
 db = SQLAlchemy(server)
-# from models.RoomData import RoomData
-# from models.Shopping import Shop, List, Item, Category
-# from models.RfData import RfData
-# from models.ProbeRequest import ProbeRequest
-# from models.Mqtt import Mqtt
-# migrate = Migrate(server, db)
+from models.RoomData import RoomData                       # noqa E402
+from models.Shopping import Shop, List, Item, Category     # noqa E402
+from models.RfData import RfData                           # noqa E402
+from models.ProbeRequest import ProbeRequest               # noqa E402
+from models.Mqtt import Mqtt                               # noqa E402
+from models.State import State                             # noqa E402
+from models.Tablet import TabletBattery                    # noqa E402
+migrate = Migrate(server, db)
+
+if server.config['ENV'] == 'development':
+    db.drop_all()
+    db.create_all()
 
 # DASH SETUP
 app = dash.Dash(
@@ -40,7 +56,6 @@ app = dash.Dash(
     # routes_pathname_prefix='/graph/'
 )
 app.logger = logger
-app.logger.setLevel(logging.DEBUG)
 app.title = "Smrt Uncrn Dsh"
 app.config['suppress_callback_exceptions'] = True
 
