@@ -14,7 +14,7 @@ import plotly.graph_objects as go
 from dash.dependencies import Input, Output, State, ClientsideFunction
 
 from ..app import app, db, COLORS
-from ..models.RoomData import RoomData
+from models.RoomData import RoomData
 
 logger = logging.getLogger()
 
@@ -486,13 +486,16 @@ def update_day_graph(interval, last):
     day_data = pd.DataFrame([room_data.to_dict() for room_data in day_data])
 
     if not day_data.empty:
-        # Design of Buterworth filter
-        filter_order = 2    # Filter order
-        cutoff_freq = 0.2   # Cutoff frequency
-        B, A = signal.butter(filter_order, cutoff_freq, output='ba')
+        if day_data['temperature'].count() > 10:
+            # Design of Buterworth filter
+            filter_order = 2    # Filter order
+            cutoff_freq = 0.2   # Cutoff frequency
+            B, A = signal.butter(filter_order, cutoff_freq, output='ba')
 
-        # Apply filter
-        tempf = signal.filtfilt(B, A, day_data['temperature'])
+            # Apply filter
+            tempf = signal.filtfilt(B, A, day_data['temperature'])
+        else:
+            tempf = day_data['temperature']
 
         fig.add_trace(go.Scatter(
             x=day_data['date'],
