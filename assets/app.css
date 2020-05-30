@@ -11,6 +11,18 @@ div {
     border: 1px solid #dddddd;
 }
 */
+#raw-shopping-shops-data .dash-spreadsheet-menu {
+    display: none;
+}
+
+#raw-room-data-data,
+#raw-probes-data,
+#raw-room-data-data,
+#raw-mqtt-data,
+#raw-shopping-data,
+#raw-rf-data-data {
+    padding: 1%;
+}
 
 .settings {
     border: 1px solid var(--border-dark);
