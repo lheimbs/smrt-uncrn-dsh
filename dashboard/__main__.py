@@ -2,7 +2,8 @@
 import logging
 
 from .app import app, server
-from .index import layout, generate_shopping_data
+from .index import layout
+from .misc.generate_shopping_data import generate_shopping_data
 
 logger = logging.getLogger()
 
