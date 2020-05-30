@@ -114,6 +114,7 @@ def main():
 
     try:
         if server.config['DEBUG']:
+            start_time = time.time()
             rand_time = random.randint(3, 9)
             choice = 'roomdata'
             client.loop_start()
@@ -123,6 +124,9 @@ def main():
                 if time.time() % rand_time == 0:
                     choice = random_publish(choice, server.config['MQTT_PORT'])
                     rand_time = random.randint(10, 90)
+                elif time.time() - start_time >= 60:
+                    random_publish('roomdata', server.config['MQTT_PORT'])
+                    start_time = time.time()
             else:
                 client.loop()
 

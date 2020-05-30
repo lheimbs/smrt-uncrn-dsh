@@ -76,4 +76,4 @@ def random_publish(choice, port):
             port=port,
         )
 
-    return random.choice(['rfdata', 'battery', 'proberequest', 'roomdata', 'state', 'charging'])
+    return random.choice(['rfdata', 'battery', 'proberequest', 'state', 'charging'])
