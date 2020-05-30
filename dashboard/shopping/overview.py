@@ -13,7 +13,7 @@ import plotly.graph_objects as go
 from dash.dependencies import Input, Output, State
 from plotly.subplots import make_subplots
 
-from .. import graph_helper
+from ..misc import graph_helper
 from ..app import app, COLORS
 from . import sql
 

@@ -45,7 +45,7 @@ from models.Tablet import TabletBattery                    # noqa E402
 migrate = Migrate(server, db)
 
 if server.config['ENV'] == 'development':
-    db.drop_all()
+    # db.drop_all()
     db.create_all()
 
 # DASH SETUP
