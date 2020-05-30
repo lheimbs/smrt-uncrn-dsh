@@ -12,7 +12,7 @@ from .app import app  # , db, server
 from . import shopping
 from . import general
 from . import data
-from . import mqtt
+from . import raw
 # from models.Shopping import List, Shop, Category, Item
 from .misc.precheck_errors import precheck_errors
 
@@ -34,26 +34,26 @@ layout = html.Div(
                     className='custom__main__tabs__container',
                     children=[
                         dcc.Tab(
-                            label="General",
-                            value="general-tab",
-                            className='custom__main__tab',
-                            selected_className='custom__main__tab____selected',
-                        ),
-                        dcc.Tab(
                             label="Data",
                             value="data-tab",
                             className='custom__main__tab',
                             selected_className='custom__main__tab____selected',
                         ),
                         dcc.Tab(
-                            label="MQTT",
-                            value="mqtt-tab",
+                            label="Shopping",
+                            value="shopping-tab",
                             className='custom__main__tab',
                             selected_className='custom__main__tab____selected',
                         ),
                         dcc.Tab(
-                            label="Shopping",
-                            value="shopping-tab",
+                            label="System",
+                            value="system-tab",
+                            className='custom__main__tab',
+                            selected_className='custom__main__tab____selected',
+                        ),
+                        dcc.Tab(
+                            label="RAW",
+                            value="raw-tab",
                             className='custom__main__tab',
                             selected_className='custom__main__tab____selected',
                         ),
@@ -79,12 +79,12 @@ layout = html.Div(
     [Input('main-tabs', 'value')],
 )
 def render_main_content(tab):
-    if tab == 'general-tab':
+    if tab == 'system-tab':
         layout = general.layout
     elif tab == 'data-tab':
         layout = data.layout
-    elif tab == 'mqtt-tab':
-        layout = mqtt.layout
+    elif tab == 'raw-tab':
+        layout = raw.layout
     elif tab == 'shopping-tab':
         layout = shopping.layout
     else:
