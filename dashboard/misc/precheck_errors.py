@@ -7,7 +7,7 @@ logger = logging.getLogger()
 
 
 def precheck_errors():
-    tables = ['room-data', 'rf-data', 'mqtt-message', 'list', 'item', 'shop', 'category']
+    tables = ['room_data', 'rf_data', 'mqtt_messages', 'list', 'item', 'shop', 'category']
     errors_str = []
     errors_dict = {
         'database': False,
@@ -21,7 +21,7 @@ def precheck_errors():
         errors_str.append("ERROR: Database not found.")
         errors_dict['database'] = True
     try:
-        db.session.execute("SELECT 1", bind=db.get_engine(server, 'probe-requests'))
+        db.session.execute("SELECT 1", bind=db.get_engine(server, 'probe_request'))
     except Exception as exc:
         logger.warning("Database for Probe-Requests not found.")
         logger.debug(exc)
