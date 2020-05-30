@@ -13,8 +13,8 @@ import dash_html_components as html
 import plotly.graph_objects as go
 from dash.dependencies import Input, Output, State, ClientsideFunction
 
-from ..app import app, db, COLORS
-from models.RoomData import RoomData
+from . import sql
+from ..app import app, COLORS
 
 logger = logging.getLogger()
 
@@ -46,6 +46,7 @@ layout = html.Div(
         dcc.Store(id='humidity_store'),
         dcc.Store(id='pressure_store'),
         dcc.Store(id='last_entry'),
+        dcc.Store(id='last_24_hrs'),
 
         html.Div(
             className='row card_row',
@@ -288,47 +289,34 @@ def get_brightness(data):
     [State('error-store', 'data')]
 )
 def update_last_value(n, errors):
-    if errors['room-data'] or db.session.query(RoomData.temperature).first() is None:
-        logger.warning("RoomData table does not exist or has no entries. Cant fetch latest data.")
+    if errors['room-data']:
+        logger.warning("RoomData table does not exist. Cant fetch latest data.")
+        last = None
+    elif not sql.is_data_in_roomdata_table():
+        logger.warning("RoomData table has no entries. Cant fetch latest data.")
         last = None
     else:
-        last = RoomData.query.filter(
-            RoomData.id == db.session.query(db.func.max(RoomData.id)).scalar()
-        ).scalar().to_dict()
+        last = sql.get_latest_roomdata()
         logger.debug(f"Updating last values store ({last}).")
     return last
 
 
 @app.callback(
     Output('temperature_store', 'data'),
-    [Input('data-overview-update', 'n_intervals')],
-    [
-        State('temperature_store', 'data'),
-        State('error-store', 'data')
-    ]
+    [Input('last_entry', 'data')],
+    [State('temperature_store', 'data')]
 )
-def update_temperature_store(n, old_data, errors):
-    if errors['room-data'] or db.session.query(RoomData.temperature).first() is None:
-        logger.warning("RoomData table does not exist or has no entries. Cant fetch latest temperature.")
-        old_data = {
-            'new': 0,
-            'old': 0,
-            'min': 0,
-            'max': 0,
-            'display': 0
-        }
-    else:
-        last = db.session.query(RoomData.temperature).filter(
-            RoomData.id == db.session.query(db.func.max(RoomData.id)).scalar()
-        ).scalar()
+def update_temperature_store(latest_data, old_data):
+    if latest_data:
+        last = latest_data['temperature']
         logger.debug(f"Updating temperature store ({round(last, 2)}).")
-        if n == 0:
+        if (old_data and old_data['display'] == 0) or not old_data:
             old_data = {
                 'display': 1,
                 'new': last,
                 'old': 0,
-                'min': floor(db.session.query(db.func.min(RoomData.temperature)).scalar()),
-                'max': ceil(db.session.query(db.func.max(RoomData.temperature)).scalar()),
+                'min': floor(sql.get_min_temperature_roomdata()),
+                'max': ceil(sql.get_max_temperature_roomdata()),
             }
         else:
             if last > old_data['max']:
@@ -338,40 +326,33 @@ def update_temperature_store(n, old_data, errors):
 
             old_data['old'] = old_data['new']
             old_data['new'] = last
-
+    else:
+        old_data = {
+            'new': 0,
+            'old': 0,
+            'min': 0,
+            'max': 0,
+            'display': 0
+        }
     return old_data
 
 
 @app.callback(
     Output('pressure_store', 'data'),
-    [Input('data-overview-update', 'n_intervals')],
-    [
-        State('pressure_store', 'data'),
-        State('error-store', 'data'),
-    ]
+    [Input('last_entry', 'data')],
+    [State('pressure_store', 'data')]
 )
-def update_pressure_store(n, old_data, errors):
-    if errors['room-data'] or db.session.query(RoomData.pressure).first() is None:
-        logger.warning("RoomData table does not exist or has no entries. Cant fetch latest pressure.")
-        old_data = {
-            'new': 0,
-            'old': 0,
-            'min': 0,
-            'max': 0,
-            'display': 0
-        }
-    else:
-        last = db.session.query(RoomData.pressure).filter(
-            RoomData.id == db.session.query(db.func.max(RoomData.id)).scalar()
-        ).scalar()
+def update_pressure_store(latest_data, old_data):
+    if latest_data:
+        last = latest_data['pressure']
         logger.debug(f"Updating pressure store ({round(last, 2)}).")
-        if n == 0:
+        if (old_data and old_data['display'] == 0) or not old_data:
             old_data = {
                 'display': 1,
                 'new': last,
                 'old': 0,
-                'min': floor(db.session.query(db.func.min(RoomData.pressure)).scalar()),
-                'max': ceil(db.session.query(db.func.max(RoomData.pressure)).scalar()),
+                'min': floor(sql.get_min_pressure_roomdata()),
+                'max': ceil(sql.get_max_pressure_roomdata()),
             }
         else:
             if last > old_data['max']:
@@ -381,21 +362,43 @@ def update_pressure_store(n, old_data, errors):
 
             old_data['old'] = old_data['new']
             old_data['new'] = last
-
+    else:
+        old_data = {
+            'new': 0,
+            'old': 0,
+            'min': 0,
+            'max': 0,
+            'display': 0
+        }
     return old_data
 
 
 @app.callback(
     Output('humidity_store', 'data'),
-    [Input('data-overview-update', 'n_intervals')],
-    [
-        State('humidity_store', 'data'),
-        State('error-store', 'data')
-    ]
+    [Input('last_entry', 'data')],
+    [State('humidity_store', 'data')]
 )
-def update_humidity_store(n, old_data, errors):
-    if errors['room-data'] or db.session.query(RoomData.humidity).first() is None:
-        logger.warning("RoomData table does not exist or has no entries. Cant fetch latest humidity.")
+def update_humidity_store(latest_data, old_data):
+    if latest_data:
+        last = latest_data['humidity']
+        logger.debug(f"Updating humidity store ({round(last, 2)}).")
+        if (old_data and old_data['display'] == 0) or not old_data:
+            old_data = {
+                'display': 1,
+                'new': last,
+                'old': 0,
+                'min': floor(sql.get_min_humidity_roomdata()),
+                'max': ceil(sql.get_max_humidity_roomdata()),
+            }
+        else:
+            if last > old_data['max']:
+                old_data['max'] = last
+            elif last < old_data['min']:
+                old_data['min'] = last
+
+            old_data['old'] = old_data['new']
+            old_data['new'] = last
+    else:
         old_data = {
             'new': '?',
             'old': 0,
@@ -403,35 +406,15 @@ def update_humidity_store(n, old_data, errors):
             'max': 0,
             'display': 0
         }
-    else:
-        last = db.session.query(RoomData.humidity).filter(
-            RoomData.id == db.session.query(db.func.max(RoomData.id)).scalar()
-        ).scalar()
-        logger.debug(f"Updating humidity store ({round(last, 2)}).")
-        if n == 0:
-            old_data = {
-                'display': 1,
-                'new': last,
-                'old': 0,
-                'min': floor(db.session.query(db.func.min(RoomData.humidity)).scalar()),
-                'max': ceil(db.session.query(db.func.max(RoomData.humidity)).scalar()),
-            }
-        else:
-            if last > old_data['max']:
-                old_data['max'] = last
-            elif last < old_data['min']:
-                old_data['min'] = last
-
-            old_data['old'] = old_data['new']
-            old_data['new'] = last
-
     return old_data
 
 
-@app.callback(Output('day-data-graph', 'figure'),
-              [Input('data-overview-update', 'n_intervals'),
-               Input('last_entry', 'data')])
-def update_day_graph(interval, last):
+@app.callback(
+    Output('day-data-graph', 'figure'),
+    [Input('data-overview-update', 'n_intervals')],
+    [State('error-store', 'data')]
+)
+def update_day_graph(interval, errors):
     fig = go.Figure()
 
     fig.update_layout({
@@ -475,17 +458,22 @@ def update_day_graph(interval, last):
         }
     })
 
-    if not last:
+    if errors['room-data']:
+        logger.warning("RoomData table does not exist. Can't get last 24 hours data.")
         return fig
+    elif not sql.is_data_in_roomdata_table():
+        logger.warning("RoomData table has no entries. Can't get last 24 hours data.")
+        return fig
+    else:
+        logger.debug("Updating last 24 hours temperature graph.")
 
-    start = datetime.fromisoformat(last['date'])-relativedelta(days=1)
+    now = datetime.now()
+    start = now - relativedelta(days=1)
 
-    data_query = RoomData.query.filter(RoomData.date.between(start, datetime.fromisoformat(last['date'])))
+    data_query = sql.get_last_24_hrs(start, now)
+    if data_query.count():
+        day_data = pd.DataFrame([{'date': value[0], 'temperature': value[1]} for value in data_query])
 
-    day_data = data_query.filter(RoomData.id % 2 == 0)
-    day_data = pd.DataFrame([room_data.to_dict() for room_data in day_data])
-
-    if not day_data.empty:
         if day_data['temperature'].count() > 10:
             # Design of Buterworth filter
             filter_order = 2    # Filter order
