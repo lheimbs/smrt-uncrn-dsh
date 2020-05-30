@@ -8,6 +8,7 @@ import pandas as pd
 import scipy.signal as signal
 import dash_core_components as dcc
 import dash_html_components as html
+import dash_daq as daq
 import plotly.graph_objects as go
 from dash.dependencies import Input, Output, State
 from plotly.subplots import make_subplots
@@ -20,7 +21,19 @@ logger = logging.getLogger()
 layout = html.Div(
     className="row one_row",
     children=[
-        dcc.Store(id='data-history-settings-state'),
+        html.Div(
+            className='settings_open_close row',
+            style={'marginTop': '5px'},
+            children=[
+                html.P('Settings:', className='one column', style={'marginTop': '5px', 'marginBottom': '0px'}),
+                daq.BooleanSwitch(
+                    className='one column',
+                    id='data-history-show-hide-switch',
+                    on=True,
+                    color=COLORS['foreground'],
+                ),
+            ],
+        ),
         html.Div(
             id='data-history-overlay',
             className="sidebar",
@@ -66,13 +79,6 @@ layout = html.Div(
                         ),
                     ],
                 ),
-                html.Br(),
-                html.Div(
-                    style={'display': 'flex', 'justifyContent': 'center'},
-                    children=[
-                        html.Button('Show graph', id='data-history-show-data', style={'marginTop': '10px'}),
-                    ],
-                ),
             ],
         ),
         html.Div(
@@ -80,7 +86,6 @@ layout = html.Div(
             className="one_row",
             children=[
                 dcc.Store(id='data-history-graph-current-width'),
-                html.Button('Settings', id='data-history-show-settings', style={'marginTop': '10px'}),
                 dcc.Loading(id="loading-1", color=COLORS['foreground'], children=[
                     dcc.Graph(
                         style={'height': '80vh'},
@@ -126,19 +131,16 @@ layout = html.Div(
     [
         Output('data-history-overlay', 'style'),
         Output('data-hist-sidebar-content', 'style'),
-        Output('data-history-settings-state', 'data'),
     ],
     [
         Input('data-history-overlay', 'loading_state'),
-        Input('data-history-show-data', 'n_clicks'),
-        Input('data-history-show-settings', 'n_clicks'),
+        Input('data-history-show-hide-switch', 'on'),
     ],
-    [State('data-history-settings-state', 'data')]
 )
-def display_data_history_overlay(state, data_clicks, hist_clicks, settings_state):
-    if settings_state:
-        return {'width': '0'}, {'marginLeft': '0'}, False
-    return {'width': '15vw'}, {'marginLeft': '15vw'}, True
+def display_data_history_overlay(state, toggle_button):
+    if not toggle_button:
+        return {'width': '0'}, {'marginLeft': '0'}
+    return {'width': '15vw'}, {'marginLeft': '15vw'}
 
 
 app.clientside_callback(
@@ -317,6 +319,6 @@ def update_history_graph(start_date, end_date, chosen_values, current_width, err
                 x=data['date'],
                 y=tempf,
             ),
-            row=i+1, col=1,
+            row=i + 1, col=1,
         )
     return fig
