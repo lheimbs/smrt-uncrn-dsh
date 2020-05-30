@@ -2,9 +2,10 @@
 
 from dashboard.app import db
 
+
 class ProbeRequest(db.Model):
-    __tablename__ = 'probe-request'
-    __bind_key__ = 'probe-requests'
+    __tablename__ = 'probe_requests'
+    __bind_key__ = 'probe_request'
 
     id = db.Column(db.Integer, primary_key=True)
     date = db.Column(db.DateTime, nullable=False)

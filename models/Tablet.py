@@ -2,8 +2,9 @@
 
 from dashboard.app import db
 
+
 class TabletBattery(db.Model):
-    __tablename__ = 'tablet-battery'
+    __tablename__ = 'tablet_battery'
 
     id = db.Column(db.Integer, primary_key=True)
     date = db.Column(db.DateTime, nullable=False)

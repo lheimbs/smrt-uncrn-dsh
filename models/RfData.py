@@ -4,8 +4,9 @@
 # from models.db import Base
 from dashboard.app import db
 
+
 class RfData(db.Model):
-    __tablename__ = 'rf-data'
+    __tablename__ = 'rf_data'
 
     id = db.Column(db.Integer, primary_key=True)
     date = db.Column(db.DateTime, nullable=False)

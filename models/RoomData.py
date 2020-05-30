@@ -4,8 +4,9 @@
 # from models.db import Base
 from dashboard.app import db
 
+
 class RoomData(db.Model):
-    __tablename__ = 'room-data'
+    __tablename__ = 'room_data'
 
     id = db.Column(db.Integer, primary_key=True)
     date = db.Column(db.DateTime, nullable=False)

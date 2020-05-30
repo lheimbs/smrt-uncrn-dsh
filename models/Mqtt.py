@@ -4,8 +4,9 @@
 # from models.db import Base
 from dashboard.app import db
 
+
 class Mqtt(db.Model):
-    __tablename__ = 'mqtt-message'
+    __tablename__ = 'mqtt_messages'
 
     id = db.Column(db.Integer, primary_key=True)
     date = db.Column(db.DateTime, nullable=False)

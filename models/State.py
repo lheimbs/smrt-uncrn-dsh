@@ -2,6 +2,7 @@
 
 from dashboard.app import db
 
+
 class State(db.Model):
     __tablename__ = 'states'
 

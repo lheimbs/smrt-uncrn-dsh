@@ -9,6 +9,7 @@ association_table = db.Table(
     db.Column('list_id', db.Integer, db.ForeignKey('list.id'))
 )
 
+
 class List(db.Model):
     __tablename__ = 'list'
 
@@ -68,6 +69,7 @@ class Item(db.Model):
     sale = db.Column(db.Boolean)
     note = db.Column(db.String)
     category_id = db.Column(db.Integer, db.ForeignKey('category.id'))
+    # category_name = db.Column(db.String, db.ForeignKey('category.name'))
 
     lists = db.relationship(
         'List',
@@ -105,9 +107,8 @@ class Shop(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String, nullable=False, unique=True)
-    shop_id = db.Column(db.Integer, db.ForeignKey('shop.id'))
-    # category_id = db.Column(db.Integer, db.ForeignKey('category.id'))
-    category_name = db.Column(db.String, db.ForeignKey('category.name'))
+    category_id = db.Column(db.Integer, db.ForeignKey('category.id'))
+    # category_name = db.Column(db.String, db.ForeignKey('category.name'))
     category = db.relationship('Category')
 
     def to_dict(self):
