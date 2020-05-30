@@ -64,6 +64,7 @@ COLORS = {
     'foreground-dark': '#123456',
     'background': '#111111',
     'background-medium': '#252525',
+    'background-sub-medium': '#1c1c1c',
     'border-light': '#d6d6d6',
     'border-medium': '#333333',
     'border-dark': '#0f0f0f',
