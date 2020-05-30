@@ -7,22 +7,40 @@ GraduatedBar - background
     border: 1px solid var(--border-medium) !important;
 }
 
+/*
+Boolean Switch
+
+.daq-booleanswitch--light__background {
+    background: var(--background-light);
+}
+.daq-booleanswitch--dark__button {
+    background: var(--foreground);
+}
+*/
 /* 
 DataTable cell selection
+.dash-cell.cell--selected.focused,
 */
-.dash-table-container .dash-spreadsheet-container .dash-spreadsheet-inner table {
-    /* border-collapse: collapse; */
-    /* font-family: monospace; */
-    --accent: var(--orange) !important;
-    /* --border: lightgrey; */
-    /* --text-color: #3c3c3c; */
-    /* --hover: #fdfdfd; */
-    /* --background-color-ellipses: #fdfdfd; */
-    /* --faded-text: #fafafa; */
-    /* --faded-text-header: #b4b4b4; */
-    --selected-background: var(--background) !important;
-    /* --faded-dropdown: #f0f0f0; */
-    /* --muted: #c8c8c8; */
+
+.dash-cell {
+    border-bottom: 1px solid !important;
+    border-top: 1px solid !important;
+}
+
+.dash-table-container .dash-spreadsheet-container .dash-spreadsheet-inner td.focused {
+    background-color: var(--background) !important;
+    border-bottom: 1px solid var(--orange) !important;
+    border-top: 1px solid var(--orange) !important;
+}
+
+.dash-table-container .dash-spreadsheet-container .dash-spreadsheet-inner input:not([type="radio"]):not([type="checkbox"]) {
+	text-align: center;
+	/* box-sizing: border-box; */
+	color: var(--foreground);
+	background-color: transparent;
+    text-shadow: none;
+    border-bottom: 1px solid var(--success) !important;
+    text-transform: none !important;
 }
 
 /* 
@@ -47,6 +65,7 @@ button.close {
     position:absolute; top:0; right:0;
     padding: 0 10px;
 }
+#raw-shopping-save-shops-alert,
 #shopping-status-alert {
     width: max-content;
     height: max-content;
