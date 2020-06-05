@@ -283,7 +283,7 @@ def update_history_graph(start_date, end_date, chosen_values, current_width, err
     else:
         current_width = 1
 
-    if (start_date is None and end_date is None) or errors['room-data']:
+    if (start_date is None and end_date is None) or errors['room_data']:
         return fig
 
     start_date = datetime.strptime(start_date, '%Y-%m-%d')

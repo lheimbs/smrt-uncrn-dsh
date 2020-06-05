@@ -289,7 +289,7 @@ def get_brightness(data):
     [State('error-store', 'data')]
 )
 def update_last_value(n, errors):
-    if errors['room-data']:
+    if errors['room_data']:
         logger.warning("RoomData table does not exist. Cant fetch latest data.")
         last = None
     elif not sql.is_data_in_roomdata_table():
@@ -458,7 +458,7 @@ def update_day_graph(interval, errors):
         }
     })
 
-    if errors['room-data']:
+    if errors['room_data']:
         logger.warning("RoomData table does not exist. Can't get last 24 hours data.")
         return fig
     elif not sql.is_data_in_roomdata_table():
