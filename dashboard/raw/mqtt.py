@@ -143,7 +143,7 @@ def toggle_raw_room_data_sidebar(toggle_button):
     [State('error-store', 'data')]
 )
 def mqtt_topics_as_options(_, errors):
-    if errors['mqtt-message']:
+    if errors['mqtt_messages']:
         logger.warning("Mqtt-Messages table does not exist. Cant fetch mqtt topics.")
         return []
     return get_mqtt_topics_as_options()
