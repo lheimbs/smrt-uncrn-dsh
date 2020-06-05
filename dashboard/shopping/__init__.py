@@ -52,7 +52,6 @@ layout = html.Div([
 @app.callback(Output('shopping-tabs-content', 'children'),
               [Input('shopping-main-tabs', 'value')])
 def render_shopping_content(tab):
-    logger.debug(f"'render_shopping_tab' called with tab '{tab}'.'")
     if tab == 'shopping-add-tab':
         layout = add.layout
     elif tab == 'shopping-overview-tab':

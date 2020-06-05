@@ -64,7 +64,6 @@ layout = html.Div([
 @app.callback(Output('raw-tabs-content', 'children'),
               [Input('raw-main-tabs', 'value')])
 def render_shopping_content(tab):
-    logger.debug(f"'render_shopping_tab' called with tab '{tab}'.'")
     if tab == 'raw-mqtt-tab':
         layout = mqtt.layout
     elif tab == 'raw-shopping-tab':

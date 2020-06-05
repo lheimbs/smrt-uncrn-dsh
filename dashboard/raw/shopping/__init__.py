@@ -50,7 +50,6 @@ layout = html.Div([
 @app.callback(Output('raw-shopping-tabs-content', 'children'),
               [Input('raw-shopping-main-tabs', 'value')])
 def render_raw_shopping_content(tab):
-    logger.debug(f"'render_shopping_tab' called with tab '{tab}'.'")
     if tab == 'raw-shopping-lists-tab':
         layout = lists.layout
     elif tab == 'raw-shopping-items-tab':
