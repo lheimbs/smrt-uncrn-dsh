@@ -11,6 +11,7 @@ div {
     border: 1px solid #dddddd;
 }
 */
+#raw-shopping-items-data .dash-spreadsheet-menu,
 #raw-shopping-shops-data .dash-spreadsheet-menu {
     display: none;
 }
@@ -81,6 +82,7 @@ div {
     padding: 10px;
     text-align: center;
     color: var(--success);
+    padding-right: 50px;
 }
 
 .shopping_status_alert_warning {
@@ -89,6 +91,7 @@ div {
     padding: 10px;
     text-align: center;
     color: var(--orange);
+    padding-right: 50px;
 }
 
 .shopping_status_alert_fail {
@@ -97,6 +100,7 @@ div {
     padding: 10px;
     text-align: center;
     color: var(--error);
+    padding-right: 50px;
 }
 
 /* Shopping overview graph height */

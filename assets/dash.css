@@ -34,14 +34,30 @@ DataTable cell selection
 }
 
 .dash-table-container .dash-spreadsheet-container .dash-spreadsheet-inner input:not([type="radio"]):not([type="checkbox"]) {
-	text-align: center;
+	text-align: center !important;
 	/* box-sizing: border-box; */
-	color: var(--foreground);
-	background-color: transparent;
-    text-shadow: none;
+	color: var(--foreground) !important;
+	background-color: transparent !important;
+    text-shadow: none !important;
     border-bottom: 1px solid var(--success) !important;
     text-transform: none !important;
 }
+
+/* 
+.dash-table-container .dash-spreadsheet-container .dash-spreadsheet-inner table {
+	border-collapse: collapse !important;
+	font-family: unset !important;
+	--accent: var(--foreground-dark) !important;
+	--border: var(--border-medium) !important;
+	--text-color: #var(--foreground) !important;
+	--hover: #fdfdfd;
+	--background-color-ellipses: #fdfdfd;
+	--faded-text: #fafafa;
+	--faded-text-header: #b4b4b4;
+	--selected-background: rgba(255, 65, 54, 0.2);
+	--faded-dropdown: #f0f0f0;
+	--muted: #c8c8c8;
+} */
 
 /* 
 SingleDatePicker
@@ -66,7 +82,8 @@ button.close {
     padding: 0 10px;
 }
 #raw-shopping-save-shops-alert,
-#shopping-status-alert {
+#shopping-status-alert,
+#raw-shopping-save-items-alert {
     width: max-content;
     height: max-content;
     max-height: -moz-max-content;
