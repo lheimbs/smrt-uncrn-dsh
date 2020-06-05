@@ -128,18 +128,25 @@ def get_raw_shopping_items(limit, search):
 
     entries_list = []
     for entry in query:
+        if entry.category:
+            category_name = entry.category.name
+        else:
+            category_name = ''
         entry_dict = entry.to_dict()
-        entry_dict.update(category_name=entry.category_id)
+        entry_dict.update(category_name=category_name)
         entry_dict.update(id=entry.id)
+        entry_dict.update(list_entrys=len(entry.lists))
         entries_list.append(entry_dict)
     return pd.DataFrame(entries_list, columns=[
+        'id',
         'name',
         'price',
         'price_per_volume',
         'volume',
         'sale',
         'note',
-        'category',
+        'category_name',
+        'list_entrys'
     ])
 
 
@@ -169,22 +176,20 @@ def get_raw_shopping_shops(limit, search):
 
 
 def update_shop(data):
-    print(f"new data: {data}")
     shop_obj = Shop.query.filter(Shop.id == data['id']).scalar()
     shop_obj.name = data['name']
     new_category = None
 
     category_query = Category.query.filter(Category.name == data['category_name'])
-    print(category_query.count())
     if category_query.count() == 1:
-        print(f"new cat: {category_query.scalar()}")
         shop_obj.category = category_query.scalar()
     elif category_query.count() > 1:
         logger.error(f"Category {data['category_name']} exists more than once!")
     else:
+        logger.debug(f"Create new Category '{data['category_name']}'.")
         new_category = Category(name=data['category_name'])
         shop_obj.category = new_category
-    print(shop_obj)
+
     try:
         if new_category:
             db.session.add(new_category)
@@ -194,3 +199,98 @@ def update_shop(data):
         db.session.rollback()
         return f"{data['name']}: {e}"
     return None
+
+
+def update_items(data):
+    logger.debug(f"Update item {data['name']}.")
+
+    item_obj = Item.query.filter(Item.id == data['id']).scalar()
+    item_status, _ = item_exists_already(data)
+
+    if item_status:
+        update_status, infos = False, [f"Item {item_obj.name} already exists."]
+    else:
+        item_obj.name = data['name']
+        item_obj.price = data['price']
+        item_obj.price_per_volume = data['price_per_volume']
+        item_obj.volume = data['volume']
+        item_obj.sale = data['sale']
+        item_obj.note = data['note']
+
+        new_category = None
+        category_query = Category.query.filter(Category.name == data['category_name'])
+        if category_query.count() == 1:
+            item_obj.category = category_query.scalar()
+        elif category_query.count() > 1:
+            logger.error(f"Category {data['category_name']} exists more than once!")
+        else:
+            new_category = Category(name=data['category_name'])
+            item_obj.category = new_category
+
+        try:
+            if new_category:
+                db.session.add(new_category)
+            db.session.commit()
+            update_status, infos = True, [f"Successfully changed {data['name']}'s attributes."]
+        except exc.IntegrityError:
+            logger.warning("SqlAlchemy IntegrityError: Edited Item violates unique constraints.")
+            logger.debug(item_obj)
+            db.session.rollback()
+            update_status, infos = False, ['Error: Item violates Integrity rules.']
+        except exc.SQLAlchemyError as e:
+            logger.error(e)
+            db.session.rollback()
+            update_status, infos = False, [
+                f"Error: Could not change item {data['name']}.",
+                'Error:',
+                str(e)
+            ]
+    return update_status, infos
+
+
+def item_exists_already(data):
+    logger.debug(f'Check if item exists: {data}.')
+    item_query = Item.query.filter(
+        Item.name == data['name']
+    ).filter(
+        Item.price == data['price']
+    ).filter(
+        Item.price_per_volume == data['price_per_volume']
+    ).filter(
+        Item.volume == data['volume']
+    ).filter(
+        Item.sale == data['sale']
+    ).filter(
+        Item.note == data['note']
+    )
+    if item_query.count() > 0:
+        return True, item_query
+    return False, None
+
+
+def update_list_with_changed_item(old_id, new_query):
+    old_item = Item.query.filter(Item.id == old_id).scalar()
+    new_item = new_query.scalar()
+
+    logger.debug(f"Item {old_item.name} exists in {len(old_item.lists)} lists. Replacing it with new item in lists.")
+
+    for old_items_list in old_item.lists:
+        new_items_list = []
+        for idx, list_item in enumerate(old_items_list.items):
+            if list_item.id == old_item.id:
+                new_items_list.append(new_item)
+            else:
+                new_items_list.append(list_item)
+        old_items_list.items = new_items_list
+
+    try:
+        db.session.commit()
+    except exc.SQLAlchemyError as e:
+        logger.error(e)
+        db.session.rollback()
+        return False, [
+            'Changing Item in its lists failed.',
+            f"old item: {old_item}",
+            f"new item: {new_item}"
+        ]
+    return True, ['Changing item in lists succeeded']

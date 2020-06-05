@@ -18,9 +18,11 @@ logger = logging.getLogger()
 layout = html.Div(
     className="row one_row",
     children=[
+        dcc.Store(id='raw-shopping-shops-previous-store'),
         dbc.Alert(
             id='raw-shopping-save-shops-alert',
-            #duration=10000*5,
+            className='notification_alert',
+            duration=10000 * 5,
             dismissable=True,
             fade=True,
             is_open=False,
@@ -157,15 +159,23 @@ def toggle_table_editable(n):
     [Input('raw-shopping-shops-save', 'n_clicks')],
     [
         State('raw-shopping-shops-data', 'data'),
-        State('raw-shopping-shops-data', 'data_previous'),
+        State('raw-shopping-shops-previous-store', 'data'),
         State('raw-shopping-shops-settings-search', 'value'),
+        State('error-store', 'data'),
     ]
 )
-def save_edited_shops(n, data, previous, search):
-    print(n, data, previous)
+def save_edited_shops(n, data, previous, search, errors):
+    logger.debug("Save edited shops from raw data to database.")
     if not n or not previous:
-        # return '', '', False
         raise PreventUpdate
+    elif errors['list'] or errors['category'] or errors['shop'] or errors['item']:
+        logger.warning("Neccessary Shopping tables do not exist in database!")
+        return (
+            [html.H4('Error'), html.Hr(), html.P("Database error. Please try again later.")],
+            'shopping_status_alert_failure',
+            True,
+            search,
+        )
     else:
         errors = []
         for new, old in zip(data, previous):
@@ -187,13 +197,23 @@ def save_edited_shops(n, data, previous, search):
     [
         Output('raw-shopping-shops-data', 'columns'),
         Output('raw-shopping-shops-data', 'data'),
+        Output('raw-shopping-shops-previous-store', 'data'),
     ],
     [
         Input('raw-shopping-shops-settings-num-results', 'value'),
         Input('raw-shopping-shops-settings-search', 'value'),
-    ]
+    ],
+    [State('error-store', 'data')]
 )
-def get_raw_room_data(limit, search):
+def get_raw_shopping_shops(limit, search, errors):
+    if errors['list'] or errors['category'] or errors['shop'] or errors['item']:
+        logger.warning("Neccessary Shopping tables do not exist in database!")
+        return (
+            [{'name': 'Info', 'id': 'info'}],
+            [{'info': 'Neccessary Shopping tables do not exist in database!'}],
+            []
+        )
+
     data = sql.get_raw_shopping_shops(limit, search)
     columns = [{
         'name': ' '.join(col.capitalize().split('_')),
@@ -201,4 +221,4 @@ def get_raw_room_data(limit, search):
         'hideable': False,
     } for col in data.columns]
 
-    return columns, data.to_dict('records')
+    return columns, data.to_dict('records'), data.to_dict('records')
