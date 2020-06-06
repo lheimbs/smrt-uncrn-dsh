@@ -21,7 +21,7 @@ layout = html.Div([
         className='custom__main__tabs__container',
         children=[
             dcc.Tab(
-                label="Shopping Lists",
+                label="Lists",
                 value="raw-shopping-lists-tab",
                 className='custom__main__sub__tab',
                 selected_className='custom__main__sub__tab____selected',
