@@ -9,7 +9,7 @@ from models.Mqtt import Mqtt
 from models.ProbeRequest import ProbeRequest
 from models.RoomData import RoomData
 from models.RfData import RfData
-from models.Shopping import Item, Shop, Category
+from models.Shopping import Item, Shop, Category, List
 
 logger = logging.getLogger()
 
@@ -294,3 +294,13 @@ def update_list_with_changed_item(old_id, new_query):
             f"new item: {new_item}"
         ]
     return True, ['Changing item in lists succeeded']
+
+
+def get_shopping_lists(start, end):
+    lists = List.query.filter(
+        List.date.between(start, end)
+    )
+    lists = [shopping_list.to_dict() for shopping_list in lists]
+    for shopping_list in lists:
+        shopping_list['date'] = shopping_list['date'].isoformat()
+    return lists
