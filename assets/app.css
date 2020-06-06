@@ -25,6 +25,11 @@ div {
     padding: 1%;
 }
 
+#raw-shopping-lists-content {
+    overflow-y: scroll;
+    height: 80vh;
+}
+
 .settings {
     border: 1px solid var(--border-dark);
 }
