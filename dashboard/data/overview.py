@@ -26,13 +26,6 @@ UNITS = {
     'altitude': 'm',
     'brightness': 'lx',
 }
-DIV_COLUMNS = {
-    1: "twelve columns",
-    2: "eight columns",
-    3: "four columns",
-    4: "three columns",
-    5: "two columns",
-}
 
 layout = html.Div(
     className='row',
@@ -49,81 +42,51 @@ layout = html.Div(
         dcc.Store(id='last_24_hrs'),
 
         html.Div(
-            className='row card_row',
+            className='card_row',
             children=[
                 html.Div(
-                    className='four columns card',
+                    className='card',
                     children=[
                         html.Div(
-                            className='row',
-                            style={
-                                'display': 'flex',
-                                'justifyContent': 'space-around',
-                                'alignItems': 'center',
+                            id='temperature-display',
+                            className='card_container',
+                            **{
+                                'data-color': COLORS['foreground'],
+                                'data-unit': UNITS['temperature'],
+                                # 'data-radius': 50
                             },
-                            children=[
-                                html.Div(
-                                    id='temperature-display',
-                                    className='card_container',
-                                    **{
-                                        'data-color': COLORS['foreground'],
-                                        'data-unit': UNITS['temperature'],
-                                        # 'data-radius': 50
-                                    },
-                                ),
-                                html.H3('Temperature', className='card_container'),
-                            ]
-                        )
+                        ),
+                        html.H3('Temperature', className='card_container'),
                     ]
                 ),
                 html.Div(
-                    className='four columns card',
+                    className='card',
                     children=[
                         html.Div(
-                            className='row',
-                            style={
-                                'display': 'flex',
-                                'justifyContent': 'space-around',
-                                'alignItems': 'center',
+                            id='humidity-display',
+                            className='card_container',
+                            **{
+                                'data-color': COLORS['colorway'][0],
+                                'data-unit': UNITS['humidity'],
+                                # 'data-radius': 50
                             },
-                            children=[
-                                html.Div(
-                                    id='humidity-display',
-                                    className='card_container',
-                                    **{
-                                        'data-color': COLORS['colorway'][0],
-                                        'data-unit': UNITS['humidity'],
-                                        # 'data-radius': 50
-                                    },
-                                ),
-                                html.H3('Humidity', className='card_container',)
-                            ]
-                        )
+                        ),
+                        html.H3('Humidity', className='card_container',)
                     ]
                 ),
                 html.Div(
-                    className='four columns card',
+                    className='card',
                     children=[
                         html.Div(
-                            className='row',
-                            style={
-                                'display': 'flex',
-                                'justifyContent': 'space-around',
-                                'alignItems': 'center',
+                            id='pressure-display',
+                            className='card_container',
+                            **{
+                                'data-color': COLORS['colorway'][1],
+                                'data-unit': UNITS['pressure'],
+                                # 'data-radius': 50
                             },
-                            children=[
-                                html.Div(
-                                    id='pressure-display',
-                                    className='card_container',
-                                    **{
-                                        'data-color': COLORS['colorway'][1],
-                                        'data-unit': UNITS['pressure'],
-                                        # 'data-radius': 50
-                                    },
-                                ),
-                                html.H3('Pressure', className='card_container',)
-                            ]
-                        )
+                        ),
+                        html.H3('Pressure', className='card_container',)
                     ]
                 ),
             ],
@@ -180,7 +143,7 @@ layout = html.Div(
                                             },
                                             children=[
                                                 html.Img(
-                                                    src='assets/altitude_icon.svg.png',
+                                                    src=app.get_asset_url('img/altitude_icon.svg.png'),
                                                     style={
                                                         'height': '50px',
                                                         'width': '50px'
@@ -205,7 +168,7 @@ layout = html.Div(
                                             },
                                             children=[
                                                 html.Img(
-                                                    src=app.get_asset_url('brightness_icon.svg.png'),
+                                                    src=app.get_asset_url('img/brightness_icon.svg.png'),
                                                     style={
                                                         'height': '50px',
                                                         'width': '50px'

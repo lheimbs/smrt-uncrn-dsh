@@ -3,10 +3,19 @@
     transition: 0.3s;
     border-radius: 5px;
     background-color: var(--background-card);
+
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    flex-wrap: wrap;
 }
 
 .card_row {
     margin-top: 1vw;
+
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
 }
 
 .card:hover {
