@@ -5,13 +5,13 @@ html, body { margin: 0; padding: 0 }
   display: grid;
   /* Header and footer span the entire width, sidebars and content are fixed, with empty space on sides */
   grid-template-areas:
-    "header header header header header"
-    "empty_left sidebar_1 content sidebar_2 empty_right"
-    "footer footer footer footer footer";
+    "header header header"
+    "empty_left content empty_right"
+    "footer footer footer";
   /* Only expand middle section vertically (content and sidebars) */
   grid-template-rows: 0fr 1fr 0fr;
   /* 100% width, but static widths for content and sidebars */
-  grid-template-columns: 1fr 100px 80vw 100px 1fr;
+  grid-template-columns: 1fr 80vw 1fr;
   /* Force grid to be at least the height of the screen */
   min-height: 100vh;
 }
