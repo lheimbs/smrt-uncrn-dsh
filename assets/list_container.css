@@ -68,3 +68,7 @@
     /* align-self: center; */
     text-align: center;
 }
+
+.list_container p {
+    margin: 1rem;
+}
