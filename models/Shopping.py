@@ -29,6 +29,7 @@ class List(db.Model):
 
     def to_dict(self):
         return {
+            'id': self.id,
             'date': self.date,
             'price': self.price,
             'shop': self.shop.to_dict(),
