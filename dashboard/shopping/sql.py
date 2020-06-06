@@ -219,6 +219,7 @@ def add_shopping_list(list_dict):
     logger.debug("Adding list to database.")
     list_obj = get_list_object(list_dict['date'], list_dict['price'])
     list_obj.shop = get_shop_object(list_dict['shop'])
+    list_obj.category = get_category_object(list_dict['category'])
 
     for item in list_dict['items']:
         name = item['name']

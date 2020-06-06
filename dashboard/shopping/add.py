@@ -7,7 +7,7 @@ import pandas as pd
 import dash_core_components as dcc
 import dash_html_components as html
 import dash_bootstrap_components as dbc
-from dash.dependencies import Input, Output, State, ALL
+from dash.dependencies import Input, Output, State, ALL, MATCH
 from dash.exceptions import PreventUpdate
 
 from ..app import app
@@ -26,7 +26,7 @@ def generate_items_list(min_id, max_id):
             className='row add__items',
             children=[
                 html.Div(
-                    className='offset-by-one two columns',
+                    className='two columns',
                     children=[
                         dcc.Input(
                             id={
@@ -116,7 +116,7 @@ def generate_items_list(min_id, max_id):
                     ]
                 ),
                 html.Div(
-                    className='one column',
+                    className='two columns',
                     children=[
                         html.Button(
                             "Remove Item",
@@ -151,21 +151,34 @@ layout = html.Div(
             fade=True,
             is_open=False,
         ),
-        dbc.Alert(
-            id='shopping-status-alert-2',
-            duration=10000 * 5,
-            dismissable=True,
-            fade=True,
-            is_open=False,
+        html.Datalist(
+            id='shopping-items-list',
+        ),
+        html.Datalist(
+            id='shopping-shops-list',
         ),
         html.Br(),
         html.Div(
             className='row shopping__add__header',
             children=[
                 html.Div(
-                    className='one column',
+                    className='offset-by-one one column',
                     children=[
-                        html.H6("Date:", className='form__header')
+                        dcc.Input(
+                            id='shopping-new-price',
+                            type="number",
+                            placeholder='Price...',
+                        )
+                    ]
+                ),
+                html.Div(
+                    className='two columns',
+                    children=[
+                        dcc.Input(
+                            id='shopping-new-shop',
+                            placeholder="Shop...",
+                            list='shopping-shops-list',
+                        )
                     ]
                 ),
                 html.Div(
@@ -179,50 +192,21 @@ layout = html.Div(
                             day_size=35,
                             first_day_of_week=1,
                             persistence=True,
-                            persistence_type='session',
-                            with_full_screen_portal=True,
+                            style={'width': '-moz-available'},
                         )
                     ]
                 ),
                 html.Div(
                     className='two columns',
                     children=[
-                        html.H6("Sum total:", className='form__header')
-                    ]
-                ),
-                html.Div(
-                    className='two columns',
-                    children=[
-                        dcc.Input(
-                            id='shopping-new-price',
-                            type="number",
-                            placeholder='Price...',
-                            # pattern=r"\d{1,3}[,.]{0,1}\d{0,2}",  # ignored in number input
+                        dcc.Dropdown(
+                            id='shopping-category-dropdown',
+                            placeholder="Category...",
                         )
                     ]
                 ),
                 html.Div(
-                    className='one columns',
-                    children=[
-                        html.H6("Shop:", className='form__header')
-                    ]
-                ),
-                html.Div(
                     className='two columns',
-                    children=[
-                        html.Datalist(
-                            id='shopping-shops-list',
-                        ),
-                        dcc.Input(
-                            id='shopping-new-shop',
-                            placeholder="Shop...",
-                            list='shopping-shops-list',
-                            # pattern=r"\d{1,3}[,.]{0,1}\d{0,2}",  # ignored in number input
-                        )
-                    ]
-                ),
-                html.Div(
-                    className='one columns',
                     children=[
                         html.Button(
                             "Add another Item",
@@ -233,12 +217,6 @@ layout = html.Div(
             ],
         ),
         html.Br(),
-        html.Datalist(
-            id='shopping-items-list',
-        ),
-        html.Datalist(
-            id='shopping-categories-list',
-        ),
         html.Div(
             id='shopping-add-items-list',
             className='shopping__add__items',
@@ -315,15 +293,7 @@ def init_categories_store(last_modified, data, errors):
     if errors['category']:
         logger.warning("Categories table does not exist.")
         return []
-    return [html.Option(value=val[0]) for val in sql.get_categories()]
-
-
-@app.callback(
-    Output('shopping-categories-list', 'children'),
-    [Input('shopping-add-categories-store', 'data')],
-)
-def get_shopping_categories(data):
-    return data
+    return [{'label': val[0].capitalize(), 'value': val[0]} for val in sql.get_categories()]
 
 
 @app.callback(
@@ -360,9 +330,33 @@ def get_shopping_products(data):
 
 
 @app.callback(
+    Output('shopping-category-dropdown', 'options'),
+    [Input('shopping-category-dropdown', 'search_value')],
+    [State('shopping-add-categories-store', 'data')]
+)
+def update_category_dropdown(search_value, options):
+    if not search_value:
+        raise PreventUpdate
+    return [optn for optn in options if search_value.lower() in optn['label'].lower()]
+
+
+@app.callback(
+    Output({'type': 'shopping-add-item-category', 'id': MATCH}, 'options'),
+    [Input({'type': 'shopping-add-item-category', 'id': MATCH}, 'search_value')],
+    [State('shopping-add-categories-store', 'data')]
+)
+def update_category_overlay_dropdown(search_value, options):
+    if not search_value:
+        raise PreventUpdate
+    return [optn for optn in options if search_value.lower() in optn['label'].lower()]
+
+
+@app.callback(
     Output('shopping-add-items-list', 'children'),
-    [Input('shopping-new-item-button', 'n_clicks'),
-     Input({'type': 'shopping-remove-item', 'id': ALL}, 'n_clicks')],
+    [
+        Input('shopping-new-item-button', 'n_clicks'),
+        Input({'type': 'shopping-remove-item', 'id': ALL}, 'n_clicks')
+    ],
     [State('shopping-add-items-list', 'children')]
 )
 def shopping_manage_items(n_clicks, indexes, old_shopping_add_list):
@@ -391,6 +385,7 @@ def shopping_manage_items(n_clicks, indexes, old_shopping_add_list):
         State('shopping-new-list-date', 'date'),
         State('shopping-new-price', 'value'),
         State('shopping-new-shop', 'value'),
+        State('shopping-category-dropdown', 'value'),
         State({'type': 'shopping-new-item', 'id': ALL}, 'value'),
         State({'type': 'shopping-new-item-price', 'id': ALL}, 'value'),
         State({'type': 'shopping-new-item-amount', 'id': ALL}, 'value'),
@@ -403,7 +398,7 @@ def shopping_manage_items(n_clicks, indexes, old_shopping_add_list):
 )
 def prepare_shopping_data(
     submit_clicks,
-    date, price, shop, items, prices, amounts, volumes, ppvs, sales, notes,
+    date, price, shop, category, items, prices, amounts, volumes, ppvs, sales, notes,
     errors
 ):
     data_dict = {}
@@ -448,6 +443,7 @@ def prepare_shopping_data(
                     'price': price,
                     'shop': {'name': shop},
                     'date': date,
+                    'category': category,
                     'items': shopping_list.to_dict('records')
                 }
             )
@@ -485,17 +481,24 @@ def handle_missing_categories(data, old_children):
                     f"Please select a category for shop '{data['data']['shop']['name']}':",
                     className='six columns'
                 ),
-                dcc.Input(
-                    id='shopping-add-shop-category',
-                    className='six columns',
-                    placeholder='Category...',
-                    list='shopping-categories-list'
+                dcc.Dropdown(
+                    id={
+                        'type': 'shopping-add-item-category',
+                        'id': 'shop',
+                    },
+                    placeholder="Category...",
                 )
+                # dcc.Input(
+                #     id='shopping-add-shop-category',
+                #     className='six columns',
+                #     placeholder='Category...',
+                #     list='shopping-categories-list'
+                # )
             ]
         )
     )
 
-    for item in missing_items:
+    for i, item in enumerate(missing_items):
         div = html.Div(
             className='row',
             hidden=False if missing_items else True,
@@ -504,14 +507,12 @@ def handle_missing_categories(data, old_children):
                     f"Please select a category for item '{item}':",
                     className='six columns'
                 ),
-                dcc.Input(
+                dcc.Dropdown(
                     id={
                         'type': 'shopping-add-item-category',
-                        'id': 'shopping-add-item-category-' + item,
+                        'id': f'item-{i}-{item}',
                     },
-                    className='six columns',
-                    placeholder='Category...',
-                    list='shopping-categories-list'
+                    placeholder="Category...",
                 )
             ]
         )
@@ -522,7 +523,7 @@ def handle_missing_categories(data, old_children):
             'Submit',
             n_clicks=0,
             id='shopping-add-add-categories-overlay-submit',
-            className='offset-by-five two columns',
+            className='offset-by-four four columns',
             style={'backgroundColor': 'var(--background)'},
         )
     )
@@ -549,13 +550,11 @@ def handle_missing_categories(data, old_children):
     ],
     [
         State('shopping-add-interim-data-store', 'data'),
-
-        State('shopping-add-shop-category', 'value'),
         State({'type': 'shopping-add-item-category', 'id': ALL}, 'id'),
         State({'type': 'shopping-add-item-category', 'id': ALL}, 'value'),
     ]
 )
-def add_categories_to_list(save_clicks, data, shop_category, item_ids, item_categories):
+def add_categories_to_list(save_clicks, data, item_ids, item_categories):  # shop_category, 
     if not data or not save_clicks:
         logger.debug("Add categories to list - data or clicks none.")
         raise PreventUpdate
@@ -566,15 +565,17 @@ def add_categories_to_list(save_clicks, data, shop_category, item_ids, item_cate
         logger.debug("Errors detected with data, skipping categories handling.")
         return data, True
 
-    logger.debug(f"Add categories to shop/items.")
-    if shop_category:
-        data['data']['shop'].update(category=shop_category)
+    logger.debug("Add categories to shop/items.")
 
     if item_ids and item_categories and len(item_ids) == len(item_categories):
         for item, category in zip(item_ids, item_categories):
-            for item_dict in data['data']['items']:
-                if item_dict['name'] == item['id'].replace('shopping-add-item-category-', ''):
-                    item_dict.update(category=category)
+            print(item, category)
+            if item['id'] == 'shop' and category:
+                data['data']['shop'].update(category=category)
+            else:
+                for item_dict in data['data']['items']:
+                    if item_dict['name'] == '-'.join(item['id'].replace('item-', '').split('-')[1:]):
+                        item_dict.update(category=category)
     return data, None
 
 
