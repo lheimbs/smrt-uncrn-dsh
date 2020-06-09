@@ -339,7 +339,11 @@ def get_shopping_expenses_type_overview(state, errors):
         return fig
 
     expenses = pd.DataFrame(
-        [(liste.date, liste.price, liste.shop.category.name) for liste in expenses],
+        [(
+            liste.date,
+            liste.price,
+            liste.shop.category.name if liste.shop.category else None,
+        ) for liste in expenses],
         columns=['date', 'price', 'category']
     )
 
@@ -431,7 +435,7 @@ def get_shopping_category_total_overview(state, errors):
         return fig
 
     expenses = pd.DataFrame(
-        [(liste.price, liste.shop.category.name) for liste in expenses],
+        [(liste.price, liste.shop.category.name if liste.shop.category else None) for liste in expenses],
         columns=['price', 'category']
     )
     fig.add_trace(go.Pie(labels=expenses.category, values=expenses.price))
