@@ -16,6 +16,32 @@
     transition: margin-left .5s; /* If you want a transition effect */
 }
 
+.sidebar_settings_item {
+    margin-top: 5px;
+    margin-bottom: 0px;
+}
+
+@media (max-width: 600px) {
+    .sidebar_settings_item {
+        visibility: collapse;
+        height: 0px;
+    }
+    .sidebar{
+        width: unset !important;
+        height: unset !important;
+        position: unset !important;
+        z-index: unset !important;
+    }
+
+    .sidebar_content {
+        position: unset !important;
+        width: unset !important;
+        height: unset !important;
+        margin-left: unset !important;
+    }
+
+}
+
 /* On smaller screens, where height is less than 450px, change the style of the sidenav (less padding and a smaller font size) */
 @media screen and (max-height: 450px) {
     .sidebar {padding-top: 15px;}
