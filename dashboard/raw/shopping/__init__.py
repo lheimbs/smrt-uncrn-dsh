@@ -23,20 +23,20 @@ layout = html.Div([
             dcc.Tab(
                 label="Lists",
                 value="raw-shopping-lists-tab",
-                className='custom__main__sub__tab',
-                selected_className='custom__main__sub__tab____selected',
+                className='custom__main__sub__sub__tab',
+                selected_className='custom__main__sub__sub__tab____selected',
             ),
             dcc.Tab(
                 label="Items",
                 value="raw-shopping-items-tab",
-                className='custom__main__sub__tab',
-                selected_className='custom__main__sub__tab____selected',
+                className='custom__main__sub__sub__tab',
+                selected_className='custom__main__sub__sub__tab____selected',
             ),
             dcc.Tab(
                 label="Shops",
                 value="raw-shopping-shops-tab",
-                className='custom__main__sub__tab',
-                selected_className='custom__main__sub__tab____selected',
+                className='custom__main__sub__sub__tab',
+                selected_className='custom__main__sub__sub__tab____selected',
             ),
         ]
     ),
