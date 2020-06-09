@@ -6,7 +6,7 @@ input[type="button"]
 {
   display: inline-block;
   height: 38px;
-  padding: 0 5%;
+  /* padding: 0 5%; */
   color: var(--foreground);
   text-align: center;
   font-size: 11px;
