@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 import logging
+from math import ceil
 from datetime import datetime
 from dateutil.relativedelta import relativedelta
 
@@ -22,6 +23,7 @@ layout = html.Div(
     children=[
         dcc.Store('raw-shopping-lists-page-store', data=0),
         dcc.Store('raw-shopping-lists-lists-store'),
+        dcc.Store('raw-shopping-lists-date-store'),
         dbc.Alert(
             id='raw-shopping-save-lists-alert',
             duration=10000 * 5,
@@ -33,23 +35,28 @@ layout = html.Div(
             className='settings_open_close row',
             style={'marginTop': '5px', 'marginBottom': '10px'},
             children=[
-                html.P('Settings:', className='one column', style={'marginTop': '5px', 'marginBottom': '0px'}),
+                html.P('Settings:', className='one column sidebar_settings_item'),
                 daq.BooleanSwitch(
-                    className='one column',
+                    className='one column sidebar_settings_item',
                     id='raw-shopping-lists-settings-show-hide-switch',
                     on=True,
                     color=COLORS['foreground'],
                 ),
                 html.Button(
-                    'Edit',
-                    id='raw-shopping-lists-edit',
+                    '\U00002190 Previous',
+                    id='raw-shopping-lists-previous',
                     className='offset-by-one two columns',
                     n_clicks=0,
                 ),
+                html.Div(
+                    id='raw-shopping-list-page-container',
+                    className='offset-by-two two columns',
+                    children=[html.P("")]
+                ),
                 html.Button(
-                    'Save',
-                    id='raw-shopping-lists-save',
-                    className='offset-by-five two columns',
+                    'Next \u2192',
+                    id='raw-shopping-lists-next',
+                    className='offset-by-two two columns',
                     n_clicks=0,
                 ),
             ],
@@ -65,9 +72,9 @@ layout = html.Div(
                         dcc.Input(
                             id='raw-shopping-lists-settings-num-results',
                             type='number',
-                            value=10,
+                            value=5,
                             min=1,
-                            max=100,
+                            max=10,
                             debounce=True,
                         )
                     ]
@@ -101,6 +108,7 @@ layout = html.Div(
                         html.Button(
                             "Reload",
                             id='raw-shopping-lists-reload',
+                            n_clicks=0,
                         ),
                     ]
                 ),
@@ -108,7 +116,7 @@ layout = html.Div(
         ),
         html.Div(
             id='raw-shopping-lists-content',
-            className="one_row",
+            className="one_row sidebar_content",
             children=[
                 dcc.Loading(
                     id="raw-shopping-lists-data-loading",
@@ -120,71 +128,129 @@ layout = html.Div(
 )
 
 
+def add_or_remove_older_lists(data, start, prev_start, prev_start_actual):
+    start_actual = prev_start_actual
+    if start > prev_start_actual:
+        lists = []
+        for i, shopping_list in enumerate(data):
+            date = datetime.fromisoformat(shopping_list['date'])
+            if not i:
+                start_actual = date
+            if date >= start:
+                lists.append(shopping_list)
+                if date < start_actual:
+                    start_actual = date
+        data = lists
+    elif start < prev_start:
+        lists = sql.get_shopping_lists(start, prev_start)
+        start_actual = min([datetime.fromisoformat(slist['date']) for slist in lists])
+        data = lists + data
+    return data, start_actual
+
+
+def add_or_remove_newer_lists(data, end, prev_end, prev_end_actual):
+    end_actual = prev_end_actual
+    if end > prev_end:
+        lists = sql.get_shopping_lists(prev_end, end)
+        end_actual = max([datetime.fromisoformat(slist['date']) for slist in lists])
+        data += lists
+    elif end < prev_end_actual:
+        lists = []
+        for i, shopping_list in enumerate(data):
+            date = datetime.fromisoformat(shopping_list['date'])
+            if not i:
+                end_actual = date
+            if datetime.fromisoformat(shopping_list['date']) <= end:
+                lists.append(shopping_list)
+                if date > end_actual:
+                    end_actual = date
+        data = lists
+    return data, end_actual
+
+
 @app.callback(
-    Output('raw-shopping-lists-lists-store', 'data'),
+    Output('raw-shopping-list-page-container', 'children'),
+    [Input('raw-shopping-lists-page-store', 'data')]
+)
+def update_lists_pages(page):
+    if not page:
+        raise PreventUpdate
+    else:
+        return (
+            html.P(f"{page['current'] + 1}"),
+            html.P("/"),
+            html.P(f"{page['max']}")
+        )
+
+
+@app.callback(
     [
-        # Input('raw-shopping-lists-lists-store', 'loading_state'),
+        Output('raw-shopping-lists-lists-store', 'data'),
+        Output('raw-shopping-lists-date-store', 'data'),
+    ],
+    [
         Input('raw-shopping-lists-settings-date-picker', 'start_date'),
         Input('raw-shopping-lists-settings-date-picker', 'end_date'),
     ],
     [
         State('raw-shopping-lists-lists-store', 'data'),
+        State('raw-shopping-lists-date-store', 'data'),
         State('error-store', 'data'),
     ]
 )
-def get_shopping_lists(start, end, data, errors):
+def get_shopping_lists(start, end, data, prev_dates, errors):
     if errors['list'] or errors['category'] or errors['shop'] or errors['item']:
         logger.warning("Neccessary Shopping tables do not exist in database!")
-        return None
+        return None, None
     elif not start or not end:
         logger.warning("Start / Enddate is missing.")
-        return None
+        return None, None
 
     start = datetime.strptime(start, '%Y-%m-%d')
     end = datetime.strptime(end, '%Y-%m-%d')
 
     if not data:
         # Get lists based on start-/end-date
-        lists = sql.get_shopping_lists(start, end)
-    else:
-        # Shrink or expand the current lists store
+        data = sql.get_shopping_lists(start, end)
         dates = [datetime.fromisoformat(shopping_list['date']) for shopping_list in data]
         dates.sort()
-        min_date, max_date = dates[0], dates[-1]
+        prev_dates = {'start': start, 'start_actual': dates[0], 'end': end, 'end_actual': dates[-1]}
+    else:
+        # adapt list
+        prev_start = datetime.fromisoformat(prev_dates['start'])
+        prev_end = datetime.fromisoformat(prev_dates['end'])
+        prev_start_actual = datetime.fromisoformat(prev_dates['start_actual'])
+        prev_end_actual = datetime.fromisoformat(prev_dates['end_actual'])
 
-        lists = None
+        data, prev_dates['start_actual'] = add_or_remove_older_lists(data, start, prev_start, prev_start_actual)
+        data, prev_dates['end_actual'] = add_or_remove_newer_lists(data, end, prev_end, prev_end_actual)
 
-        if start < min_date:
-            lists = sql.get_shopping_lists(start, min_date)
-            lists += data
-        if max_date < end:
-            lists = sql.get_shopping_lists(max_date, end)
-            lists = data + lists
-
-    return lists
+        prev_dates['end'] = end
+        prev_dates['start'] = start
+    return data, prev_dates
 
 
 @app.callback(
     Output('raw-shopping-lists-data-loading', 'children'),
     [
-        Input('raw-shopping-lists-reload', 'n_clicks'),
-        Input('raw-shopping-lists-page-store', 'data'),
         Input('raw-shopping-lists-lists-store', 'data'),
+        Input('raw-shopping-lists-page-store', 'data'),
     ],
     [
-        State('raw-shopping-lists-settings-num-results', 'value'),
         State('error-store', 'data'),
     ]
 )
-def load_shopping_lists(clicks, page, data, lists_per_page, errors):
+def load_shopping_lists(data, page, errors):
     if errors['list'] or errors['category'] or errors['shop'] or errors['item']:
         logger.warning("Neccessary Shopping tables do not exist in database!")
-        return html.P("Database Error! Please try again later.", style={'color': COLORS['error']})
-
-    if not data:
+        return html.P(
+            "Database Error! Please try again later.",
+            style={'color': COLORS['error'], 'textAlign': 'center'}
+        )
+    elif not data:
         children = [html.P("No lists in this timeframe avaliable.", style={'color': COLORS['warning']})]
     else:
-        lists = data[page * lists_per_page:(page + 1) * lists_per_page]
+        lists = data[page['current'] * page['n_listperpage']:(page['current'] + 1) * page['n_listperpage']]
         if lists:
             children = []
             for shopping_list in lists:
@@ -217,10 +283,14 @@ def load_shopping_lists(clicks, page, data, lists_per_page, errors):
                             html.B([html.P('Price')], className='price_header grid_card item'),
                             html.B([html.P('Shop')], className='shop_header grid_card item'),
                             html.B([html.P('Category')], className='category_header grid_card item'),
-                            html.P(datetime.fromisoformat(shopping_list['date']).strftime('%c'), className='date item'),
+                            html.P(
+                                datetime.fromisoformat(shopping_list['date']).strftime('%a, %d. %b %Y'),
+                                className='date item',
+                            ),
                             html.P(shopping_list['price'], className='price item'),
                             html.P(
-                                shopping_list['shop']['name'] if shopping_list['shop'] else 'None', className='shop item'
+                                shopping_list['shop']['name'] if shopping_list['shop'] else 'None',
+                                className='shop item',
                             ),
                             html.P(
                                 shopping_list[
@@ -296,12 +366,47 @@ def load_shopping_lists(clicks, page, data, lists_per_page, errors):
     return children
 
 
+@app.callback(
+    Output('raw-shopping-lists-page-store', 'data'),
+    [
+        Input('raw-shopping-lists-reload', 'n_clicks'),
+        Input('raw-shopping-lists-previous', 'n_clicks'),
+        Input('raw-shopping-lists-next', 'n_clicks'),
+        Input('raw-shopping-lists-settings-num-results', 'value'),
+        Input('raw-shopping-lists-lists-store', 'data'),
+    ],
+    [
+        State('raw-shopping-lists-page-store', 'data'),
+    ]
+)
+def update_page_store(n_reload, previous, n_next, lists_per_page, data, page):
+    if not data:
+        raise PreventUpdate
+    elif not page:
+        return {
+            'current': 0,
+            'max': ceil(len(data) / lists_per_page),
+            'n_reload': n_reload,
+            'n_previous': previous,
+            'n_next': n_next,
+            'n_listperpage': lists_per_page,
+        }
 
-'''
-children=[
-    
-]
-'''
+    if n_reload > page['n_reload']:
+        page['n_reload'] = n_reload
+        page['current'] = 0
+    if previous > page['n_previous']:
+        page['n_previous'] = previous
+        if page['current'] - 1 >= 0:
+            page['current'] -= 1
+    if n_next > page['n_next']:
+        page['n_next'] = n_next
+        if page['current'] + 1 < page['max']:
+            page['current'] += 1
+    if lists_per_page != page['n_listperpage']:
+        page['n_listperpage'] = lists_per_page
+        page['max'] = ceil(len(data) / lists_per_page)
+    return page
 
 
 @app.callback(
@@ -317,89 +422,3 @@ def toggle_raw_room_data_sidebar(toggle_button):
     if not toggle_button:
         return {'width': '0'}, {'marginLeft': '0'}
     return {'width': '15vw'}, {'marginLeft': '16vw'}
-
-
-'''
-@app.callback(
-    [
-        Output('raw-shopping-save-lists-alert', 'children'),
-        Output('raw-shopping-save-lists-alert', 'className'),
-        Output('raw-shopping-save-lists-alert', 'is_open'),
-        Output('raw-shopping-lists-settings-search', 'value'),
-    ],
-    [Input('raw-shopping-lists-save', 'n_clicks')],
-    [
-        State('raw-shopping-lists-data', 'data'),
-        State('raw-shopping-lists-previous-store', 'data'),
-        State('raw-shopping-lists-settings-search', 'value'),
-        State('error-store', 'data'),
-    ]
-)
-def save_edited_lists(n, data, previous, search, errors):
-    if not n or previous == data:
-        # return '', '', False
-        raise PreventUpdate
-    elif errors['list'] or errors['category'] or errors['shop'] or errors['item']:
-        logger.warning("Neccessary Shopping tables do not exist in database!")
-        return (
-            [html.H4('Error'), html.Hr(), html.P("Database error. Please try again later.")],
-            'shopping_status_alert_failure',
-            True,
-            search,
-        )
-    else:
-        status = True
-        infos = []
-        for new, old in zip(data, previous):
-            if new != old:
-                if type(new['sale']) == str:
-                    new['sale'] = True if new['sale'].lower() == 'true' else False
-                success, info = sql.update_lists(new)
-                status &= success
-                infos += info
-        if not status:
-            return (
-                [html.H4('Errors occured updating lists')] + [html.P(info) for info in infos],
-                'shopping_status_alert_failure',
-                True,
-                search,
-            )
-        return (
-            [html.H4('Successfully updated lists...')] + [html.P(info) for info in infos],
-            'shopping_status_alert_success',
-            True,
-            search
-        )
-'''
-
-
-'''
-@app.callback(
-    [
-        Output('raw-shopping-lists-data', 'columns'),
-        Output('raw-shopping-lists-data', 'data'),
-        Output('raw-shopping-lists-previous-store', 'data'),
-    ],
-    [
-        Input('raw-shopping-lists-settings-date-picker', 'start_date'),
-        Input('raw-shopping-lists-settings-date-picker', 'end_date'),
-    ],
-    [State('error-store', 'data')]
-)
-def get_raw_shopping_lists(start, end, errors):
-    if errors['list'] or errors['category'] or errors['shop'] or errors['item']:
-        logger.warning("Neccessary Shopping tables do not exist in database!")
-        return (
-            [{'name': 'Info', 'id': 'info'}],
-            [{'info': 'Neccessary Shopping tables do not exist in database!'}],
-            []
-        )
-
-    data = sql.get_raw_shopping_lists(limit, search)
-    columns = [{
-        'name': ' '.join(col.capitalize().split('_')),
-        'id': col,
-        'hideable': False,
-    } for col in data.columns]
-    return columns, data.to_dict('records'), data.to_dict('records')
-'''
