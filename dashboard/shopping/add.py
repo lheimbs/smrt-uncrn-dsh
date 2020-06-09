@@ -26,7 +26,7 @@ def generate_items_list(min_id, max_id):
             className='row add__items',
             children=[
                 html.Div(
-                    className='two columns',
+                    className='offset-by-one two columns',
                     children=[
                         dcc.Input(
                             id={
@@ -116,10 +116,10 @@ def generate_items_list(min_id, max_id):
                     ]
                 ),
                 html.Div(
-                    className='two columns',
+                    className='one columns',
                     children=[
                         html.Button(
-                            "Remove Item",
+                            "Remove",
                             id={
                                 'type': 'shopping-remove-item',
                                 'id': n,
@@ -159,10 +159,10 @@ layout = html.Div(
         ),
         html.Br(),
         html.Div(
-            className='row shopping__add__header',
+            className='row shopping__add__header card',
             children=[
                 html.Div(
-                    className='offset-by-one one column',
+                    className='two columns',
                     children=[
                         dcc.Input(
                             id='shopping-new-price',
@@ -201,7 +201,16 @@ layout = html.Div(
                     children=[
                         dcc.Dropdown(
                             id='shopping-category-dropdown',
-                            placeholder="Category...",
+                            placeholder="Existing Category...",
+                        )
+                    ]
+                ),
+                html.Div(
+                    className='two columns',
+                    children=[
+                        dcc.Input(
+                            id='shopping-new-category',
+                            placeholder="New Category...",
                         )
                     ]
                 ),
@@ -330,6 +339,44 @@ def get_shopping_products(data):
 
 
 @app.callback(
+    [
+        Output('shopping-category-dropdown', 'disabled'),
+        Output('shopping-new-category', 'disabled'),
+    ],
+    [
+        Input('shopping-category-dropdown', 'value'),
+        Input('shopping-new-category', 'value'),
+    ]
+)
+def handle_list_categories(existing, new):
+    if existing and not new:
+        return False, True
+    elif not existing and new:
+        return True, False
+    else:
+        return False, False
+
+
+@app.callback(
+    [
+        Output({'type': 'shopping-add-item-category', 'id': MATCH}, 'disabled'),
+        Output({'type': 'shopping-new-category-input', 'id': MATCH}, 'disabled'),
+    ],
+    [
+        Input({'type': 'shopping-add-item-category', 'id': MATCH}, 'value'),
+        Input({'type': 'shopping-new-category-input', 'id': MATCH}, 'value'),
+    ]
+)
+def handle_rest_categories(existing, new):
+    if existing and not new:
+        return False, True
+    elif not existing and new:
+        return True, False
+    else:
+        return False, False
+
+
+@app.callback(
     Output('shopping-category-dropdown', 'options'),
     [Input('shopping-category-dropdown', 'search_value')],
     [State('shopping-add-categories-store', 'data')]
@@ -386,6 +433,7 @@ def shopping_manage_items(n_clicks, indexes, old_shopping_add_list):
         State('shopping-new-price', 'value'),
         State('shopping-new-shop', 'value'),
         State('shopping-category-dropdown', 'value'),
+        State('shopping-new-category', 'value'),
         State({'type': 'shopping-new-item', 'id': ALL}, 'value'),
         State({'type': 'shopping-new-item-price', 'id': ALL}, 'value'),
         State({'type': 'shopping-new-item-amount', 'id': ALL}, 'value'),
@@ -398,7 +446,7 @@ def shopping_manage_items(n_clicks, indexes, old_shopping_add_list):
 )
 def prepare_shopping_data(
     submit_clicks,
-    date, price, shop, category, items, prices, amounts, volumes, ppvs, sales, notes,
+    date, price, shop, category_existing, category_new, items, prices, amounts, volumes, ppvs, sales, notes,
     errors
 ):
     data_dict = {}
@@ -443,7 +491,7 @@ def prepare_shopping_data(
                     'price': price,
                     'shop': {'name': shop},
                     'date': date,
-                    'category': category,
+                    'category': category_existing if category_existing else category_new,
                     'items': shopping_list.to_dict('records')
                 }
             )
@@ -487,13 +535,14 @@ def handle_missing_categories(data, old_children):
                         'id': 'shop',
                     },
                     placeholder="Category...",
+                ),
+                dcc.Input(
+                    id={
+                        'type': 'shopping-new-category-input',
+                        'id': 'shop',
+                    },
+                    placeholder="New Category...",
                 )
-                # dcc.Input(
-                #     id='shopping-add-shop-category',
-                #     className='six columns',
-                #     placeholder='Category...',
-                #     list='shopping-categories-list'
-                # )
             ]
         )
     )
@@ -513,6 +562,13 @@ def handle_missing_categories(data, old_children):
                         'id': f'item-{i}-{item}',
                     },
                     placeholder="Category...",
+                ),
+                dcc.Input(
+                    id={
+                        'type': 'shopping-new-category-input',
+                        'id': f'item-{i}-{item}',
+                    },
+                    placeholder="New Category...",
                 )
             ]
         )
@@ -552,9 +608,11 @@ def handle_missing_categories(data, old_children):
         State('shopping-add-interim-data-store', 'data'),
         State({'type': 'shopping-add-item-category', 'id': ALL}, 'id'),
         State({'type': 'shopping-add-item-category', 'id': ALL}, 'value'),
+        State({'type': 'shopping-new-category-input', 'id': ALL}, 'id'),
+        State({'type': 'shopping-new-category-input', 'id': ALL}, 'value'),
     ]
 )
-def add_categories_to_list(save_clicks, data, item_ids, item_categories):  # shop_category, 
+def add_categories_to_list(save_clicks, data, item_ids, item_categories, item_new_ids, item_new_categories):
     if not data or not save_clicks:
         logger.debug("Add categories to list - data or clicks none.")
         raise PreventUpdate
@@ -567,9 +625,12 @@ def add_categories_to_list(save_clicks, data, item_ids, item_categories):  # sho
 
     logger.debug("Add categories to shop/items.")
 
-    if item_ids and item_categories and len(item_ids) == len(item_categories):
-        for item, category in zip(item_ids, item_categories):
-            print(item, category)
+    if item_ids and item_categories and item_new_ids and item_new_categories:
+        for existing_id, existing_category, new_id, new_category in zip(
+            item_ids, item_categories, item_new_ids, item_new_categories
+        ):
+            item = existing_id if existing_category else new_id
+            category = existing_category if existing_category else new_category
             if item['id'] == 'shop' and category:
                 data['data']['shop'].update(category=category)
             else:
