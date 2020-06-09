@@ -24,9 +24,12 @@ layout = html.Div(
             className='settings_open_close row',
             style={'marginTop': '5px'},
             children=[
-                html.P('Settings:', className='one column', style={'marginTop': '5px', 'marginBottom': '0px'}),
+                html.P(
+                    'Settings:',
+                    className='one column sidebar_settings_item',
+                ),
                 daq.BooleanSwitch(
-                    className='one column',
+                    className='one column sidebar_settings_item',
                     id='raw-mqtt-settings-show-hide-switch',
                     on=True,
                     color=COLORS['foreground'],
@@ -88,7 +91,7 @@ layout = html.Div(
         ),
         html.Div(
             id='raw-mqtt-content',
-            className="one_row",
+            className="one_row sidebar_content",
             children=[
                 dcc.Loading(id="loading-mqtt-messages", type="default", color=COLORS['foreground'], children=[
                     dash_table.DataTable(
