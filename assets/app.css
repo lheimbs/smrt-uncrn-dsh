@@ -28,6 +28,17 @@ div {
 #raw-shopping-lists-content {
     overflow-y: scroll;
     height: 80vh;
+    scrollbar-width: none;
+}
+
+#raw-shopping-list-page-container {
+    display: flex;
+    justify-content: space-evenly;
+    align-items: center;
+}
+
+#raw-shopping-list-page-container P {
+    margin: 2% !important;
 }
 
 .settings {
