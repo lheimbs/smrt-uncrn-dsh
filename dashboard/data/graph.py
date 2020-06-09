@@ -25,9 +25,12 @@ layout = html.Div(
             className='settings_open_close row',
             style={'marginTop': '5px'},
             children=[
-                html.P('Settings:', className='one column', style={'marginTop': '5px', 'marginBottom': '0px'}),
+                html.P(
+                    'Settings:',
+                    className='one column sidebar_settings_item',
+                ),
                 daq.BooleanSwitch(
-                    className='one column',
+                    className='one column sidebar_settings_item',
                     id='data-history-show-hide-switch',
                     on=True,
                     color=COLORS['foreground'],
@@ -83,7 +86,7 @@ layout = html.Div(
         ),
         html.Div(
             id='data-hist-sidebar-content',
-            className="one_row",
+            className="one_row sidebar_content",
             children=[
                 dcc.Store(id='data-history-graph-current-width'),
                 dcc.Loading(id="loading-1", color=COLORS['foreground'], children=[
