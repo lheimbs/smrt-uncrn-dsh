@@ -134,51 +134,31 @@ layout = html.Div(
                                 html.Div(
                                     className='six columns card',
                                     children=[
-                                        html.Div(
-                                            className='row',
+                                        html.Img(
+                                            src=app.get_asset_url('img/altitude_icon.svg.png'),
                                             style={
-                                                'display': 'flex',
-                                                'justifyContent': 'space-around',
-                                                'alignItems': 'center',
+                                                'height': '50px',
+                                                'width': '50px'
                                             },
-                                            children=[
-                                                html.Img(
-                                                    src=app.get_asset_url('img/altitude_icon.svg.png'),
-                                                    style={
-                                                        'height': '50px',
-                                                        'width': '50px'
-                                                    },
-                                                ),
-                                                html.H4(
-                                                    id='altitude-display',
-                                                ),
-                                            ]
-                                        )
+                                        ),
+                                        html.H4(
+                                            id='altitude-display',
+                                        ),
                                     ],
                                 ),
                                 html.Div(
                                     className='six columns card',
                                     children=[
-                                        html.Div(
-                                            className='row',
+                                        html.Img(
+                                            src=app.get_asset_url('img/brightness_icon.svg.png'),
                                             style={
-                                                'display': 'flex',
-                                                'justifyContent': 'space-around',
-                                                'alignItems': 'center',
+                                                'height': '50px',
+                                                'width': '50px'
                                             },
-                                            children=[
-                                                html.Img(
-                                                    src=app.get_asset_url('img/brightness_icon.svg.png'),
-                                                    style={
-                                                        'height': '50px',
-                                                        'width': '50px'
-                                                    },
-                                                ),
-                                                html.H4(
-                                                    id='brightness-display',
-                                                ),
-                                            ]
-                                        )
+                                        ),
+                                        html.H4(
+                                            id='brightness-display',
+                                        ),
                                     ],
                                 ),
                             ],
