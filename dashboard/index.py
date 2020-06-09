@@ -22,6 +22,7 @@ logger = logging.getLogger()
 layout = html.Div(
     className="wrapper",
     children=[
+        html.Meta(name='viewport', content="width=device-width, initial-scale=1.0"),
         # store site's settings
         dcc.Store(id='error-store', storage_type='local'),
         html.Div(
