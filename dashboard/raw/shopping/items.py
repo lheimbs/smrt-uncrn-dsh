@@ -8,7 +8,7 @@ import dash_core_components as dcc
 import dash_bootstrap_components as dbc
 import dash_daq as daq
 from dash.dependencies import Input, Output, State
-from dash.exceptions import PreventUpdate
+# from dash.exceptions import PreventUpdate
 
 from dashboard.app import app, COLORS
 from .. import sql
@@ -37,18 +37,18 @@ layout = html.Div(
                     on=True,
                     color=COLORS['foreground'],
                 ),
-                html.Button(
-                    'Edit',
-                    id='raw-shopping-items-edit',
-                    className='offset-by-one two columns',
-                    n_clicks=0,
-                ),
-                html.Button(
-                    'Save',
-                    id='raw-shopping-items-save',
-                    className='offset-by-five two columns',
-                    n_clicks=0,
-                ),
+                # html.Button(
+                #     'Edit',
+                #     id='raw-shopping-items-edit',
+                #     className='offset-by-one two columns',
+                #     n_clicks=0,
+                # ),
+                # html.Button(
+                #     'Save',
+                #     id='raw-shopping-items-save',
+                #     className='offset-by-five two columns',
+                #     n_clicks=0,
+                # ),
             ],
         ),
         html.Div(
@@ -140,64 +140,64 @@ def toggle_raw_room_data_sidebar(toggle_button):
     return {'width': '15vw'}, {'marginLeft': '15vw'}
 
 
-@app.callback(
-    Output('raw-shopping-items-data', 'editable'),
-    [Input('raw-shopping-items-edit', 'n_clicks')]
-)
-def toggle_table_editable(n):
-    return bool(n % 2)
+# @app.callback(
+#     Output('raw-shopping-items-data', 'editable'),
+#     [Input('raw-shopping-items-edit', 'n_clicks')]
+# )
+# def toggle_table_editable(n):
+#     return bool(n % 2)
 
 
-@app.callback(
-    [
-        Output('raw-shopping-save-items-alert', 'children'),
-        Output('raw-shopping-save-items-alert', 'className'),
-        Output('raw-shopping-save-items-alert', 'is_open'),
-        Output('raw-shopping-items-settings-search', 'value'),
-    ],
-    [Input('raw-shopping-items-save', 'n_clicks')],
-    [
-        State('raw-shopping-items-data', 'data'),
-        State('raw-shopping-items-previous-store', 'data'),
-        State('raw-shopping-items-settings-search', 'value'),
-        State('error-store', 'data'),
-    ]
-)
-def save_edited_items(n, data, previous, search, errors):
-    if not n or previous == data:
-        # return '', '', False
-        raise PreventUpdate
-    elif errors['list'] or errors['category'] or errors['shop'] or errors['item']:
-        logger.warning("Neccessary Shopping tables do not exist in database!")
-        return (
-            [html.H4('Error'), html.Hr(), html.P("Database error. Please try again later.")],
-            'shopping_status_alert_failure',
-            True,
-            search,
-        )
-    else:
-        status = True
-        infos = []
-        for new, old in zip(data, previous):
-            if new != old:
-                if type(new['sale']) == str:
-                    new['sale'] = True if new['sale'].lower() == 'true' else False
-                success, info = sql.update_items(new)
-                status &= success
-                infos += info
-        if not status:
-            return (
-                [html.H4('Errors occured updating items')] + [html.P(info) for info in infos],
-                'shopping_status_alert_failure',
-                True,
-                search,
-            )
-        return (
-            [html.H4('Successfully updated items...')] + [html.P(info) for info in infos],
-            'shopping_status_alert_success',
-            True,
-            search
-        )
+# @app.callback(
+#     [
+#         Output('raw-shopping-save-items-alert', 'children'),
+#         Output('raw-shopping-save-items-alert', 'className'),
+#         Output('raw-shopping-save-items-alert', 'is_open'),
+#         Output('raw-shopping-items-settings-search', 'value'),
+#     ],
+#     [Input('raw-shopping-items-save', 'n_clicks')],
+#     [
+#         State('raw-shopping-items-data', 'data'),
+#         State('raw-shopping-items-previous-store', 'data'),
+#         State('raw-shopping-items-settings-search', 'value'),
+#         State('error-store', 'data'),
+#     ]
+# )
+# def save_edited_items(n, data, previous, search, errors):
+#     if not n or previous == data:
+#         # return '', '', False
+#         raise PreventUpdate
+#     elif errors['list'] or errors['category'] or errors['shop'] or errors['item']:
+#         logger.warning("Neccessary Shopping tables do not exist in database!")
+#         return (
+#             [html.H4('Error'), html.Hr(), html.P("Database error. Please try again later.")],
+#             'shopping_status_alert_failure',
+#             True,
+#             search,
+#         )
+#     else:
+#         status = True
+#         infos = []
+#         for new, old in zip(data, previous):
+#             if new != old:
+#                 if type(new['sale']) == str:
+#                     new['sale'] = True if new['sale'].lower() == 'true' else False
+#                 success, info = sql.update_items(new)
+#                 status &= success
+#                 infos += info
+#         if not status:
+#             return (
+#                 [html.H4('Errors occured updating items')] + [html.P(info) for info in infos],
+#                 'shopping_status_alert_failure',
+#                 True,
+#                 search,
+#             )
+#         return (
+#             [html.H4('Successfully updated items...')] + [html.P(info) for info in infos],
+#             'shopping_status_alert_success',
+#             True,
+#             search
+#         )
 
 
 @app.callback(

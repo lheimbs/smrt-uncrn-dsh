@@ -34,12 +34,12 @@ layout = html.Div([
                 className='custom__main__sub__tab',
                 selected_className='custom__main__sub__tab____selected',
             ),
-            dcc.Tab(
-                label="Add Shopping List",
-                value="shopping-add-tab",
-                className='custom__main__sub__tab',
-                selected_className='custom__main__sub__tab____selected',
-            ),
+            # dcc.Tab(
+            #     label="Add Shopping List",
+            #     value="shopping-add-tab",
+            #     className='custom__main__sub__tab',
+            #     selected_className='custom__main__sub__tab____selected',
+            # ),
         ]
     ),
     html.Div(
