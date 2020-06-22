@@ -44,9 +44,9 @@ from models.State import State                             # noqa E402
 from models.Tablet import TabletBattery                    # noqa E402
 migrate = Migrate(server, db)
 
-if server.config['ENV'] == 'development':
+# if server.config['ENV'] == 'development':
     # db.drop_all()
-    db.create_all()
+db.create_all()
 
 # DASH SETUP
 app = dash.Dash(
@@ -55,6 +55,7 @@ app = dash.Dash(
     external_scripts=external_scripts,
     # routes_pathname_prefix='/graph/'
 )
+
 app.logger = logger
 app.title = "Smrt Uncrn Dsh"
 app.config['suppress_callback_exceptions'] = True

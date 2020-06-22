@@ -277,7 +277,7 @@ def load_shopping_lists(data, page, errors):
 
                 children += [
                     html.Div(
-                        className='list_container',
+                        className='list_container no_edit',
                         children=[
                             html.B([html.P('Date')], className='date_header grid_card item'),
                             html.B([html.P('Price')], className='price_header grid_card item'),
@@ -349,14 +349,14 @@ def load_shopping_lists(data, page, errors):
                                 ],
                                 className='details item',
                             ),
-                            html.Button(
-                                'Edit',
-                                className='edit item',
-                                id={
-                                    'type': 'raw-shopping-lists-show-items-button',
-                                    'id': shopping_list['id'],
-                                }
-                            ),
+                            # html.Button(
+                            #     'Edit',
+                            #     className='edit item',
+                            #     id={
+                            #         'type': 'raw-shopping-lists-show-items-button',
+                            #         'id': shopping_list['id'],
+                            #     }
+                            # ),
                         ]
                     ),
                     html.Br(),

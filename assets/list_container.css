@@ -13,6 +13,14 @@
     /* grid-template-rows: 50px 50px 50px; */
 }
 
+.list_container.no_edit {
+    grid-template-columns: repeat(4, 1fr) !important;
+    grid-template-areas: 
+        "date_header price_header shop_header category_header"
+        "date price shop category" !important;
+    /* grid-template-rows: 50px 50px 50px; */
+}
+
 .grid_card {
     box-shadow: 0 1px 2px 0 rgba(255,255,255,0.05);
     transition: 0.3s;
