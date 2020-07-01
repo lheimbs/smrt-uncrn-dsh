@@ -1,0 +1,31 @@
+
+ul.infobar {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    background-color: #333;
+  }
+  
+  ul.infobar li {float: left;}
+  
+  ul.infobar li a {
+    display: block;
+    color: white;
+    text-align: center;
+    padding: 14px 16px;
+    text-decoration: none;
+  }
+  
+  ul.infobar li a:hover:not(.active) {background-color: #111;}
+  
+  ul.infobar li a.active {background-color: blue;}
+  
+  ul.infobar li.right {float: right;}
+  
+  @media screen and (max-width: 300px) {
+    ul.infobar li.right, 
+    ul.infobar li {float: none;}
+
+    .sidebar {flex-wrap: wrap;}
+  }

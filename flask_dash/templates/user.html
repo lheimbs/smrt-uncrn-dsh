@@ -1,0 +1,11 @@
+{% extends "layout.html" %}
+
+{% block content %}
+    <h1>Welcome {{ user.name if user.name else 'Admin' }}</h1>
+    <hr>
+    <p>Username: {{ user.username }}</p>
+    <p>Email: {{ user.email }}</p>
+    <p>Last Login: {{ user.last_login }}</p>
+    <p>Account created at: {{ user.created_on.strftime('%c') }}</p>
+    <a href="{{ url_for('logout') }}"><button>Logout</button></a>
+{% endblock %}
