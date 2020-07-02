@@ -2,7 +2,7 @@
 import os
 from logging.config import dictConfig
 
-from flask_dash import create_app
+from smrtuncrndsh import create_app
 
 dictConfig({
     'version': 1,

@@ -6,25 +6,27 @@
   z-index: 1;
   top: 0;
   left: 0;
-  background-color: #111;
+  background-color: var(--background);
   transition: 0.5s;
   /* all 1s ease 0s; */
   overflow-x: hidden;
   white-space: nowrap;
   text-align: center;
   padding-top: 15px;
+
+  border-right: 2px solid var(--border-medium) ;
 }
 
 .sidebar a {
   /* padding: 8px 8px 8px 32px; */
   text-decoration: none;
   /* font-size: 25px; */
-  color: #818181;
+  color: var(--font-link);
   display: block;
 }
 
 .sidebar a:hover {
-  color: #f1f1f1;
+  color: var(--font-link-hover);
 }
 
 main .sidebar {

@@ -1,34 +1,33 @@
-"""Routes for parent Flask app."""
 from datetime import datetime
 
-from flask import current_app as app
-from flask import redirect, render_template, flash, request, url_for
-from flask_login import login_required, logout_user, current_user, login_user
-# from .models import db
-from .models.Users import User
-from .auth.forms import SignupForm, LoginForm
+from flask import flash, redirect, url_for, render_template, request, Blueprint
+from flask_login import LoginManager, AnonymousUserMixin, current_user, login_user
+
+from ..models.Users import User
+from .forms import SignupForm, LoginForm
+
+login_manager = LoginManager()
 
 
-@app.route('/')
-def home():
-    """Landing page."""
-    return render_template(
-        'index.html',
-        title='Flask Dash experiment',
-        description='Embed Plotly Dash into Flask applications.',
-        template='home-template',
-        body="This is a homepage served with Flask."
-    )
+class MyAnonymousUser(AnonymousUserMixin):
+    is_admin = False
 
 
-@app.route('/user/<username>')
-@login_required
-def user(username):
-    user = User.query.filter_by(username=username).first_or_404()
-    return render_template('user.html', user=user)
+def init_login(app):
+    """ initiate login manager with custom anonymoususer class """
+    login_manager.anonymous_user = MyAnonymousUser
+    login_manager.init_app(app)
 
 
-@app.route('/login', methods=['GET', 'POST'])
+# Blueprint Configuration
+auth_bp = Blueprint(
+    'auth_bp', __name__,
+    template_folder='templates',
+    static_folder='static'
+)
+
+
+@auth_bp.route('/login', methods=['GET', 'POST'])
 def login():
     """
     Log-in page for registered users.
@@ -62,14 +61,7 @@ def login():
     )
 
 
-@app.route("/logout")
-@login_required
-def logout():
-    logout_user()
-    return redirect('/')
-
-
-@app.route('/register', methods=['GET', 'POST'])
+@auth_bp.route('/register', methods=['GET', 'POST'])
 def register():
     form = SignupForm()
     if form.validate_on_submit():
@@ -96,3 +88,18 @@ def register():
         template='register-page',
         body="Sign up for a user account."
     )
+
+
+@login_manager.user_loader
+def load_user(user_id):
+    """Check if user is logged-in on every page load."""
+    if user_id is not None:
+        return User.query.get(user_id)
+    return None
+
+
+@login_manager.unauthorized_handler
+def unauthorized():
+    """Redirect unauthorized users to Login page."""
+    flash('You must be logged in to view that page.')
+    return redirect(url_for('auth_bp.login'))

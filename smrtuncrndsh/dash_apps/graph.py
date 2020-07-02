@@ -6,11 +6,9 @@ import dash_html_components as html
 import pandas as pd
 import plotly.express as px
 
-from flask_login import current_user
-
 from flask import current_app
 
-from .layout import dash_template, apply_layout
+from .layout import apply_layout
 
 df = pd.read_csv('https://plotly.github.io/datasets/country_indicators.csv')
 available_indicators = df['Indicator Name'].unique()
@@ -77,7 +75,7 @@ layout = html.Div([
 
 def create_graph(server):
     """Create a Plotly Dash dashboard."""
-    assets_path = os.path.join(os.getcwd(), 'flask_dash', 'static')
+    assets_path = os.path.join(os.getcwd(), 'smrtuncrndsh', 'static')
     dash_app = dash.Dash(
         server=server,
         routes_pathname_prefix='/graph/',
@@ -90,10 +88,11 @@ def create_graph(server):
         dash_app.logger.handlers.clear()
 
     # Custom HTML layout
-    dash_app.index_string = dash_template()
+    # dash_app.index_string = dash_template_from_jinja()
 
     # Create Dash Layout
-    apply_layout(dash_app, layout)
+    apply_layout(dash_app, layout, admin_only=True)
+    init_callbacks(dash_app)
     return dash_app.server
 
 
@@ -108,6 +107,7 @@ def init_callbacks(app):
     def update_graph(xaxis_column_name, yaxis_column_name,
                     xaxis_type, yaxis_type,
                     year_value):
+        current_app.logger.debug("update graph")
         dff = df[df['Year'] == year_value]
 
         fig = px.scatter(x=dff[dff['Indicator Name'] == xaxis_column_name]['Value'],

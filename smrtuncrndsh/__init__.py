@@ -27,21 +27,26 @@ def create_app():
 
     with app.app_context(), app.test_request_context():
         # Import Flask routes
-        from flask_dash import routes           # noqa: F401
+        from smrtuncrndsh import routes           # noqa: F401
+
+        from .home import home_bp, home  # noqa: F401
+        app.register_blueprint(home_bp)  # , url_prefix='/home')
+
+        from .auth import auth_bp, login, register  # noqa: F401
+        app.register_blueprint(auth_bp)
 
         from .admin import admin_bp, admin      # noqa: F401
         app.register_blueprint(admin_bp)
 
         # Compile CSS
-        from flask_dash.assets import compile_assets
+        from smrtuncrndsh.assets import compile_assets
         compile_assets(app)
 
-        # Import Dash application
-        from flask_dash.dash_apps.dashboard import create_dashboard
+        # Import Dash applications
+        from smrtuncrndsh.dash_apps.dashboard import create_dashboard
         create_dashboard(app)
 
-        from flask_dash.dash_apps.graph import create_graph
+        from smrtuncrndsh.dash_apps.graph import create_graph
         create_graph(app)
-
 
         return app

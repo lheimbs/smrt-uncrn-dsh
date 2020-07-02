@@ -1,9 +1,11 @@
 {% extends "layout.html" %}
 
 {% block content %}
-<div class="card">
-  <img src="{{ url_for('static', filename='img/logo.png') }}" class="logo" />
+<div class="wrapper">
   <h1 class="site-title">{{ title }}</h1>
+</div>
+<div class="card">
+  
   <p class="subtitle">Demo for embedding Plotly Dash within Flask Apps (View source on <a href="https://github.com/toddbirchard/plotlydash-flask-tutorial">Github</a>).</p>
   <a href="/dashapp/" class="dash-link">
     <span>Embdedded Plotly Dash</span>
