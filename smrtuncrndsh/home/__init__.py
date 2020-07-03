@@ -1,4 +1,5 @@
-from flask import render_template, Blueprint
+from flask import render_template, Blueprint, redirect
+from flask_login import login_required, logout_user
 
 
 # Blueprint Configuration
@@ -19,3 +20,10 @@ def home():
         template='home',
         body="Homepage."
     )
+
+
+@home_bp.route("/logout")
+@login_required
+def logout():
+    logout_user()
+    return redirect('/')

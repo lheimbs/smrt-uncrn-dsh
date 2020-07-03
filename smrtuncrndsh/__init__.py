@@ -22,21 +22,20 @@ def create_app():
     from .auth import init_login
     init_login(app)
 
-    # from .admin import init_admin
-    # init_admin(app)
-
     with app.app_context(), app.test_request_context():
-        # Import Flask routes
-        from smrtuncrndsh import routes           # noqa: F401
+        from .user import user_bp, user             # noqa: F401
+        app.register_blueprint(user_bp)
 
-        from .home import home_bp, home  # noqa: F401
+        from .home import home_bp, home, logout     # noqa: F401
         app.register_blueprint(home_bp)  # , url_prefix='/home')
 
         from .auth import auth_bp, login, register  # noqa: F401
         app.register_blueprint(auth_bp)
 
-        from .admin import admin_bp, admin      # noqa: F401
-        app.register_blueprint(admin_bp)
+        # from .admin import admin_bp, admin          # noqa: F401
+        # app.register_blueprint(admin_bp)
+        from .admin import init_admin
+        init_admin(app)
 
         # Compile CSS
         from smrtuncrndsh.assets import compile_assets

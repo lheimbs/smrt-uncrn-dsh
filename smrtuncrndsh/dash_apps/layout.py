@@ -9,8 +9,6 @@ from flask import current_app
 
 
 def apply_layout(app, layout, login_only=False, admin_only=False):
-    current_app.logger.debug("apply layout")
-
     def serve_layout():
         current_app.logger.debug("serve layout")
         current_app.logger.debug(current_user.is_anonymous)
@@ -29,7 +27,7 @@ def apply_layout(app, layout, login_only=False, admin_only=False):
 
     def serve_index(**kwargs):
         current_app.logger.debug("serve index")
-        template = render_template('dash.html')
+        template = render_template('layout.html')
         idx = template.index('<div class="container">') + len('<div class="container">')
         template = template[:idx] + f'{kwargs["app_entry"]}' + template[idx:]
         idx = template.index('</body>')

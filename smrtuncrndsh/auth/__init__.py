@@ -11,6 +11,7 @@ login_manager = LoginManager()
 
 class MyAnonymousUser(AnonymousUserMixin):
     is_admin = False
+    is_activated = False
 
 
 def init_login(app):
@@ -36,8 +37,8 @@ def login():
     POST requests validate and redirect user to dashboard.
     """
     # Bypass if user is logged in
-    if current_user.is_authenticated:
-        return redirect(url_for('user', username=current_user.username))
+    if current_user.is_authenticated and current_user.is_activated:
+        return redirect(url_for('user_bp.user'))
 
     form = LoginForm()
     # Validate login attempt
@@ -49,9 +50,9 @@ def login():
                 user.last_login = datetime.now()
                 user.db_commit()
             next_page = request.args.get('next')
-            return redirect(next_page or url_for('user', username=user.username))
+            return redirect(next_page or url_for('user_bp.user'))
         flash('Invalid username/password combination')
-        return redirect(url_for('login'))
+        return redirect(url_for('auth_bp.login'))
     return render_template(
         'login.html',
         form=form,
@@ -79,7 +80,7 @@ def register():
             if login_user(user):  # Log in as newly created user
                 user.last_login = datetime.now()
                 user.db_commit()
-            return redirect(url_for('user', username=user.username))
+            return redirect(url_for('user'))
         flash('A user already exists with that email address.')
     return render_template(
         'register.html',

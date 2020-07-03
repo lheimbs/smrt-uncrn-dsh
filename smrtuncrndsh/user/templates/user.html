@@ -7,5 +7,5 @@
     <p>Email: {{ user.email }}</p>
     <p>Last Login: {{ user.last_login }}</p>
     <p>Account created at: {{ user.created_on.strftime('%c') }}</p>
-    <a href="{{ url_for('logout') }}"><button>Logout</button></a>
+    <a href="{{ url_for('home_bp.logout') }}"><button>Logout</button></a>
 {% endblock %}

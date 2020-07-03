@@ -1,0 +1,80 @@
+#bootstrap-override .container {
+    width: 100%;
+    padding-right: 2%;
+    padding-left: 2%;
+    margin: 0;
+    height: unset;
+    background-color: white;
+    color: var(--background);
+}
+
+#bootstrap-override #no-more-tables {
+    overflow-x: scroll;
+    height: 100%;
+}
+
+@media 
+only screen and (max-width: 800px),
+(min-device-width: 768px) and (max-device-width: 1024px)  {
+
+	/* Force table to not be like tables anymore */
+	#bootstrap-override table, thead, tbody, th, td, tr { 
+		display: block; 
+	}
+	
+	/* Hide table headers (but not display: none;, for accessibility) */
+	#bootstrap-override thead tr { 
+		position: absolute;
+		top: -9999px;
+		left: -9999px;
+	}
+	
+	#bootstrap-override tr { border: 1px solid #ccc; }
+	
+	#bootstrap-override td { 
+		/* Behave  like a "row" */
+		border: none;
+		border-bottom: 1px solid #eee; 
+		position: relative;
+		padding-left: 50%; 
+	}
+	
+	#bootstrap-override td:before { 
+		/* Now like a table header */
+		position: absolute;
+		/* Top/left values mimic padding */
+		top: 6px;
+		left: 6px;
+		width: 45%; 
+		padding-right: 10px; 
+		white-space: nowrap;
+    }
+
+    #bootstrap-override table td[class*="col-"], table th[class*="col-"] {
+        position: relative;
+        display: unset;
+        float: unset;
+    }
+
+    /*
+	Label the data
+	*/
+	#bootstrap-override td:nth-of-type(1):before { content: "Select"; }
+	#bootstrap-override td:nth-of-type(2):before { content: "Edit"; }
+	#bootstrap-override td:nth-of-type(3):before { content: "Name"; }
+	#bootstrap-override td:nth-of-type(4):before { content: "Email"; }
+	#bootstrap-override td:nth-of-type(5):before { content: "Username"; }
+	#bootstrap-override td:nth-of-type(6):before { content: "Created On"; }
+	#bootstrap-override td:nth-of-type(7):before { content: "Last Login"; }
+	#bootstrap-override td:nth-of-type(8):before { content: "Is Admin"; }
+    #bootstrap-override td:nth-of-type(9):before { content: "Is Activated"; }
+    
+}
+
+#bootstrap-override ::after, ::before {
+
+    -webkit-box-sizing: unset;
+    -moz-box-sizing: unset;
+    box-sizing: unset;
+
+}

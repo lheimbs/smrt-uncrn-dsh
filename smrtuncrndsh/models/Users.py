@@ -1,5 +1,5 @@
 from datetime import datetime
-from flask_login import UserMixin, AnonymousUserMixin
+from flask_login import UserMixin
 from werkzeug.security import generate_password_hash, check_password_hash
 
 from . import db
@@ -41,7 +41,7 @@ class User(UserMixin, db.Model):
     @property
     def is_anonymous(self):
         return False
-    
+
     def add_to_db(self):
         self.created_on = datetime.now()
         db.session.add(self)
@@ -63,6 +63,10 @@ class User(UserMixin, db.Model):
             'email': self.email,
             'last_login': self.last_login
         }
+
+    # Required for administrative interface
+    def __unicode__(self):
+        return self.username
 
 
 # class AccessRequested(db.Model):

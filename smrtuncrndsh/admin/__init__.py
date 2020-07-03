@@ -1,28 +1,12 @@
-from flask import current_app as app
-from flask import Blueprint, render_template, abort, render_template_string
-from flask_login import current_user
 
-from ..models.Users import User
+from flask_admin import Admin
 
-# admin blueprint
-admin_bp = Blueprint(
-    'admin_bp',
-    __name__,
-    template_folder='templates',
-    static_folder='static'
-)
+from .views import UserModelView, MyAdminIndexView, UserActivateModelView
+from ..models import db
 
 
-@admin_bp.route('/admin/', methods=['GET', 'POST'])
-def admin():
-    """ Admin page """
-    if current_user.is_authenticated and not current_user.is_anonymous:
-        if current_user.is_admin:
-            users = User.query.all()
-            return render_template(
-                'admin.html',
-                title='Admin Panel',
-                template='admin-template',
-                users=users
-            )
-    abort(403)
+def init_admin(app):
+    admin_obj = Admin(index_view=MyAdminIndexView())
+    admin_obj.add_view(UserModelView(db.session))
+    admin_obj.add_view(UserActivateModelView(db.session, name='Activate', endpoint='Activate'))
+    admin_obj.init_app(app)

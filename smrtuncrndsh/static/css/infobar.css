@@ -4,28 +4,54 @@ ul.infobar {
     margin: 0;
     padding: 0;
     overflow: hidden;
-    background-color: #333;
-  }
+    background-color: var(--background-light);
+    display: flex;
+}
   
-  ul.infobar li {float: left;}
+ul .left {
+    flex: 1;
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+}
+
+ul .right {
+    flex: 1;
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+}
+
+ul .center {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+ul.infobar li {float: left;}
   
-  ul.infobar li a {
+ul.infobar li a {
     display: block;
-    color: white;
+    color: var(--font-foreground);
     text-align: center;
     padding: 14px 16px;
     text-decoration: none;
-  }
+}
+
+ul.infobar li button {
+    color: var(--background);
+}
   
-  ul.infobar li a:hover:not(.active) {background-color: #111;}
+ul.infobar li a:hover:not(.active) {background-color: var(--background);}
   
-  ul.infobar li a.active {background-color: blue;}
+ul.infobar li a.active {background-color: var(--foreground-dark);}
   
-  ul.infobar li.right {float: right;}
+ul.infobar li.right {float: right;}
   
-  @media screen and (max-width: 300px) {
+@media screen and (max-width: 300px) {
     ul.infobar li.right, 
     ul.infobar li {float: none;}
 
     .sidebar {flex-wrap: wrap;}
-  }
+}
