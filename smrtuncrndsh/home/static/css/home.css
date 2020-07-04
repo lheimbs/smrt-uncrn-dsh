@@ -1,35 +1,22 @@
-.wrapper {
-    height: 25vh;
-    /* Location of the image */
-    background-image: url(/static/img/background.jpg);
 
-    /* Background image is centered vertically and horizontally at all times */
-    background-position: center center;
-
-    /* Background image doesn't tile */
+.banner-image-wrapper {
+    background-image: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url('/static/img/street.jpg');
+    height: 40vh;
+    background-position: center;
     background-repeat: no-repeat;
-
-    /* Background image is fixed in the viewport so that it doesn't move when 
-    the content's height is greater than the image's height */
-    background-attachment: fixed;
-
-    /* This is what makes the background image rescale based
-    on the container's size */
     background-size: cover;
-    /* background-size: 100% 100%; */
-
-    /* Set a background color that will be displayed
-    while the background image is loading */
-    background-color: #464646;
-
+    /* position: relative; */
     display: flex;
     align-items: center;
     justify-content: center;
 }
 
-.wrapper h1 {
-    margin: 0;
-    font-size: 5em;
+.banner-text {
+    color: var(--font-foreground);
+}
+
+.banner-text h1 {
+    margin-left: 49px;
 }
 
 .card {

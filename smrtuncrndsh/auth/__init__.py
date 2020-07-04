@@ -80,7 +80,7 @@ def register():
             if login_user(user):  # Log in as newly created user
                 user.last_login = datetime.now()
                 user.db_commit()
-            return redirect(url_for('user'))
+            return redirect(url_for('user_bp.user'))
         flash('A user already exists with that email address.')
     return render_template(
         'register.html',

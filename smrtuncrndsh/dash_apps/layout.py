@@ -8,13 +8,10 @@ from flask_login import current_user
 from flask import current_app
 
 
-def apply_layout(app, layout, login_only=False, admin_only=False):
+def apply_layout(app, layout, admin_only=False, activated_only=False):
     def serve_layout():
         current_app.logger.debug("serve layout")
-        current_app.logger.debug(current_user.is_anonymous)
-        current_app.logger.debug(current_user.is_authenticated)
-        current_app.logger.debug(current_user.is_admin)
-        if login_only and not current_user.is_authenticated:
+        if activated_only and not current_user.is_activated:
             return html.Div('403 Access Denied')
         elif admin_only and not current_user.is_admin:
             return html.Div('403 Access Denied')

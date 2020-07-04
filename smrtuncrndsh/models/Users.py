@@ -19,17 +19,6 @@ class User(UserMixin, db.Model):
     is_admin = db.Column(db.Boolean, index=False, unique=False, nullable=False)
     is_activated = db.Column(db.Boolean, index=False, unique=False, nullable=False)
 
-    def set_password(self, password):
-        """Create hashed password."""
-        self.password = generate_password_hash(
-            password,
-            method='sha256'
-        )
-
-    def check_password(self, password):
-        """Check hashed password."""
-        return check_password_hash(self.password, password)
-
     @property
     def is_authenticated(self):
         return True
@@ -41,6 +30,21 @@ class User(UserMixin, db.Model):
     @property
     def is_anonymous(self):
         return False
+
+    def set_password(self, password):
+        """Create hashed password."""
+        self.password = generate_password_hash(
+            password,
+            method='sha256'
+        )
+
+    def check_password(self, password):
+        """Check hashed password."""
+        return check_password_hash(self.password, password)
+
+    def activate_user(self):
+        self.is_activated = True
+        self.db_commit()
 
     def add_to_db(self):
         self.created_on = datetime.now()
@@ -55,7 +59,14 @@ class User(UserMixin, db.Model):
         db.session.commit()
 
     def __repr__(self):
-        return '<User {}>'.format(self.username)
+        return (
+            f"<User(id={self.id}, "
+            f"name={self.name}, "
+            f"username={self.username}, "
+            f"email={self.email}, "
+            f"is_admin='{self.is_admin}', "
+            f"is_activated='{self.is_activated}')>"
+        )
 
     def to_dict(self):
         return {

@@ -4,10 +4,6 @@
 {% block content %}
   <div class="form-wrapper">
 
-    <div class="logo">
-      <img src="{{ url_for('static', filename='dist/img/logo.png') }}" alt="logo"/>
-    </div>
-
     {% for message in get_flashed_messages() %}
       <div class="alert alert-warning">
         <button type="button" class="close" data-dismiss="alert">&times;</button>
@@ -21,8 +17,7 @@
       {{ form.csrf_token }}
 
       <fieldset class="username">
-        {{ form.username.label }}
-        {{ form.username(placeholder='yourusername') }}
+        {{ form.username(placeholder='Username') }}
         {% if form.username.errors %}
           <ul class="errors">
             {% for error in form.username.errors %}
@@ -32,8 +27,7 @@
       </fieldset>
 
       <fieldset class="password">
-        {{ form.password.label }}
-        {{ form.password }}
+        {{ form.password(placeholder='Password') }}
         {% if form.username.errors %}
           <ul class="errors">
             {% for error in form.password.errors %}

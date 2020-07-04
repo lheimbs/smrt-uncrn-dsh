@@ -4,10 +4,6 @@
 {% block content %}
   <div class="form-wrapper">
 
-    <div class="logo">
-      <img src="{{ url_for('static', filename='dist/img/logo.png') }}" alt="logo"/>
-    </div>
-
     {% for message in get_flashed_messages() %}
       <div class="alert alert-warning">
         <button type="button" class="close" data-dismiss="alert">&times;</button>
@@ -21,8 +17,7 @@
       {{ form.csrf_token }}
 
       <fieldset class="name">
-        {{ form.name.label }}
-        {{ form.name(placeholder='John Smith') }}
+        {{ form.name(placeholder='Name') }}
         {% if form.name.errors %}
           <ul class="errors">
             {% for error in form.email.errors %}
@@ -32,8 +27,7 @@
       </fieldset>
 
       <fieldset class="email">
-        {{ form.email.label }}
-        {{ form.email(placeholder='youremail@example.com') }}
+        {{ form.email(placeholder='Email') }}
         {% if form.email.errors %}
           <ul class="errors">
             {% for error in form.email.errors %}
@@ -43,8 +37,7 @@
       </fieldset>
 
       <fieldset class="username">
-        {{ form.username.label }}
-        {{ form.username(placeholder='jonnyboy') }}
+        {{ form.username(placeholder='Username') }}
         {% if form.username.errors %}
           <ul class="errors">
             {% for error in form.username.errors %}
@@ -54,8 +47,7 @@
       </fieldset>
 
       <fieldset class="password">
-        {{ form.password.label }}
-        {{ form.password }}
+        {{ form.password(placeholder='Password') }}
         {% if form.password.errors %}
           <ul class="errors">
             {% for error in form.password.errors %}
@@ -65,8 +57,7 @@
       </fieldset>
 
       <fieldset class="confirm">
-        {{ form.confirm.label }}
-        {{ form.confirm }}
+        {{ form.confirm(placeholder='Confirm Password') }}
         {% if form.confirm.errors %}
           <ul class="errors">
             {% for error in form.confirm.errors %}

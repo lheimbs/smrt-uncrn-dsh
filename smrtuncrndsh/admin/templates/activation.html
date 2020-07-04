@@ -3,27 +3,42 @@
 {% block content %}
 {% include "navbar.html" %}
 <div class="card">
-    <p>These users are not yet approved to use your page:</p>
-    <table class="users-table">
-        <thead>
-            <tr>
-                <th>Name</th>
-                <th>Email</th>
-                <th>Username</th>
-                <th>Is Activated</th>
-            </tr>
-        </thead>
-        <tbody id="table-users-data">
-            {% for user in act_users %}
-            <tr>
-                <td>{{ user.name }}</td>
-                <td>{{ user.email }}</td>
-                <td>{{ user.username }}</td>
-                <td><input type="checkbox" name="rowid" class="action-checkbox" value="{{ user.id }}" title="Select record" {% if user.is_activated %}checked{% else %}{% endif %}></td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
-
+    {% if users %}
+        <p>These users are not yet approved to use your page:</p>
+        <form id="user-activate-form" method="POST" action="{{ url_for('admin_bp.activation') }}">
+            {{ form.csrf_token }}
+            <table class="users-activate-table">
+                <tr class="thead">
+                    <th rowspan="2" valign="top">Name</th>
+                    <th rowspan="2" valign="top">Email</th>
+                    <th rowspan="2" valign="top">Username</th>
+                    <th colspan="3" valign="top">Activate?</th>
+                </tr>
+                <tr class="thead">
+                    <td valign="top">Yes</th>
+                    <td valign="top">No</th>
+                    <td valign="top">Delete</th>
+                </tr>
+                <tbody id="table-users-data">
+                    {% for user in users %}
+                        <tr>
+                            <td valign="top">{{ user.name }}</td>
+                            <td valign="top">{{ user.email }}</td>
+                            <td valign="top">{{ user.username }}</td>
+                            {% for radiofield in form[user.username] %}
+                                <td valign="top">
+                                    {{ radiofield }}
+                                </td>
+                            {% endfor %}
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            <input type="submit" value="Go">
+        </form>
+    {% else %}
+        <p>No activation needed at this moment.</p>
+    {% endif %}
 </div>
+
 {% endblock %}
