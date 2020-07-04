@@ -15,7 +15,7 @@
     
 
     {% block head_css %}
-        <link href="{{ admin_static.url(filename='bootstrap/bootstrap3/swatch/{swatch}/bootstrap.min.css'.format(swatch=config.get('FLASK_ADMIN_SWATCH', 'default')), v='3.3.5') }}" rel="stylesheet">
+        <!--<link href="{{ admin_static.url(filename='bootstrap/bootstrap3/swatch/{swatch}/bootstrap.min.css'.format(swatch=config.get('FLASK_ADMIN_SWATCH', 'default')), v='3.3.5') }}" rel="stylesheet">
         {%if config.get('FLASK_ADMIN_SWATCH', 'default') == 'default' %}
         <link href="{{ admin_static.url(filename='bootstrap/bootstrap3/css/bootstrap-theme.min.css', v='3.3.5') }}" rel="stylesheet">
         {%endif%}
@@ -26,7 +26,7 @@
             <link href="{{ css_url }}" rel="stylesheet">
           {% endfor %}
         {% endif %}
-        <!-- <style>
+         <style>
         body {
             padding-top: 4px;
         }
