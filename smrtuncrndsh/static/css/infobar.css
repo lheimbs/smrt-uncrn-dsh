@@ -7,7 +7,7 @@ ul.infobar {
     background-color: var(--background-light);
     display: flex;
 }
-  
+
 ul .left {
     flex: 1;
     display: flex;
@@ -30,7 +30,7 @@ ul .center {
 }
 
 ul.infobar li {float: left;}
-  
+
 ul.infobar li a {
     display: block;
     color: var(--font-foreground);
@@ -42,16 +42,20 @@ ul.infobar li a {
 ul.infobar li button {
     color: var(--background);
 }
-  
+
 ul.infobar li a:hover:not(.active) {background-color: var(--background);}
-  
-ul.infobar li a.active {background-color: var(--foreground-dark);}
-  
+
+ul.infobar li a:active {background-color: var(--foreground-dark);}
+
 ul.infobar li.right {float: right;}
-  
+
 @media screen and (max-width: 300px) {
     ul.infobar li.right, 
     ul.infobar li {float: none;}
 
     .sidebar {flex-wrap: wrap;}
+    ul.sidebar li a {
+        text-align: center;
+        float: none;
+    }
 }

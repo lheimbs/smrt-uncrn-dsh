@@ -1,0 +1,47 @@
+.admin-navbar {
+    margin-top: 10px;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+}
+
+.admin-navbar ul.navbar {
+    border-radius: 5px;
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+    width: 90%;
+    background-color: var(--background-lighter);
+    position: relative;
+    height: auto;
+    overflow: auto;
+}
+
+.admin-navbar ul.navbar li a {
+    display: block;
+    color: var(--font-foreground);
+    text-decoration: none;
+    float: left;
+    padding: 15px;
+}
+
+.admin-navbar ul.navbar li a:active {
+    background-color: var(--background);
+}
+/* :not(a:active) */
+.admin-navbar ul.navbar li a:hover {
+    background-color: var(--background-medium);
+    /* color: white; */
+}
+
+.admin-navbar div.content {
+    margin-left: 0;
+    padding: 1px 16px;
+}
+
+@media screen and (max-width: 400px) {
+    .admin-navbar ul.navbar li a {
+        text-align: center;
+        float: none;
+    }
+}

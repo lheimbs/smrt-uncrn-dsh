@@ -1,0 +1,29 @@
+{% extends "layout.html" %}
+
+{% block content %}
+{% include "navbar.html" %}
+<div class="card">
+    <p>These users are not yet approved to use your page:</p>
+    <table class="users-table">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Username</th>
+                <th>Is Activated</th>
+            </tr>
+        </thead>
+        <tbody id="table-users-data">
+            {% for user in act_users %}
+            <tr>
+                <td>{{ user.name }}</td>
+                <td>{{ user.email }}</td>
+                <td>{{ user.username }}</td>
+                <td><input type="checkbox" name="rowid" class="action-checkbox" value="{{ user.id }}" title="Select record" {% if user.is_activated %}checked{% else %}{% endif %}></td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+</div>
+{% endblock %}

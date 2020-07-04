@@ -1,0 +1,38 @@
+{% extends "layout.html" %}
+
+{% block content %}
+{% include "navbar.html" %}
+<div class="card">
+    <table class="users-table">
+        <thead>
+            <tr>
+                <th><input type="checkbox" name="rowtoggle" onClick="setAllCheckboxes('table-users-data', this);" title="Select all records"></th>
+                <th>Edit</th>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Username</th>
+                <th>Created On</th>
+                <th>Last Login</th>
+                <th>Is Admin</th>
+                <th>Is Activated</th>
+            </tr>
+        </thead>
+        <tbody id="table-users-data">
+            {% for user in all_users %}
+            <tr>
+                <td><input type="checkbox" name="rowid" class="action-checkbox" value="{{ user.id }}" title="Select record"></td>
+                <td><a href="#" class="material-icons">edit</a></td>
+                <td>{{ user.name }}</td>
+                <td>{{ user.email }}</td>
+                <td>{{ user.username }}</td>
+                <td>{{ user.created_on.strftime('%d.%m.%Y %H:%M:%S') if user.created_on else '-' }}</td>
+                <td>{{ user.last_login.strftime('%d.%m.%Y %H:%M:%S') if user.last_login else '-' }}</td>
+                <td>{{ user.is_admin }}</td>
+                <td>{{ user.is_activated }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+</div>
+{% endblock %}

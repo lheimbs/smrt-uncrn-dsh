@@ -23,6 +23,10 @@ def create_app():
     init_login(app)
 
     with app.app_context(), app.test_request_context():
+
+        from .admin import admin_bp, users, activation          # noqa: F401
+        app.register_blueprint(admin_bp)
+
         from .user import user_bp, user             # noqa: F401
         app.register_blueprint(user_bp)
 
@@ -31,11 +35,8 @@ def create_app():
 
         from .auth import auth_bp, login, register  # noqa: F401
         app.register_blueprint(auth_bp)
-
-        # from .admin import admin_bp, admin          # noqa: F401
-        # app.register_blueprint(admin_bp)
-        from .admin import init_admin
-        init_admin(app)
+        # from .admin import init_admin
+        # init_admin(app)
 
         # Compile CSS
         from smrtuncrndsh.assets import compile_assets

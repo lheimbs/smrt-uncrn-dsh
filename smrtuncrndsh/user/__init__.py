@@ -12,6 +12,6 @@ user_bp = Blueprint(
 @user_bp.route('/user')
 @login_required
 def user():
-    if current_user.is_admin:
-        return redirect(url_for("admin.index"))
+    # if current_user.is_admin:
+    #     return redirect(url_for("admin_bp.admin"))
     return render_template('user.html', user=current_user, title=current_user.name)
