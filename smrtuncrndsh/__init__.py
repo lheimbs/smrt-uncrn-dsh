@@ -1,5 +1,6 @@
 """Initialize Flask app."""
 from flask import Flask
+from flask_migrate import Migrate
 # from extra.get_config import get_config
 
 
@@ -23,8 +24,10 @@ def create_app():
     init_login(app)
 
     with app.app_context(), app.test_request_context():
+        from .models import db
+        migrate = Migrate(app, db)          # noqa: F841
 
-        from .admin import admin_bp, users, activation          # noqa: F401
+        from .admin import admin_bp, users, activation, delete_user, edit_user  # noqa: F401
         app.register_blueprint(admin_bp)
 
         from .user import user_bp, user             # noqa: F401
@@ -35,8 +38,6 @@ def create_app():
 
         from .auth import auth_bp, login, register  # noqa: F401
         app.register_blueprint(auth_bp)
-        # from .admin import init_admin
-        # init_admin(app)
 
         # Compile CSS
         from smrtuncrndsh.assets import compile_assets
