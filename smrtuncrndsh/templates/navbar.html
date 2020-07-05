@@ -1,0 +1,14 @@
+<a class="home-page" href="{{ url_for('home_bp.home') }}">
+    <i class="material-icons">home</i><span class="name">home</span>
+</a>
+<a class="dashboard-page" href="/dashboard/">
+    <i class="material-icons">dashboard</i><span class="name">dashboard</span>
+</a>
+<a class="graph-page" href="/graph/">
+    <i class="material-icons">poll</i><span class="name">graph</span>
+</a>
+{% if current_user.is_authenticated and current_user.is_admin %}
+    <a class="admin-page" href="{{ url_for('admin_bp.users') }}">
+        <i class="material-icons">admin_panel_settings</i><span class="name">admin</span>
+    </a>
+{% endif %}

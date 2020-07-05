@@ -3,7 +3,7 @@ import os
 import dash_html_components as html
 from dash import Dash
 
-from .layout import apply_layout
+from ..layout import apply_layout
 
 
 def create_dashboard(server):
@@ -17,5 +17,5 @@ def create_dashboard(server):
     if (dash_app.logger.hasHandlers()):
         dash_app.logger.handlers.clear()
 
-    apply_layout(dash_app, html.Div("lol"))
+    apply_layout(dash_app, html.Div("lol"), "dashboard-page")
     return dash_app.server

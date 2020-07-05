@@ -8,7 +8,7 @@ from flask_login import current_user
 from flask import current_app
 
 
-def apply_layout(app, layout, admin_only=False, activated_only=False):
+def apply_layout(app, layout, template_name, admin_only=False, activated_only=False):
     def serve_layout():
         current_app.logger.debug("serve layout")
         if activated_only and not current_user.is_activated:
@@ -24,12 +24,12 @@ def apply_layout(app, layout, admin_only=False, activated_only=False):
 
     def serve_index(**kwargs):
         current_app.logger.debug("serve index")
-        template = render_template('layout.html')
-        idx = template.index('<div class="container">') + len('<div class="container">')
+        template = render_template('base.html', template=template_name)
+        idx = template.index('<main>') + len('<main>')
         template = template[:idx] + f'{kwargs["app_entry"]}' + template[idx:]
         idx = template.index('</body>')
         template = template[:idx] + (
-            f'<footer>{kwargs["config"]}{kwargs["scripts"]}{kwargs["renderer"]}</footer>'
+            f'<dash_footer>{kwargs["config"]}{kwargs["scripts"]}{kwargs["renderer"]}</dash_footer>'
         ) + template[idx:]
         return template
 

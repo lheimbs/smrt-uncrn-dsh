@@ -1,13 +1,13 @@
-{% extends "layout.html" %}
+{% extends "base.html" %}
 
 {% block content %}
-{% include "navbar.html" %}
+{% include "adminbar.html" %}
 <div class="card">
     <table class="users-table">
         <thead>
             <tr>
-                <th><input type="checkbox" name="rowtoggle" onClick="setAllCheckboxes('table-users-data', this);" title="Select all records"></th>
                 <th>Edit</th>
+                <th>Delete</th>
                 <th>Name</th>
                 <th>Email</th>
                 <th>Username</th>
@@ -20,8 +20,12 @@
         <tbody id="table-users-data">
             {% for user in all_users %}
             <tr>
-                <td><input type="checkbox" name="rowid" class="action-checkbox" value="{{ user.id }}" title="Select record"></td>
-                <td><a href="#" class="material-icons">edit</a></td>
+                <td class="link">
+                    <a href="{{ url_for('admin_bp.edit_user', username=user.username) }}" class="material-icons">edit</a>
+                </td>
+                <td class="link">
+                    <a href="{{ url_for('admin_bp.delete_user', username=user.username) }}" class="material-icons">delete_forever</a>
+                </td>
                 <td>{{ user.name }}</td>
                 <td>{{ user.email }}</td>
                 <td>{{ user.username }}</td>

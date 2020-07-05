@@ -17,7 +17,7 @@ def home():
     return render_template(
         'home.html',
         title='Home',
-        template='home',
+        template='home-page',
         body="Homepage."
     )
 

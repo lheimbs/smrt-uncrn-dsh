@@ -1,8 +1,8 @@
-{% extends "layout.html" %}
+{% extends "base.html" %}
 
 {% block content %}
 {% if current_user.is_admin %}
-    {% include "navbar.html" %}
+    {% include "adminbar.html" %}
 {% endif %}
 <div class="user-welcome">
     <h1 style="text-align: center;">Welcome {{ user.name if user.name else 'Admin' }}</h1>

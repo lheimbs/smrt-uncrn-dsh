@@ -5,7 +5,7 @@ def compile_assets(app):
     assets = Environment(app)
 
     js = Bundle(
-        'js/*.js', 'home_bp/static/js/*.js', 'admin_bp/static/js/*.js','auth_bp/static/js/*.js',
+        'js/*.js', 'home_bp/js/*.js', 'admin_bp/js/*.js',
         filters='jsmin', output='gen/packed.js'
     )
     css = Bundle(

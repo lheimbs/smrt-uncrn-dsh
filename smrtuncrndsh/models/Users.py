@@ -2,10 +2,10 @@ from datetime import datetime
 from flask_login import UserMixin
 from werkzeug.security import generate_password_hash, check_password_hash
 
-from . import db
+from . import db, BaseMixin
 
 
-class User(UserMixin, db.Model):
+class User(UserMixin, db.Model, BaseMixin):
     """User account model."""
     __bind_key__ = 'users'
     __tablename__ = 'users'

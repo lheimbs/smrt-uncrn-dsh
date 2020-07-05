@@ -91,7 +91,7 @@ def create_graph(server):
     # dash_app.index_string = dash_template_from_jinja()
 
     # Create Dash Layout
-    apply_layout(dash_app, layout, activated_only=True)
+    apply_layout(dash_app, layout, template_name='graph-page', activated_only=True)
     init_callbacks(dash_app)
     return dash_app.server
 

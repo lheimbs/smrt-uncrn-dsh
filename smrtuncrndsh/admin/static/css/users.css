@@ -12,11 +12,14 @@ div.users-table-grid > span {
     text-align: center;
 }
 
-table.users-table a {
+td.link a {
     color: var(--font-foreground);
     text-align: center;
     /* padding: 14px 16px; */
     text-decoration: none;
+}
+td.link {
+    text-align: center;
 }
 
 @media 
@@ -25,8 +28,8 @@ only screen and (max-width: 900px),
 	/*
 	Label the data
 	*/
-	.users-table td:nth-of-type(1):before { content: "Select"; }
-	.users-table td:nth-of-type(2):before { content: "Edit"; }
+	.users-table td:nth-of-type(1):before { content: "Edit"; }
+	.users-table td:nth-of-type(2):before { content: "Delete"; }
 	.users-table td:nth-of-type(3):before { content: "Name"; }
 	.users-table td:nth-of-type(4):before { content: "Email"; }
 	.users-table td:nth-of-type(5):before { content: "Username"; }
@@ -34,4 +37,31 @@ only screen and (max-width: 900px),
 	.users-table td:nth-of-type(7):before { content: "Last Login"; }
 	.users-table td:nth-of-type(8):before { content: "Is Admin"; }
 	.users-table td:nth-of-type(9):before { content: "Is Activated"; }
+}
+
+#edit-users-table table {
+    border: none;
+}
+
+#edit-users-table tr:nth-of-type(2n+1) {
+    background: unset;
+}
+
+#edit-users-table td, th {
+    padding: 6px;
+    border: none;
+    text-align: left;
+}
+
+input[type=submit] {
+    margin: 10px 0;
+    width: 50%;
+}
+
+@media 
+only screen and (max-width: 900px),
+(min-device-width: 808px) and (max-device-width: 1024px)  {
+
+    #edit-users-table tr { border: none; }
+    #edit-users-table td, th { text-align: center };
 }

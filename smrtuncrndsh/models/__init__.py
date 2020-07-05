@@ -1,6 +1,15 @@
+from flask import current_app
 from flask_sqlalchemy import SQLAlchemy
 
 db = SQLAlchemy()
+
+class BaseMixin(object):
+    @classmethod
+    def create(model_class, **kwargs):
+        new_obj = model_class(**kwargs)
+        BaseMixin.add_object_to_db(new_obj)
+        db.session.add(new_obj)
+        db.session.commit()
 
 
 def init_db(app):

@@ -1,7 +1,8 @@
 from flask import Blueprint, render_template, abort, request, jsonify, make_response, redirect, url_for, current_app
 from flask_login import login_required, current_user
 from flask_wtf import FlaskForm
-from wtforms import RadioField, SelectField
+from wtforms import RadioField
+from wtforms.ext.sqlalchemy.orm import model_form
 
 from ..models.Users import User
 # from .forms import ActivateForm
@@ -16,15 +17,75 @@ admin_bp = Blueprint(
 @admin_bp.route('/users/')
 @login_required
 def users():
-    if current_user.is_admin:
-        users_obj = User.query.all()
-        return render_template(
-            'users.html',
-            all_users=users_obj,
-            title='Admin Panel - Users',
-            template='users-page'
-        )
-    abort(403)
+    if not current_user.is_admin:
+        abort(403)
+
+    users_obj = User.query.all()
+    return render_template(
+        'users.html',
+        all_users=users_obj,
+        title='Admin Panel - Users',
+        template='admin-page'
+    )
+
+
+@admin_bp.route('/users/edit/<username>', methods=['POST', 'GET'])
+@login_required
+def edit_user(username):
+    if not current_user.is_admin:
+        abort(403)
+
+    current_app.logger.debug(f"Edit User View, user: {username}")
+    user = User.query.filter_by(username=username).scalar()
+    UserForm = model_form(User, base_class=FlaskForm, exclude=['password', 'created_on', 'last_login'])
+    UserForm.is_admin.kwargs['validators'] = []
+    UserForm.is_activated.kwargs['validators'] = []
+    user_form = UserForm(obj=user)
+
+    print(dir(user_form))
+
+    if user_form.validate_on_submit():
+        user.name = user_form.name.data
+        user.username = user_form.username.data
+        user.email = user_form.email.data
+        user.is_activated = user_form.is_activated.data
+        user.is_admin = user_form.is_admin.data
+        user.db_commit()
+
+        return redirect(url_for('admin_bp.users'))
+    else:
+        current_app.logger.debug(user_form.errors)
+
+    return render_template(
+        'edit_users.html',
+        user=user,
+        form=user_form,
+        title='Admin Panel - Edit User',
+        template="admin-page",
+    )
+
+
+@admin_bp.route('/users/delete/<username>')
+@login_required
+def delete_user(username):
+    if not current_user.is_admin:
+        abort(403)
+    
+    if username:
+        user = User.query.filter_by(username=username).scalar()
+        if user:
+            user.delete_from_db()
+
+    return redirect(url_for('admin_bp.users'))
+
+    current_app.logger.debug(f"Delete User View, user: {username}")
+    users_obj = User.query.all()
+    return render_template(
+        'users.html',
+        all_users=users_obj,
+        title='Admin Panel - Users',
+        template='admin-page'
+    )
 
 
 @admin_bp.route('/activation/', methods=['GET', 'POST'])
@@ -66,73 +127,7 @@ def activation():
     return render_template(
         'activation.html',
         title='Admin Panel - Activation',
-        template='activation-page',
+        template='admin-page',
         users=users,
         form=form
     )
-
-# @admin_bp.route('/activation/', methods=['GET', 'POST'])
-# @login_required
-# def activation():
-#     if not current_user.is_admin:
-#         abort(403)
-
-#     if request.method == 'GET':
-#         print('GET')
-#         data = []
-#         for user in User.query.filter(User.is_activated == False).all():     # noqa: E712
-#             data.append({'user': user, 'form': ActivateForm(user.username)})
-#         return render_template(
-#             'activation.html',
-#             title='Admin Panel - Activation',
-#             template='activation-page',
-#             data=data,
-#         )
-
-#     formid = request.args.get('formid', '')
-#     submitted_user, submitted_form = None, None
-#     if formid:
-#         for date in data:
-#             user = date['user']
-#             form = date['form']
-#             if form.username == formid:
-#                 break
-#     if submitted_form:
-#         if form.validate_on_submit():
-#             print(form.username, user)
-#             user.activate_user()
-
-#             data = []
-#             for user in User.query.filter(User.is_activated == False).all():     # noqa: E712
-#                 data.append({'user': user, 'form': ActivateForm(user.username)})
-#             # return render_template(
-#             #     'activation.html',
-#             #     title='Admin Panel - Activation',
-#             #     template='activation-page',
-#             #     data=data,
-#             # )
-
-#     return render_template(
-#         'activation.html',
-#         title='Admin Panel - Activation',
-#         template='activation-page',
-#         data=data,
-#     )
-
-
-# @admin_bp.route('/activation/<formid>', methods=['POST'])
-# @login_required
-# def toggle_activated():
-#     if not current_user.is_admin:
-#         res = make_response(jsonify({"message": "Not Authorized"}), 403)
-#     else:
-#         req = request.get_json()
-#         user_id = int(req['id'].split('-')[-1])
-#         user = User.query.filter(User.id == user_id).scalar()
-#         print(req, user)
-#         if user:
-#             user.activate_user()
-
-#         res = make_response(redirect(url_for('admin_bp.activation')))  # jsonify({"message": "OK"}), 200)
-#         # return res
-#     return res
