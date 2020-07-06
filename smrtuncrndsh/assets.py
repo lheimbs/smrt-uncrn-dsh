@@ -9,7 +9,8 @@ def compile_assets(app):
         filters='jsmin', output='gen/packed.js'
     )
     css = Bundle(
-        'css/*.css', 'home_bp/css/*.css', 'admin_bp/css/*.css', 'auth_bp/css/*.css',
+        'css/*.css', 'css/dash/*.css',
+        'home_bp/css/*.css', 'admin_bp/css/*.css', 'auth_bp/css/*.css',
         filters='cssmin', output='gen/packed.css'
     )
 

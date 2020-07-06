@@ -1,7 +1,8 @@
-from flask import current_app
+# from flask import current_app
 from flask_sqlalchemy import SQLAlchemy
 
 db = SQLAlchemy()
+
 
 class BaseMixin(object):
     @classmethod
@@ -17,6 +18,7 @@ def init_db(app):
 
     with app.app_context():
         from .Users import User
+        from .RoomData import RoomData      # noqa: F401
         if app.config['DROP_ALL']:
             db.drop_all()
         db.create_all()

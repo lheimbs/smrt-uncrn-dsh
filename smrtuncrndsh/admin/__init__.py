@@ -1,4 +1,5 @@
-from flask import Blueprint, render_template, abort, request, jsonify, make_response, redirect, url_for, current_app
+from flask import Blueprint, render_template, abort, redirect, url_for, current_app
+# , request, jsonify, make_response
 from flask_login import login_required, current_user
 from flask_wtf import FlaskForm
 from wtforms import RadioField
@@ -70,7 +71,7 @@ def edit_user(username):
 def delete_user(username):
     if not current_user.is_admin:
         abort(403)
-    
+
     if username:
         user = User.query.filter_by(username=username).scalar()
         if user:

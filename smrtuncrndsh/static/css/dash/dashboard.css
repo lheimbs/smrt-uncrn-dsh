@@ -1,0 +1,99 @@
+.dashboard-container {
+    height:90vh;
+    overflow-y: auto;
+}
+
+.dashboard-content {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+        /* auto-fit, minmax(200px, 1fr)); */
+    /* grid-template-rows: 1fr 1fr 1fr; */
+    grid-template-areas: "temp temp humid humid press press"
+                         "day_hrs day_hrs day_hrs day_hrs brightness altitude"
+                         "day_hrs day_hrs day_hrs day_hrs . .";
+    
+    grid-gap: 10px;
+
+    overflow-y: scroll;
+    -ms-overflow-style: none;  /* IE and Edge */
+    scrollbar-width: none;  /* Firefox */
+}
+.dashboard-content::-webkit-scrollbar {
+    display: none;
+}
+
+@media(max-width:768px) {
+    .dashboard-content {
+        grid-template-columns: 1fr;
+        grid-template-areas: "temp"
+                             "humid"
+                             "press"
+                             "brightness"
+                             "altitude"
+                             "day_hrs";
+    }
+    .dashboard-container {
+        height:81vh;
+        overflow-y: scroll;
+    }
+}
+
+.temperature-current-container {
+    grid-area: temp;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    flex-wrap: wrap;
+}
+.humidity-current-container {
+    grid-area: humid;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    flex-wrap: wrap;
+}
+.pressure-current-container {
+    grid-area: press;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    flex-wrap: wrap;
+}
+.day-hrs-container {
+    grid-area: day_hrs;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+.brightness-current-container {
+    grid-area: brightness;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    flex-wrap: wrap;
+}
+.altitide-current-container {
+    grid-area: altitude;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.dashboard-content .card {
+    box-shadow: 0 1px 2px 0 rgba(255,255,255,0.05);
+    transition: 0.3s;
+    border-radius: 5px;
+    background-color: var(--background-card);
+    margin: 0;
+    padding: 5px;
+}
+
+.dashboard-content .card:hover {
+    box-shadow: 0 8px 16px 0 rgba(255,255,255,0.05);
+}
+
+#day-data-graph {
+    height: 25vh;
+    width: 90%;
+}
