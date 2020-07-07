@@ -9,7 +9,7 @@ from flask import current_app
 from dash.dependencies import Input, Output, State, ClientsideFunction
 
 from .import sql
-from .layout import COLORS
+from ..variables import COLORS
 
 
 def init_callbacks(app):                    # noqa: C901
@@ -71,14 +71,9 @@ def init_callbacks(app):                    # noqa: C901
 
     @app.callback(
         Output('last_entry', 'data'),
-        [Input('data-overview-update', 'n_intervals')],
-        # [State('error-store', 'data')]
+        [Input('data-overview-update', 'n_intervals')]
     )
-    def update_last_value(n):  # , errors):
-        # if errors['room_data']:
-        #     current_app.logger.warning("RoomData table does not exist. Cant fetch latest data.")
-        #     last = None
-        # el
+    def update_last_value(n):
         if not sql.is_data_in_roomdata_table():
             current_app.logger.warning("RoomData table has no entries. Cant fetch latest data.")
             last = None
@@ -195,9 +190,8 @@ def init_callbacks(app):                    # noqa: C901
     @app.callback(
         Output('day-data-graph', 'figure'),
         [Input('data-overview-update', 'n_intervals')],
-        # [State('error-store', 'data')]
     )
-    def update_day_graph(interval):  # , errors):
+    def update_day_graph(interval):
         fig = go.Figure()
 
         fig.update_layout({
@@ -241,10 +235,6 @@ def init_callbacks(app):                    # noqa: C901
             }
         })
 
-        # if errors['room_data']:
-        #     current_app.logger.warning("RoomData table does not exist. Can't get last 24 hours data.")
-        #     return fig
-        # el
         if not sql.is_data_in_roomdata_table():
             current_app.logger.warning("RoomData table has no entries. Can't get last 24 hours data.")
             return fig

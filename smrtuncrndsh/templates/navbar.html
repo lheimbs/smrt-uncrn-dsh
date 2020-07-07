@@ -4,8 +4,8 @@
 <a class="dashboard-page" href="/dashboard/">
     <i class="material-icons">dashboard</i><span class="name">dashboard</span>
 </a>
-<a class="graph-page" href="/graph/">
-    <i class="material-icons">poll</i><span class="name">graph</span>
+<a class="shopping-dashboard-page" href="/shopping/dashboard/">
+    <i class="material-icons">local_grocery_store</i><span class="name">shopping dash</span>
 </a>
 {% if current_user.is_authenticated and current_user.is_admin %}
     <a class="admin-page" href="{{ url_for('admin_bp.users') }}">

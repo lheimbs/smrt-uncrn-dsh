@@ -1,13 +1,12 @@
 """Initialize Flask app."""
+import os
 from flask import Flask
 from flask_migrate import Migrate
 # from extra.get_config import get_config
 
 
-def register_blueprints(app):
-    """ Register all app Blueprints """
-    from .admin import admin
-    app.register_blueprints(admin.admin_bp)
+def get_base_dir():
+    return os.path.abspath(os.path.abspath(os.path.dirname(__file__)))
 
 
 def create_app():
@@ -47,7 +46,7 @@ def create_app():
         from smrtuncrndsh.dash_apps.dashboard import create_dashboard
         create_dashboard(app)
 
-        from smrtuncrndsh.dash_apps.graph import create_graph
-        create_graph(app)
+        from smrtuncrndsh.dash_apps.shopping import create_shopping_dashboard
+        create_shopping_dashboard(app)
 
         return app
