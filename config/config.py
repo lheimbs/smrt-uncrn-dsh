@@ -18,7 +18,8 @@ class Config(object):
     @property
     def SQLALCHEMY_BINDS(self):
         return {
-            'probe_request': f'postgresql://pi:{os.getenv("DATABASE_PASSWORD")}@lennyspi.local/{self.DB_NAME}_probes'
+            'probe_request':
+            f'postgresql://pi:{os.getenv("DATABASE_PASSWORD")}@lennyspi.local/probes'
         }
 
 
@@ -29,7 +30,7 @@ class ProductionConfig(Config):
 
 
 class DevelopmentConfig(Config):
-    DB_NAME = 'data_development'
+    DB_NAME = 'data'
     MQTT_SERVER = 'localhost'
     MQTT_PORT = 1883
     DEBUG = True
