@@ -49,4 +49,22 @@ def create_app():
         from smrtuncrndsh.dash_apps.shopping import create_shopping_dashboard
         create_shopping_dashboard(app)
 
+        from smrtuncrndsh.dash_apps.dashboard_overview import create_dashboard_overview
+        create_dashboard_overview(app)
+
         return app
+
+
+def get_css_vars():
+    BASE_DIR = get_base_dir()
+    vars = {}
+    with open(os.path.join(BASE_DIR, 'static', 'css', 'variables.css'), 'r') as css_file:
+        for line in css_file:
+            line = line.strip()
+            if line.startswith('--'):
+                key, value = line[:-1].replace('--', '').split(': ')
+                vars[key] = value
+    return vars
+
+
+CSS_VARIABLES = get_css_vars()

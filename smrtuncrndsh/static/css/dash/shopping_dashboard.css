@@ -1,25 +1,11 @@
-.shopping-dashboard-container {
-    height: 88vh;
-    overflow-y: auto;
-}
-
 .shopping-dashboard-content {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
-        /* auto-fit, minmax(200px, 1fr)); */
-    /* grid-template-rows: 1fr 1fr 1fr; */
     grid-template-areas: 
         "monthly_expenses monthly_expenses total_cat shopping_cat"
         "total_expenses total_expenses total_expenses total_expenses";
 
     grid-gap: 10px;
-
-    overflow-y: scroll;
-    -ms-overflow-style: none;  /* IE and Edge */
-    scrollbar-width: none;  /* Firefox */
-}
-.shopping-dashboard-content::-webkit-scrollbar {
-    display: none;
 }
 
 @media(max-width:768px) {
@@ -29,10 +15,6 @@
                              "total_cat"
                              "shopping_cat"
                              "total_expenses";
-    }
-    .shopping-dashboard-container {
-        height:81vh;
-        overflow-y: scroll;
     }
 }
 

@@ -23,25 +23,27 @@ html, body {
 
     grid-template-columns: 200px 1fr;
     grid-template-rows: auto 1fr;
-    grid-gap: 10px;
-
-    height: 100vh;
+    grid-gap: var(--container-grid-gap);
 }
 
 header {
     grid-area: header;
+    height: var(--header-height);
 }
 
 nav {
+    /* height: 100%; */
     grid-area: nav;
 }
 
 main {
     grid-area: content;
     margin-right: 10px;
+    overflow-y: auto;
 }
 
 footer {
+    height: var(--footer-height);
     grid-area: footer;
 }
 

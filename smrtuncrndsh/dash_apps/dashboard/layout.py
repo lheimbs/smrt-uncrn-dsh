@@ -82,7 +82,7 @@ layout = html.Div(
                                 'staticPlot': False,
                                 'displayModeBar': False,
                             },
-                            className="graph",
+                            className="dash-graph",
                         ),
                     ]
                 ),

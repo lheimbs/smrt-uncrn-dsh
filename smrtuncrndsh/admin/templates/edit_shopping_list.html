@@ -1,0 +1,156 @@
+{% extends "base.html" %}
+
+{% block extra_assets %}
+{% assets "select2_js" %}
+    <script type="text/javascript" src="{{ ASSET_URL }}"></script>
+{% endassets %}
+{% assets "select2_css" %}
+    <link rel="stylesheet" href="{{ ASSET_URL }}" />
+{% endassets %}
+{% assets "chosen_js" %}
+    <script type="text/javascript" src="{{ ASSET_URL }}"></script>
+{% endassets %}
+{% assets "chosen_css" %}
+    <link rel="stylesheet" href="{{ ASSET_URL }}" />
+{% endassets %}
+{% endblock %}
+
+{% block content %}
+{% include "adminbar.html" %}
+
+<div class="card">
+    <div class="form-wrapper">
+
+        {% for message in get_flashed_messages() %}
+        <div class="alert alert-warning">
+            <button type="button" class="close" data-dismiss="alert">&times;</button>
+            {{ message }}
+        </div>
+        {% endfor %}
+
+        <h3>Edit Shopping List {{ liste.id }}</h3>
+
+        <form id="users-edit-form" method="POST" action="{{ url_for('admin_bp.edit_shopping_list', id=liste.id) }}">
+            {{ form.csrf_token }}
+            {{ form.test }}
+
+            <table id="edit-users-table" cellspacing="0" cellpadding="0">
+                <tr>
+                    <td>Date</td>
+                    <td>
+                        <fieldset class="date">
+                            {{ form.date }}
+                            {% if form.date.errors %}
+                            <ul class="errors">
+                                {% for error in form.date.errors %}
+                                    <li>{{ error }}</li>
+                                {% endfor %}
+                            </ul>
+                            {% endif %}
+                        </fieldset>
+                    </td>
+                </tr>
+                <tr>
+                    <td>Price</td>
+                    <td>
+                        <fieldset class="price">
+                            {{ form.price }}
+                            {% if form.price.errors %}
+                            <ul class="errors">
+                                {% for error in form.price.errors %}
+                                    <li>{{ error }}</li>
+                                {% endfor %}
+                            </ul>
+                            {% endif %}
+                        </fieldset>
+                    </td>
+                </tr>
+                <tr>
+                    <td>Shop</td>
+                    <td>
+                        <fieldset class="shop">
+                            {{ form.shop(class="js-example-basic-single") }}
+                            {% if form.shop.errors %}
+                              <ul class="errors">
+                                {% for error in form.shop.errors %}
+                                    <li>{{ error }}</li>
+                                {% endfor %}
+                              </ul>
+                            {% endif %}
+                        </fieldset>
+                    </td>
+                </tr>
+                <tr>
+                    <td>Category</td>
+                    <td>
+                        <fieldset class="category">
+                            {{ form.category(class="js-example-basic-single") }}
+                            {% if form.category.errors %}
+                              <ul class="errors">
+                                {% for error in form.category.errors %}
+                                    <li>{{ error }}</li>
+                                {% endfor %}
+                              </ul>
+                            {% endif %}
+                        </fieldset>
+                    </td>
+                </tr>
+                <tr>
+                    <td>Items</td>
+                    <td>
+                        <fieldset class="items">
+                            {{ form.items_obj(class="select-items-multi-chosen", multiple="multiple") }}
+                            {% if form.items_obj.errors %}
+                              <ul class="errors">
+                                {% for error in form.items_obj.errors %}
+                                    <li>{{ error }}</li>
+                                {% endfor %}
+                              </ul>
+                            {% endif %}
+                        </fieldset>
+                    </td>
+                </tr>
+            </table>
+            <div class="submit-button">
+                <input type="submit" value="Save"/>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+    function reset_selected(e) {
+        // remove result-selected class from all li under the dropdown
+        $('.chosen-drop .chosen-results li').removeClass('result-selected');
+        // add active-result class to all li which are missing the respective class
+        $('.chosen-drop .chosen-results li').each(function() {
+            if (!$(this).hasClass('active-result'))
+            $(this).addClass('active-result');
+        });
+    }
+
+        
+    $(document).ready(function() {
+        $(".select-items-multi-chosen").chosen();
+    });
+
+    $(function() {
+        $('.chosen-container-multi').on('mousemove keyup', reset_selected)
+    });
+
+    $(function() {
+        $("#users-edit-form").submit(function() {
+            ids = [];
+            $(".choice-id").each(function(){
+                if(($.trim($(this).text()).length>0)){
+                ids.push($(this).text());
+                }
+            });
+            $("#test").val(ids);
+        });
+    });
+
+    
+    </script>
+
+{% endblock %}

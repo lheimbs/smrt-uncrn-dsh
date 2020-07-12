@@ -1,0 +1,71 @@
+{% extends "base.html" %}
+
+{% block content %}
+{% include "adminbar.html" %}
+
+<div class="card">
+    <table class="shopping-list-table" id="shopping-list-table">
+        <thead>
+            <tr>
+                <th>Edit</th>
+                <th>Delete</th>
+                <th>Date</th>
+                <th>Price</th>
+                <th>Shop</th>
+                <th>Category</th>
+                <th>Items</th>
+            </tr>
+        </thead>
+        <tbody id="table-shopping-list-data">
+            {% for list in all_lists %}
+            <tr>
+                <td class="link">
+                    <a href="{{ url_for('admin_bp.edit_shopping_list', id=list.id) }}" class="material-icons">edit</a>
+                </td>
+                <td class="link">
+                    <a href="#" class="material-icons">delete_forever</a>
+                </td>
+                <td>{{ list.date.strftime('%d.%m.%Y %H:%M:%S') if list.date else '-' }}</td>
+                <td>{{ list.price }}</td>
+                <td>{{ list.shop.name if list.shop else '-' }}</td>
+                <td>{{ list.category.name if list.category else '-' }}</td>
+                <td>
+                    <div class="shopping-items-in-list">
+                        {% for item in list.items %}
+                        <div class="item-row">
+                            <span class="name">{{ item.name }}</span>
+                            <span class="price">{{ item.price }}</span>
+                        </div>
+                        {% endfor %}
+                    </div>
+
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% block script %}
+    <script type=text/javascript>
+        const getCellValue = (tr, idx) => tr.children[idx].innerText || tr.children[idx].textContent;
+    
+        const comparer = (idx, asc) => (a, b) => ((v1, v2) => 
+            v1 !== '' && v2 !== '' && !isNaN(v1) && !isNaN(v2) ? v1 - v2 : v1.toString().localeCompare(v2)
+            )(getCellValue(asc ? a : b, idx), getCellValue(asc ? b : a, idx));
+    
+        // do the work...
+        document.querySelectorAll('th').forEach(
+            th => th.addEventListener(
+                'click', (() => {
+                    const table = th.closest('table');
+                    const tbody = table.querySelector('tbody');
+                    Array.from(tbody.querySelectorAll('tr'))
+                        .sort(comparer(Array.from(th.parentNode.children).indexOf(th), this.asc = !this.asc))
+                        .forEach(tr => tbody.appendChild(tr) );
+                    }
+            ))
+        );
+    </script>
+    {% endblock %}
+    
+</div>
+{% endblock %}

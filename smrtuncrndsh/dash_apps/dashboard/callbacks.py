@@ -205,7 +205,8 @@ def init_callbacks(app):                    # noqa: C901
             },
             'colorway': COLORS['colorway'],
             'font': {
-                'color': COLORS['foreground'],
+                'family': "Ubuntu",
+                'color': COLORS['font-foreground'],
             },
             'legend': {
                 'orientation': 'h',

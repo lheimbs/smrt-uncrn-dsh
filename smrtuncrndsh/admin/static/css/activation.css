@@ -12,7 +12,7 @@ table.users-activate-table > td, th {
     padding: 0;
 }
 
-.form-wrapper fieldset ul li:before {
+.form-wrapper fieldset ul.errors li:before {
     content: "\2191  \0020";
 }
 

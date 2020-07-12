@@ -5,7 +5,6 @@ from dotenv import load_dotenv
 from smrtuncrndsh import get_base_dir
 
 BASE_DIR = get_base_dir()
-print(f"config: {BASE_DIR}")
 load_dotenv(os.path.join(BASE_DIR, '.env'))
 
 

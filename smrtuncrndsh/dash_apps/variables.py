@@ -1,7 +1,8 @@
 import os
+from smrtuncrndsh import CSS_VARIABLES
 
 GRAPH_INTERVAL = os.environ.get("GRAPH_INTERVAL", 60000)
-COLORS = {
+COLORS = {**{
     'foreground': '#7FDBFF',  # 4491ed',
     'foreground-dark': '#123456',
     'background': '#111111',
@@ -39,7 +40,7 @@ COLORS = {
         '#0fb9b1',
         '#4b6584',
     ]
-}
+}, **CSS_VARIABLES}
 UNITS = {
     'temperature': '°C',
     'pressure': 'hPa',

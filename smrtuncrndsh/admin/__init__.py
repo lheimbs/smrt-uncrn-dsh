@@ -1,12 +1,19 @@
-from flask import Blueprint, render_template, abort, redirect, url_for, current_app
-# , request, jsonify, make_response
+from datetime import datetime
+
+from flask import Blueprint, render_template, abort, redirect, url_for, current_app, request
+#  , request, jsonify, make_response
 from flask_login import login_required, current_user
 from flask_wtf import FlaskForm
 from wtforms import RadioField
 from wtforms.ext.sqlalchemy.orm import model_form
+# from wtforms.validators import Required
+# from wtforms.ext.sqlalchemy.fields import QuerySelectField, QuerySelectMultipleField
 
+# from ..models import db
 from ..models.Users import User
-# from .forms import ActivateForm
+from ..models.Shopping import List
+# , Shop, Category, Item
+from .forms import ListForm
 
 admin_bp = Blueprint(
     'admin_bp', __name__,
@@ -131,4 +138,74 @@ def activation():
         template='admin-page',
         users=users,
         form=form
+    )
+
+
+@admin_bp.route('/shopping/list/', methods=['GET', 'POST'])
+@login_required
+def shopping_list():
+    lists = List.query.order_by(List.date.desc()).limit(5).all()
+    return render_template(
+        'shopping_list.html',
+        all_lists=lists,
+        title='Admin Panel - Shopping Lists',
+        template='admin-page'
+    )
+
+
+@admin_bp.route('/shopping/list/edit/<id>', methods=['POST', 'GET'])
+@login_required
+def edit_shopping_list(id):
+    if not current_user.is_admin:
+        abort(403)
+
+    current_app.logger.debug(f"Edit shopping list View, list id: {id}")
+    liste = List.query.filter_by(id=id).scalar()
+
+    list_form = ListForm(obj=liste)
+    list_form.items_obj.data = [item for item in liste.items]
+
+    if list_form.validate_on_submit():
+        print(request.form.getlist('items_obj'))
+        current_app.logger.debug("submit list form")
+        list_form.items_obj.process_formdata(request.form.getlist('items_obj'))
+        current_app.logger.debug(list_form.date.data)
+        current_app.logger.debug(list_form.price.data)
+        current_app.logger.debug(list_form.shop.data)
+        current_app.logger.debug(list_form.category.data)
+        current_app.logger.debug(list_form.items_obj.data)
+        current_app.logger.debug(list_form.test.data)
+
+        liste.date = datetime.combine(list_form.date.data, datetime.min.time())
+        liste.price = list_form.price.data
+        liste.shop = list_form.shop.data
+        liste.category = list_form.category.data
+
+        # add new items:
+        for item in list_form.items_obj.data:
+            if item.id in list_form.test.data.keys():
+                for _ in range(list_form.test.data[item.id] - liste.items.count(item)):
+                    current_app.logger.debug(f"Add <Item({item.id}, {item.name})> to list with id {liste.id}.")
+                    liste.items.append(item)
+
+        # remove deleted items
+        for item in liste.items:
+            if item not in list_form.items_obj.data:
+                current_app.logger.debug(f"Remove <Item({item.id}, {item.name})> from list with id {liste.id}.")
+                liste.items.pop(item)
+
+        liste.db_commit()
+
+        print(List.query.filter(List.id==liste.id).scalar())
+
+        return redirect(request.url)
+    else:
+        current_app.logger.debug(f"Errors: {list_form.errors}")
+
+    return render_template(
+        'edit_shopping_list.html',
+        liste=liste,
+        form=list_form,
+        title='Admin Panel - Edit Shopping List',
+        template="admin-page",
     )

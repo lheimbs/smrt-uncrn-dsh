@@ -1,16 +1,17 @@
 #!/usr/bin/env python3
 
-from . import db
+from . import db, BaseMixin
 
 association_table = db.Table(
     'association',
     db.Model.metadata,
+    db.Column('id', db.Integer, primary_key=True),
     db.Column('item_id', db.Integer, db.ForeignKey('item.id')),
     db.Column('list_id', db.Integer, db.ForeignKey('list.id'))
 )
 
 
-class List(db.Model):
+class List(db.Model, BaseMixin):
     __tablename__ = 'list'
 
     id = db.Column(db.Integer, primary_key=True)
@@ -48,7 +49,7 @@ class List(db.Model):
         )
 
 
-class Item(db.Model):
+class Item(db.Model, BaseMixin):
     __tablename__ = 'item'
     __table_args__ = (
         db.UniqueConstraint(
@@ -58,6 +59,7 @@ class Item(db.Model):
             'price_per_volume',
             'sale',
             'note',
+            'amount',
             name='_unique_item_uc'
         ),
     )
@@ -69,6 +71,7 @@ class Item(db.Model):
     price_per_volume = db.Column(db.String)
     sale = db.Column(db.Boolean)
     note = db.Column(db.String)
+    amount = db.Column(db.Integer, default=1)
     category_id = db.Column(db.Integer, db.ForeignKey('category.id'))
     # category_name = db.Column(db.String, db.ForeignKey('category.name'))
 
@@ -103,7 +106,7 @@ class Item(db.Model):
         )
 
 
-class Shop(db.Model):
+class Shop(db.Model, BaseMixin):
     __tablename__ = 'shop'
 
     id = db.Column(db.Integer, primary_key=True)
@@ -126,7 +129,7 @@ class Shop(db.Model):
         )
 
 
-class Category(db.Model):
+class Category(db.Model, BaseMixin):
     __tablename__ = 'category'
 
     id = db.Column(db.Integer, primary_key=True)

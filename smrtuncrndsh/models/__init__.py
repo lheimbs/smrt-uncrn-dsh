@@ -5,6 +5,13 @@ db = SQLAlchemy()
 
 
 class BaseMixin(object):
+    def delete_from_db(self):
+        db.session.delete(self)
+        self.db_commit()
+
+    def db_commit(self):
+        db.session.commit()
+
     @classmethod
     def create(model_class, **kwargs):
         new_obj = model_class(**kwargs)

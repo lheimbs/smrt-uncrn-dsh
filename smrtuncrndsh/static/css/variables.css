@@ -1,5 +1,6 @@
 
 :root {
+    /* COLORS  */
     --font-foreground: #cccccc;
     --font-link: #818181;
     --font-link-hover: #f1f1f1;
@@ -25,4 +26,9 @@
 
     --error: #960c0c;
     --success: #17960c;
+
+    /*  SIZES */
+    --container-grid-gap: 10px;
+    --footer-height: 0;
+
 }

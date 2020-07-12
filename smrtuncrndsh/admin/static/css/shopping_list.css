@@ -1,0 +1,57 @@
+@media 
+only screen and (max-width: 900px),
+(min-device-width: 808px) and (max-device-width: 1024px)  {
+	/*
+	Label the data
+	*/
+	.shopping-list-table td:nth-of-type(1):before { content: "Edit"; width: 25%; }
+	.shopping-list-table td:nth-of-type(2):before { content: "Delete"; width: 25%; }
+	.shopping-list-table td:nth-of-type(3):before { content: "Date"; width: 25%; }
+	.shopping-list-table td:nth-of-type(4):before { content: "Price"; width: 25%; }
+	.shopping-list-table td:nth-of-type(5):before { content: "Shop"; width: 25%; }
+	.shopping-list-table td:nth-of-type(6):before { content: "Category"; width: 25%; }
+    .shopping-list-table td:nth-of-type(7):before { content: "Items"; width: 25%; }
+
+    .shopping-list-items-table td:nth-of-type(1):before { content: "Item Name"; }
+    .shopping-list-items-table td:nth-of-type(2):before { content: "Item Price"; }
+    
+
+	.shopping-list-table .shopping-items-in-list  {
+        position: relative;
+        left: -40%;
+        width: 140%;
+    }
+
+    .shopping-list-table .link {
+        text-align: left;
+    }
+
+    .shopping-items-in-list span.name {
+        white-space: nowrap;
+    }
+}
+
+.shopping-items-in-list {
+    position: relative;
+    top: 0;
+    left: 0;
+}
+
+.shopping-items-in-list .item-row {
+    display: flex;
+    justify-content: space-between;
+    border-bottom: 1px solid var(--border-medium);
+}
+
+.shopping-items-in-list span.name {
+    display: inline-block;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    min-width: 0;
+    flex: 1;
+}
+
+
+table select {
+    width: 100%;
+}

@@ -1,25 +1,11 @@
-.dashboard-container {
-    height: 88vh;
-    overflow-y: auto;
-}
-
 .dashboard-content {
     display: grid;
     grid-template-columns: repeat(6, 1fr);
-        /* auto-fit, minmax(200px, 1fr)); */
-    /* grid-template-rows: 1fr 1fr 1fr; */
     grid-template-areas: "temp temp humid humid press press"
                          "day_hrs day_hrs day_hrs day_hrs brightness altitude"
                          "day_hrs day_hrs day_hrs day_hrs . .";
     
     grid-gap: 10px;
-
-    overflow-y: scroll;
-    -ms-overflow-style: none;  /* IE and Edge */
-    scrollbar-width: none;  /* Firefox */
-}
-.dashboard-content::-webkit-scrollbar {
-    display: none;
 }
 
 @media(max-width:768px) {
@@ -31,10 +17,6 @@
                              "brightness"
                              "altitude"
                              "day_hrs";
-    }
-    .dashboard-container {
-        height:81vh;
-        overflow-y: scroll;
     }
 }
 
@@ -95,5 +77,4 @@
 
 #day-data-graph {
     height: 25vh;
-    width: 90%;
 }

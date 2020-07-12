@@ -16,7 +16,7 @@ from ..variables import COLORS
 def init_callbacks(app):                    # noqa: C901
     @app.callback(
         Output('shopping-month-graph', 'figure'),
-        [Input("loading-shopping-overview-graph", 'loading_state')]
+        [Input("loading-shopping-overview-graph-id", 'loading_state')]
     )
     def get_shopping_monthly_overview(state):
         fig = make_subplots(specs=[[{"secondary_y": True}]])
@@ -34,7 +34,8 @@ def init_callbacks(app):                    # noqa: C901
             'colorway': COLORS['colorway'],
             'dragmode': False,
             'font': {
-                'color': COLORS['foreground'],
+                'family': "Ubuntu",
+                'color': COLORS['font-foreground'],
             },
             'legend': {
                 'orientation': 'h',
@@ -46,6 +47,7 @@ def init_callbacks(app):                    # noqa: C901
             'plot_bgcolor': COLORS['background'],
             'title': {
                 'text': "Monthly expenses Overview",
+                'x': 0.5,
             },
             'xaxis': {
                 'fixedrange': True, 'rangemode': 'tozero',
@@ -167,11 +169,84 @@ def init_callbacks(app):                    # noqa: C901
         return fig
 
     @app.callback(
+        Output('shopping-category-total-graph', 'figure'),
+        [Input('loading-shopping-category-total-graph-id', 'loading_state')]
+    )
+    def get_shopping_category_total_overview(state):
+        fig = go.Figure()
+        fig.update_layout({
+            'autosize': True,
+            'barmode': 'overlay',
+            'coloraxis': {
+                'colorbar': {
+                    'outlinewidth': 0,
+                    'bordercolor': COLORS['background'],
+                    'bgcolor': COLORS['background'],
+                },
+            },
+            'colorway': COLORS['colorway'],
+            'dragmode': False,
+            'font': {
+                'family': "Ubuntu",
+                'color': COLORS['font-foreground'],
+            },
+            'legend': {
+                'orientation': 'h',
+            },
+            'margin': {
+                'l': 10, 'r': 10, 'b': 40, 't': 40, 'pad': 0,
+            },
+            'paper_bgcolor': COLORS['background'],
+            'plot_bgcolor': COLORS['background'],
+            'title': {
+                'text': "Total category Overview",
+                'x': 0.5,
+            },
+            'xaxis': {
+                'fixedrange': True,
+                'showline': False,
+                'showgrid': False,
+                'zeroline': False,
+            },
+            'yaxis': {
+                'fixedrange': True,
+                'showline': False,
+                'showgrid': False,
+                'zeroline': False,
+            },
+        })
+
+        if not sql.is_data_in_shopping_tables():
+            current_app.logger.warning("Neccessary Shopping tables do not exist in database!")
+            return fig
+
+        expenses = sql.get_all_lists()
+        if not expenses.count():
+            return fig
+
+        expenses = pd.DataFrame(
+            [(liste.price, liste.shop.category.name if liste.shop.category else None) for liste in expenses],
+            columns=['price', 'category']
+        )
+        fig.add_trace(go.Pie(labels=expenses.category, values=expenses.price))
+
+        fig.update_traces(
+            # hoverinfo='label+percent',
+            hovertemplate="%{label}: %{value:.2f}€ (%{percent})<extra></extra>",
+            textinfo='value',  # textfont_size=20,
+            marker=dict(
+                colors=[COLORS['foreground']] + COLORS['colorway'],
+                # line=dict(color='#000000', width=2)
+            )
+        )
+        return fig
+
+    @app.callback(
         Output('shopping-category-month-graph', 'figure'),
-        [Input('loading-shopping-category-month-graph', 'loading_state')]
+        [Input('loading-shopping-category-month-graph-id', 'loading_state')]
     )
     def get_shopping_expenses_type_overview(state):
-        fig = make_subplots(rows=1, cols=2, specs=[[{'type': 'domain'}, {'type': 'domain'}]])
+        fig = go.Figure()
 
         fig.update_layout({
             'autosize': True,
@@ -186,11 +261,11 @@ def init_callbacks(app):                    # noqa: C901
             'colorway': COLORS['colorway'],
             'dragmode': False,
             'font': {
-                'color': COLORS['foreground'],
+                'family': "Ubuntu",
+                'color': COLORS['font-foreground'],
             },
-            'height': 250,
             'legend': {
-                'orientation': 'v',
+                'orientation': 'h',
             },
             'margin': {
                 'l': 10, 'r': 10, 'b': 40, 't': 40, 'pad': 0,
@@ -199,6 +274,7 @@ def init_callbacks(app):                    # noqa: C901
             'plot_bgcolor': COLORS['background'],
             'title': {
                 'text': "Shopping categories",
+                'x': 0.5,
             },
             'xaxis': {
                 'fixedrange': True,
@@ -239,7 +315,7 @@ def init_callbacks(app):                    # noqa: C901
                 values=expenses.price,
                 name='This months categories',
             ),
-            1, 2,
+            # 1, 2,
         )
 
         this_month = datetime(datetime.now().year, datetime.now().month, 1)
@@ -251,7 +327,7 @@ def init_callbacks(app):                    # noqa: C901
                 name='This months categories',
                 textposition='inside'
             ),
-            1, 1,
+            # 1, 1,
         )
 
         fig.update_traces(
@@ -263,79 +339,8 @@ def init_callbacks(app):                    # noqa: C901
         return fig
 
     @app.callback(
-        Output('shopping-category-total-graph', 'figure'),
-        [Input('loading-shopping-category-total-graph', 'loading_state')]
-    )
-    def get_shopping_category_total_overview(state):
-        fig = go.Figure()
-        fig.update_layout({
-            'autosize': True,
-            'barmode': 'overlay',
-            'coloraxis': {
-                'colorbar': {
-                    'outlinewidth': 0,
-                    'bordercolor': COLORS['background'],
-                    'bgcolor': COLORS['background'],
-                },
-            },
-            'colorway': COLORS['colorway'],
-            'dragmode': False,
-            'font': {
-                'color': COLORS['foreground'],
-            },
-            'height': 250,
-            'legend': {
-                'orientation': 'v',
-            },
-            'margin': {
-                'l': 10, 'r': 10, 'b': 40, 't': 40, 'pad': 0,
-            },
-            'paper_bgcolor': COLORS['background'],
-            'plot_bgcolor': COLORS['background'],
-            'title': {
-                'text': "Total category Overview",
-            },
-            'xaxis': {
-                'fixedrange': True,
-                'showline': False,
-                'showgrid': False,
-                'zeroline': False,
-            },
-            'yaxis': {
-                'fixedrange': True,
-                'showline': False,
-                'showgrid': False,
-                'zeroline': False,
-            },
-        })
-
-        if not sql.is_data_in_shopping_tables():
-            current_app.logger.warning("Neccessary Shopping tables do not exist in database!")
-            return fig
-
-        expenses = sql.get_all_lists()
-        if not expenses.count():
-            return fig
-
-        expenses = pd.DataFrame(
-            [(liste.price, liste.shop.category.name if liste.shop.category else None) for liste in expenses],
-            columns=['price', 'category']
-        )
-        fig.add_trace(go.Pie(labels=expenses.category, values=expenses.price))
-
-        fig.update_traces(
-            hoverinfo='label+percent',
-            textinfo='value', textfont_size=20,
-            marker=dict(
-                colors=COLORS['colorway'],
-                line=dict(color='#000000', width=2)
-            )
-        )
-        return fig
-
-    @app.callback(
         Output('shopping-overview-graph', 'figure'),
-        [Input("loading-shopping-overview-graph", 'loading_state')]
+        [Input("loading-shopping-overview-graph-id", 'loading_state')]
     )
     def get_shopping_total_overview(state):
         fig = go.Figure()
@@ -351,13 +356,19 @@ def init_callbacks(app):                    # noqa: C901
             },
             'colorway': COLORS['colorway'][3:],
             'font': {
-                'color': COLORS['foreground'],
+                'family': "Ubuntu",
+                'color': COLORS['font-foreground'],
             },
             'legend': {
                 'orientation': 'h',
             },
             'margin': {
-                'l': 10, 'r': 10, 't': 10, 'b': 10, 'pad': 0,
+                # 'l': 10, 'r': 10, 't': 10, 'b': 10, 'pad': 0,
+                'l': 10, 'r': 10, 'b': 40, 't': 40, 'pad': 0,
+            },
+            'title': {
+                'text': "Total expenses overview",
+                'x': 0.5,
             },
             'paper_bgcolor': COLORS['background'],
             'plot_bgcolor': COLORS['background'],
