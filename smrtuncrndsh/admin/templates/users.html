@@ -37,6 +37,10 @@
             {% endfor %}
         </tbody>
     </table>
+</div>
 
+<div class="users-extra-options card">
+    <a href="{{ url_for('admin_bp.new_user') }}"><button>Add User</button></a>
+    <a href="{{ url_for('admin_bp.activation') }}"><button>Activate Users</button></a>
 </div>
 {% endblock %}

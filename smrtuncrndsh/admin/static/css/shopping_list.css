@@ -55,3 +55,19 @@ only screen and (max-width: 900px),
 table select {
     width: 100%;
 }
+
+form .shopping.submit-button {
+    display: flex;
+    justify-content: space-around;
+    border: 1px solid var(--background-medium-light);
+    border-radius: 5px;
+}
+
+.shopping.submit-button input[type="submit"] {
+    margin: 10px 0;
+    width: unset;
+}
+
+.shopping.submit-button a {
+    margin: 10px 0;
+}

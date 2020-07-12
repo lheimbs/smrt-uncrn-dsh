@@ -22,9 +22,9 @@
         </div>
         {% endfor %}
 
-        <h3>Edit Shopping Liste {{ liste.id }}</h3>
+        <h3>New Shopping List</h3>
 
-        <form id="users-edit-form" method="POST" action="{{ url_for('admin_bp.edit_shopping_list', id=liste.id) }}">
+        <form id="users-edit-form" method="POST" action="{{ url_for('admin_bp.new_shopping_list') }}">
             {{ form.csrf_token }}
             {{ form.test }}
 
@@ -101,24 +101,17 @@
                                 {% endfor %}
                               </ul>
                             {% endif %}
-                            {% for id, amount in multiples.items() %}
-                              <span class="multi-items-amount" value="{{ id }}" style="display: none;">{{ amount }}</span>
-                            {% endfor %}
                         </fieldset>
                     </td>
                 </tr>
             </table>
             <div class="shopping submit-button">
                 <input type="submit" value="Save"/>
-                <a href="{{ url_for('admin_bp.delete_shopping_list', id=liste.id) }}"><button>Delete</button></a>
-                <a href="{{ url_for('admin_bp.new_shopping_list') }}"><button>New</button></a>
             </div>
         </form>
     </div>
 </div>
-<div class="shopping-extra-options">
-    
-</div>
+
 <script>
     function reset_selected(e) {
         // remove result-selected class from all li under the dropdown
@@ -132,14 +125,6 @@
 
         
     $(document).ready(function() {
-        $(".multi-items-amount").each(function() {
-            var val=$( this ).attr("value");
-            var amount=$( this ).text();
-            console.log("Add id '"+val+"' "+amount+"x to options");
-            for (var i = 1; i < amount; i++) { 
-                $("#items_obj option[value='"+val+"']").first().clone().appendTo("#items_obj");
-            }
-        });
         $(".select-items-multi-chosen").chosen();
     });
 
@@ -152,14 +137,12 @@
             ids = [];
             $(".choice-id").each(function(){
                 if(($.trim($(this).text()).length>0)){
-                ids.push($(this).text());
+                    ids.push($(this).text());
                 }
             });
             $("#test").val(ids);
         });
-    });
-
-    
+    });    
     </script>
 
 {% endblock %}

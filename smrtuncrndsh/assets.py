@@ -13,13 +13,13 @@ def compile_assets(app):
         'home_bp/css/*.css', 'admin_bp/css/*.css', 'auth_bp/css/*.css',
         filters='cssmin', output='gen/packed.css'
     )
-    select2_css = Bundle(
-        'css/select2/select2.css',  # _3-5-4
-        filters='cssmin', output='gen/select2.css'
+    tablesorter_css = Bundle(
+        'css/tablesorter/*.css',
+        filters='cssmin', output='gen/tablesorter.css'
     )
-    select2_js = Bundle(
-        'js/select2/select2.js',  # _3-5-4.min
-        filters='jsmin', output='gen/select2.js'
+    tablesorter_js = Bundle(
+        'js/tablesorter/*.js',
+        filters='jsmin', output='gen/tablesorter.js'
     )
     chosen_css = Bundle(
         'css/chosen/chosen.min.css',
@@ -36,8 +36,8 @@ def compile_assets(app):
     bundles = {
         'js_all': js,
         'css_all': css,
-        'select2_css': select2_css,
-        'select2_js': select2_js,
+        'tablesorter_css': tablesorter_css,
+        'tablesorter_js': tablesorter_js,
         'chosen_css': chosen_css,
         'chosen_js': chosen_js,
         'jquery': jquery,

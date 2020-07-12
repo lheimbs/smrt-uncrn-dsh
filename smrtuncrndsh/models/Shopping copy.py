@@ -1,39 +1,32 @@
 #!/usr/bin/env python3
-from sqlalchemy.ext.associationproxy import association_proxy
 
 from . import db, BaseMixin
 
+association_table = db.Table(
+    'association',
+    db.Model.metadata,
+    db.Column('id', db.Integer, primary_key=True),
+    db.Column('item_id', db.Integer, db.ForeignKey('item.id')),
+    db.Column('list_id', db.Integer, db.ForeignKey('list.id'))
+)
+
 
 class Liste(db.Model, BaseMixin):
-    __tablename__ = 'liste'
+    __tablename__ = 'list'
 
     id = db.Column(db.Integer, primary_key=True)
-    date = db.Column(db.Date, nullable=False)
+    date = db.Column(db.DateTime, nullable=False)
     price = db.Column(db.Float, nullable=False)
-
     shop_id = db.Column(db.Integer, db.ForeignKey('shop.id'), nullable=False)
     category_id = db.Column(db.Integer, db.ForeignKey('category.id'))
 
+    items = db.relationship(
+        'Item',
+        secondary=association_table,
+        back_populates='lists',
+    )
     shop = db.relationship('Shop')
     category = db.relationship('Category')
-
-    items = association_proxy('liste_items', 'item')
-
-    def __init__(self, date, price, shop, category=None):
-        self.date = date
-        self.price = price
-        self.shop = shop
-        self.category = category
-
-    def __repr__(self):
-        return (
-            f"<Liste(id={self.id}, "
-            f"date={self.date}, "
-            f"price={self.price}, "
-            f"shop='{self.shop}', "
-            f"category='{self.category}', "
-            f"items={[item.name for item in self.items]})>"
-        )
 
     def to_dict(self):
         return {
@@ -45,31 +38,15 @@ class Liste(db.Model, BaseMixin):
             'items': [item.to_dict() for item in self.items],
         }
 
-
-class ListeItem(db.Model, BaseMixin):
-    __tablename__ = 'liste_item'
-
-    id = db.Column(db.Integer, primary_key=True)
-    liste_id = db.Column(db.Integer, db.ForeignKey('liste.id'))  # , primary_key=True)
-    item_id = db.Column(db.Integer, db.ForeignKey('item.id'))  # , primary_key=True)
-    special_key = db.Column(db.String(50))
-
-    # bidirectional attribute/collection of "liste"/"liste_items"
-    liste = db.relationship(
-        Liste,
-        backref=db.backref(
-            "liste_items",
-            cascade="all, delete-orphan"
+    def __repr__(self):
+        return (
+            f"<Liste(id={self.id}, "
+            f"date={self.date}, "
+            f"price={self.price}, "
+            f"shop='{self.shop}', "
+            f"category='{self.category}', "
+            f"items={[item.name for item in self.items]})>"
         )
-    )
-
-    # reference to the "Keyword" object
-    item = db.relationship("Item")
-
-    def __init__(self, item=None, liste=None, special_key=None):
-        self.liste = liste
-        self.item = item
-        self.special_key = special_key
 
 
 class Item(db.Model, BaseMixin):
@@ -96,17 +73,25 @@ class Item(db.Model, BaseMixin):
     note = db.Column(db.String)
     amount = db.Column(db.Integer, default=1)
     category_id = db.Column(db.Integer, db.ForeignKey('category.id'))
+    # category_name = db.Column(db.String, db.ForeignKey('category.name'))
+
+    lists = db.relationship(
+        'Liste',
+        secondary=association_table,
+        back_populates='items'
+    )
     category = db.relationship('Category')
 
-    def __init__(self, name, price, volume=None, price_per_volume=None, sale=False, note=None, amount=1, category=None):
-        self.name = name
-        self.price = price
-        self.volume = volume
-        self.price_per_volume = price_per_volume
-        self.note = note
-        self.sale = sale
-        self.amount = amount
-        self.category = category
+    def to_dict(self):
+        return {
+            'name': self.name,
+            'price': self.price,
+            'volume': self.volume,
+            'price_per_volume': self.price_per_volume,
+            'sale': self.sale,
+            'note': self.note,
+            'category': self.category.to_dict() if self.category else self.category,
+        }
 
     def __repr__(self):
         return (
@@ -119,17 +104,6 @@ class Item(db.Model, BaseMixin):
             f"note='{self.note}', "
             f"category='{self.category}')>"
         )
-
-    def to_dict(self):
-        return {
-            'name': self.name,
-            'price': self.price,
-            'volume': self.volume,
-            'price_per_volume': self.price_per_volume,
-            'sale': self.sale,
-            'note': self.note,
-            'category': self.category.to_dict() if self.category else self.category,
-        }
 
 
 class Shop(db.Model, BaseMixin):

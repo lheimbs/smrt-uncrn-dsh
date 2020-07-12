@@ -39,6 +39,8 @@ class Config:
     }
     SQLALCHEMY_TRACK_MODIFICATIONS = False
 
+    SHOPPING_LISTS_PER_PAGE = 10
+
 
 class ProductionConfig(Config):
     """Uses production database server."""

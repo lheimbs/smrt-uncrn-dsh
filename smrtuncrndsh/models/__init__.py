@@ -5,6 +5,10 @@ db = SQLAlchemy()
 
 
 class BaseMixin(object):
+    def save_to_db(self):
+        db.session.add(self)
+        db.session.commit()
+
     def delete_from_db(self):
         db.session.delete(self)
         self.db_commit()
@@ -31,7 +35,7 @@ def init_db(app):
         from .Mqtt import Mqtt      # noqa: F401
         from .State import State      # noqa: F401
         from .Tablet import TabletBattery      # noqa: F401
-        from .Shopping import List, Shop, Category, Item      # noqa: F401
+        from .Shopping import Liste, Shop, Category, Item      # noqa: F401
 
         if app.config['DROP_ALL']:
             app.logger.debug("Drop all Database Tables")

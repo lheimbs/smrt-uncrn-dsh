@@ -80,7 +80,8 @@ class ListForm(FlaskForm):
         validators=[Required()],
         query_factory=lambda: Shop.query,
         get_label='name',
-        allow_blank=False,
+        allow_blank=True,
+        blank_text="Select a Shop",
         description="Shop where purchase took place",
     )
     category = QuerySelectField(

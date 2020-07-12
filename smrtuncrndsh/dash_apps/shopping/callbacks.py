@@ -318,7 +318,7 @@ def init_callbacks(app):                    # noqa: C901
             # 1, 2,
         )
 
-        this_month = datetime(datetime.now().year, datetime.now().month, 1)
+        this_month = datetime(datetime.now().year, datetime.now().month, 1).date()
         expenses.loc[expenses.date < this_month, "price"] = 0
         fig.add_trace(
             go.Pie(

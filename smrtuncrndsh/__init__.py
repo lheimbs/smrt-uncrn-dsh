@@ -9,6 +9,34 @@ def get_base_dir():
     return os.path.abspath(os.path.abspath(os.path.dirname(__file__)))
 
 
+def register_blueprints(app):
+    from .admin import admin_bp                                             # noqa: F401
+    from .admin.users import users, edit_user, delete_user, activation, new_user      # noqa: F401
+    from .admin.shopping import shopping_list, edit_shopping_list, new_shopping_list           # noqa: F401
+    app.register_blueprint(admin_bp)
+
+    from .user import user_bp, user             # noqa: F401
+    app.register_blueprint(user_bp)
+
+    from .home import home_bp, home, logout     # noqa: F401
+    app.register_blueprint(home_bp)  # , url_prefix='/home')
+
+    from .auth import auth_bp, login, register  # noqa: F401
+    app.register_blueprint(auth_bp)
+
+
+def register_dash(app):
+    # Import Dash applications
+    from smrtuncrndsh.dash_apps.dashboard import create_dashboard
+    create_dashboard(app)
+
+    from smrtuncrndsh.dash_apps.shopping import create_shopping_dashboard
+    create_shopping_dashboard(app)
+
+    from smrtuncrndsh.dash_apps.dashboard_overview import create_dashboard_overview
+    create_dashboard_overview(app)
+
+
 def create_app():
     """Construct core Flask application with embedded Dash app."""
     app = Flask(__name__, instance_relative_config=False)
@@ -26,31 +54,12 @@ def create_app():
         from .models import db
         migrate = Migrate(app, db)          # noqa: F841
 
-        from .admin import admin_bp, users, activation, delete_user, edit_user  # noqa: F401
-        app.register_blueprint(admin_bp)
-
-        from .user import user_bp, user             # noqa: F401
-        app.register_blueprint(user_bp)
-
-        from .home import home_bp, home, logout     # noqa: F401
-        app.register_blueprint(home_bp)  # , url_prefix='/home')
-
-        from .auth import auth_bp, login, register  # noqa: F401
-        app.register_blueprint(auth_bp)
+        register_blueprints(app)
+        register_dash(app)
 
         # Compile CSS
         from smrtuncrndsh.assets import compile_assets
         compile_assets(app)
-
-        # Import Dash applications
-        from smrtuncrndsh.dash_apps.dashboard import create_dashboard
-        create_dashboard(app)
-
-        from smrtuncrndsh.dash_apps.shopping import create_shopping_dashboard
-        create_shopping_dashboard(app)
-
-        from smrtuncrndsh.dash_apps.dashboard_overview import create_dashboard_overview
-        create_dashboard_overview(app)
 
         return app
 
