@@ -51,7 +51,7 @@ def login():
                 user.db_commit()
             next_page = request.args.get('next')
             return redirect(next_page or url_for('user_bp.user'))
-        flash('Invalid username/password combination')
+        flash('Invalid username/password combination', 'error')
         return redirect(url_for('auth_bp.login'))
     return render_template(
         'login.html',
@@ -81,7 +81,7 @@ def register():
                 user.last_login = datetime.now()
                 user.db_commit()
             return redirect(url_for('user_bp.user'))
-        flash('A user already exists with that username.')
+        flash('A user already exists with that username.', 'error')
     return render_template(
         'register.html',
         title='Create an Account.',
@@ -102,5 +102,5 @@ def load_user(user_id):
 @login_manager.unauthorized_handler
 def unauthorized():
     """Redirect unauthorized users to Login page."""
-    flash('You must be logged in to view that page.')
+    flash('You must be logged in to view that page.', 'error')
     return redirect(url_for('auth_bp.login'))

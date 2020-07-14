@@ -1,3 +1,4 @@
+{% from "macros.html" import render_flashes %}
 {% extends "base.html" %}
 
 {% block extra_assets %}
@@ -15,12 +16,12 @@
 <div class="card">
     <div class="form-wrapper">
 
-        {% for message in get_flashed_messages() %}
-        <div class="alert alert-warning">
-            <button type="button" class="close" data-dismiss="alert">&times;</button>
-            {{ message }}
+        <div class="flashes">
+            {{ render_flashes('error') }}
+            {{ render_flashes('warning') }}
+            {{ render_flashes('info') }}
+            {{ render_flashes('success') }}
         </div>
-        {% endfor %}
 
         <h3>Edit Shopping Liste {{ liste.id }}</h3>
 
@@ -109,9 +110,9 @@
                 </tr>
             </table>
             <div class="shopping submit-button">
-                <input type="submit" value="Save"/>
-                <a href="{{ url_for('admin_bp.delete_shopping_list', id=liste.id) }}"><button>Delete</button></a>
-                <a href="{{ url_for('admin_bp.new_shopping_list') }}"><button>New</button></a>
+                <input class="material-icons" type="submit" value="send"/>
+                <a class="material-icons" href="{{ url_for('admin_bp.delete_shopping_list', id=liste.id) }}">delete</a>
+                <a class="material-icons" href="{{ url_for('admin_bp.new_shopping_list') }}">add_circle</a>
             </div>
         </form>
     </div>

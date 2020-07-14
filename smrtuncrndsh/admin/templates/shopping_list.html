@@ -1,3 +1,4 @@
+{% from "macros.html" import render_pagination %}
 {% extends "base.html" %}
 
 {% block extra_assets %}
@@ -7,10 +8,94 @@
 {% assets "tablesorter_css" %}
     <link rel="stylesheet" href="{{ ASSET_URL }}" />
 {% endassets %}
+{% assets "nouislider_js" %}
+    <script type="text/javascript" src="{{ ASSET_URL }}"></script>
+{% endassets %}
+{% assets "nouislider_css" %}
+    <link rel="stylesheet" href="{{ ASSET_URL }}" />
+{% endassets %}
 {% endblock %}
 
 {% block content %}
 {% include "adminbar.html" %}
+
+<div class="card">
+    <details>
+        <summary>Filter Shopping Lists</summary>
+        <form id="filter-form" action="" method="post" autocomplete="off" class="filter-form">
+            {{ form.csrf_token }}
+            <div class="filter-form-container">
+                
+                <div class="filter-date-range">
+                    <div class="tooltip filter-date-range-tooltip">
+                        <div id="date-min-max-slider"></div>
+                        {{ form.date_min(style="display: none") }}
+                        {{ form.date_max(style="display: none") }}
+                        <span class="tooltiptext bottom">Select min and max date</span>
+                    </div>
+                </div>
+                <div class="filter-price-range">
+                    <div class="tooltip filter-price-range-tooltip">
+                        <div id="price-min-max-slider"></div>
+                        {{ form.price_min(style="display: none") }}
+                        {{ form.price_max(style="display: none") }}
+                        <span class="tooltiptext bottom">Select min and max price</span>
+                    </div>
+                </div>
+                <div class="filter-shop-container tooltip">
+                    {% if data[current_shop] %}
+                        {{ form.shop(value=data[current_shop]) }}
+                    {% else %}
+                        {{ form.shop(placeholder="Shop") }}
+                    {% endif %}
+                    <span class="tooltiptext">{{ form.shop.label.text }}</span>
+                </div>
+                <div class="filter-category-container tooltip">
+                    {% if data[current_category] %}
+                        {{ form.category(value=data[current_category]) }}
+                    {% else %}
+                        {{ form.category(placeholder="Category") }}
+                    {% endif %}
+                    <span class="tooltiptext">{{ form.category.label.text }}</span>
+                </div>
+                <!-- <div class="filter-item-container tooltip">
+                    {{ form.item(placeholder="Comma separated list") }}
+                    <span class="tooltiptext">{{ form.item.label.text }}</span>
+                </div> -->
+                <div class="filter-submit">
+                    <button class="material-icons cancel-filters" onclick="cancelFilters();">close</button>
+                    <input class="material-icons" type="submit" value="send"/>
+                </div>
+            </div>
+            {% if form.date_min.errors or form.date_max.errors  or form.price_min.errors or form.price_max.errors or form.shop.errors or form.category.errors or form.item.errors %}
+            <ul class="errors">
+                {% for error in form.date_min.errors %}
+                    <li>{{ form.date_min.label.text }}: {{ error }}</li>
+                {% endfor %}
+                {% for error in form.date_max.errors %}
+                    <li>{{ form.date_max.label.text }}: {{ error }}</li>
+                {% endfor %}
+                {% for error in form.price_min.errors %}
+                    <li>{{ form.price_min.label.text }}: {{ error }}</li>
+                {% endfor %}
+                {% for error in form.price_max.errors %}
+                    <li>{{ form.price_max.label.text }}: {{ error }}</li>
+                {% endfor %}
+                {% for error in form.shop.errors %}
+                    <li>{{ form.shop.label.text }}: {{ error }}</li>
+                {% endfor %}
+                {% for error in form.category.errors %}
+                    <li>{{ form.category.label.text }}: {{ error }}</li>
+                {% endfor %}
+                {% for error in form.item.errors %}
+                    <li>{{ form.item.label.text }}: {{ error }}</li>
+                {% endfor %}
+                </ul>
+                {% endif %}
+            </div>
+        </form>
+    </details>
+</div>
 
 <div class="card">
     <table class="shopping-list-table" id="shopping-list-table">
@@ -26,7 +111,7 @@
             </tr>
         </thead>
         <tbody id="table-shopping-list-data">
-            {% for list in all_lists %}
+            {% for list in lists.items %}
             <tr>
                 <td class="link">
                     <a href="{{ url_for('admin_bp.edit_shopping_list', id=list.id) }}" class="material-icons">edit</a>
@@ -55,22 +140,57 @@
     </table>
     {% block script %}
     <script type=text/javascript>
-        $(function() {
-            $("#shopping-list-table").tablesorter({dateFormat:"ddmmyyyy"});
-        });
+        
     </script>
     {% endblock %}
-    
 </div>
 
-<div class="card">
-    <a href="{{ url_for('admin_bp.new_shopping_list') }}"><button>New</button></a>
-    {% if prev_url %}
-    <a href="{{ prev_url }}"><button>Previous Page</button></a>
-    {% endif %}
-    {% if next_url %}
-    <a href="{{ next_url }}"><button>Next Page</button></a>
-    {% endif %}
+<div class="card pager">
+    <div class="pagination-container">
+        {% if prev_url %}
+        <a class="navigation material-icons" href="{{ prev_url }}">chevron_left</a>
+        {% endif %}
+        {{ render_pagination(lists, 'admin_bp.shopping_list') }}
+        {% if next_url %}
+        <a class="navigation material-icons" href="{{ next_url }}">chevron_right</a>
+        {% endif %}
+    </div>
+    
+    <a class="new material-icons" href="{{ url_for('admin_bp.new_shopping_list') }}">add_circle</a>
 </div>
+
+<script type="text/javascript" src="{{ url_for('admin_bp.static', filename='js/shopping_list.js') }}"></script>
+<script type="text/javascript">
+
+    $(function() {
+        $("#shopping-list-table").tablesorter({dateFormat:"ddmmyyyy"});
+    });
+
+    function getMinDate() {
+        return {{ data['min_date']|tojson }};
+    }
+    function getMaxDate() {
+        return {{ data['max_date']|tojson }};
+    }
+    function getCurrMinDate() {
+        return {{ data['current_min_date']|tojson }};
+    }
+    function getCurrMaxDate() {
+        return {{ data['current_max_date']|tojson }};
+    }
+    function getMinPrice() {
+        return parseFloat({{ data['min_price']|string|tojson|safe }});
+    }
+    function getMaxPrice() {
+        return parseFloat({{ data['max_price']|string|tojson|safe }});
+    }
+    function getCurrMinPrice() {
+        return parseFloat({{ data['current_min_price']|string|tojson|safe }});
+    }
+    function getCurrMaxPrice() {
+        return parseFloat({{ data['current_max_price']|string|tojson|safe }});
+    }
+</script>
+    
 
 {% endblock %}

@@ -37,9 +37,9 @@ header a {
     text-decoration: none;
 }
 
-header a.no-icon-header-item {
+/* header a.no-icon-header-item {
     padding: 35px 20px;
-}
+} */
 
 header a.no-icon-header-item button {
     padding: 0;

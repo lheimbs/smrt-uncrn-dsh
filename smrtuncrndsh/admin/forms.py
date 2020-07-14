@@ -1,15 +1,17 @@
+from math import floor, ceil
+
 from flask import current_app
 
 from flask_wtf import FlaskForm
-
 from wtforms import BooleanField
 from wtforms_alchemy import model_form_factory
-from wtforms.fields import HiddenField
+from wtforms.fields import HiddenField, FormField, StringField
 # , StringField, Field, SelectField, SelectMultipleField, SearchField,
-from wtforms.fields.html5 import DateField, DecimalField
-from wtforms.validators import Required
+from wtforms.fields.html5 import DateField, DecimalField, DecimalRangeField
+from wtforms.validators import Required, NumberRange, ValidationError
 from wtforms.ext.sqlalchemy.fields import QuerySelectField, QuerySelectMultipleField
 
+from .misc import max_price, min_price, min_date, max_date
 from ..models import db
 from ..models.Shopping import Item, Shop, Category
 
@@ -98,3 +100,34 @@ class ListForm(FlaskForm):
         allow_blank=False,
         get_label=get_item_label
     )
+
+
+class DateRange(FlaskForm):
+    start_date = DateField(label="Start")
+    end_date = DateField(label="End")
+
+    def validate(self):
+        if self.start_date.data and self.end_date.data:
+            print(self.start_date.data, self.end_date.data)
+            return True
+        elif not self.start_date.data and not self.end_date.data:
+            return True
+        return False
+
+
+class FilterForm(FlaskForm):
+    # date_range = FormField(DateRange)
+    date_min = DateField(label="Start Date", validators=[])
+    date_max = DateField(label="End Date", validators=[])
+    price_min = DecimalField(label="Min Price")
+    price_max = DecimalField(label="Max Price")
+    shop = StringField(label="Shop")
+    category = StringField(label="Category")
+    item = StringField(label="Items")
+
+    def validate_date_min(form, field):
+        if form.date_max.data and field.data and form.date_max.data < field.data:
+            raise ValidationError('Max date has to be higher than min date.')
+        elif (form.date_max.data and not field.data) \
+                or (not form.date_max.data and field.data):
+            raise ValidationError('Both Max date and min date eiher have to be set or not set.')

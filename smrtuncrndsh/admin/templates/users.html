@@ -40,7 +40,7 @@
 </div>
 
 <div class="users-extra-options card">
-    <a href="{{ url_for('admin_bp.new_user') }}"><button>Add User</button></a>
-    <a href="{{ url_for('admin_bp.activation') }}"><button>Activate Users</button></a>
+    <a class="material-icons" href="{{ url_for('admin_bp.new_user') }}">add_circle</a>
+    <a class="material-icons" href="{{ url_for('admin_bp.activation') }}">verified_user</a>
 </div>
 {% endblock %}

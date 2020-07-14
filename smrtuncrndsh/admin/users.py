@@ -92,9 +92,9 @@ def new_user():
             )
             user.set_password(form.password.data)
             user.add_to_db()
-            flash("User added successfully.")
+            flash("User added successfully.", 'success')
         else:
-            flash('A user already exists with that username.')
+            flash('A user already exists with that username.', 'error')
     return render_template(
         'new_user.html',
         form=form,

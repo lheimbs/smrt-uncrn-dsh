@@ -1,4 +1,8 @@
 from flask import current_app
+from sqlalchemy import func
+
+from ..models import db
+from ..models.Shopping import Liste
 
 
 def get_multiple_items(liste):
@@ -39,3 +43,19 @@ def add_remove_items_from_liste(new_items, repeated_items, liste=None):
 
     if not liste.items and new_items:
         liste.items = new_items
+
+
+def min_price():
+    return db.session.query(func.min(Liste.price)).scalar()
+
+
+def max_price():
+    return db.session.query(func.max(Liste.price)).scalar()
+
+
+def min_date():
+    return db.session.query(func.min(Liste.date)).scalar()
+
+
+def max_date():
+    return db.session.query(func.max(Liste.date)).scalar()

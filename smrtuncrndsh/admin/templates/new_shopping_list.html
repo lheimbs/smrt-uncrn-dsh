@@ -1,3 +1,4 @@
+{% from "macros.html" import render_flashes %}
 {% extends "base.html" %}
 
 {% block extra_assets %}
@@ -15,12 +16,12 @@
 <div class="card">
     <div class="form-wrapper">
 
-        {% for message in get_flashed_messages() %}
-        <div class="alert alert-warning">
-            <button type="button" class="close" data-dismiss="alert">&times;</button>
-            {{ message }}
+        <div class="flashes">
+            {{ render_flashes('error') }}
+            {{ render_flashes('warning') }}
+            {{ render_flashes('info') }}
+            {{ render_flashes('success') }}
         </div>
-        {% endfor %}
 
         <h3>New Shopping List</h3>
 
@@ -106,7 +107,7 @@
                 </tr>
             </table>
             <div class="shopping submit-button">
-                <input type="submit" value="Save"/>
+                <input class="material-icons" type="submit" value="send"/>
             </div>
         </form>
     </div>
