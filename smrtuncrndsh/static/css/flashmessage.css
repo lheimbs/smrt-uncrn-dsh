@@ -1,0 +1,28 @@
+.flashes {
+
+}
+
+.flash.message {
+    padding: 10px;
+    border-radius: 5px;
+}
+
+.flash.message .close {
+    
+}
+
+.flash.success.message {
+    border: 1px solid var(--success);
+}
+
+.flash.info.message {
+    border: 1px solid var(--font-foreground);
+}
+
+.flash.warning.message {
+    border: 1px solid var(--orange);
+}
+
+.flash.error.message {
+    border: 1px solid var(--error);
+}

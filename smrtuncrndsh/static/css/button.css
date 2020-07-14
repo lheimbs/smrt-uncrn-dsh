@@ -1,0 +1,18 @@
+button, input[type='submit'] {
+    background: none!important;
+    border: none;
+    padding: 0!important;
+    /*optional*/
+    /* font-family: unset; */
+    /*input has OS specific font-family*/
+    color: var(--font-link);
+    text-decoration: none;
+    cursor: pointer;
+}
+
+button:hover {
+    color: var(--font-link-hover);
+}
+
+a { color: var(--font-link); text-decoration: none; }
+a:hover { color: var(--font-link-hover); }
