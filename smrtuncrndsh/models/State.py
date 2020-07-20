@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 
-from . import db
+from . import db, BaseMixin
 
 
-class State(db.Model):
+class State(db.Model, BaseMixin):
     __tablename__ = 'states'
 
     id = db.Column(db.Integer, primary_key=True)

@@ -39,15 +39,15 @@ only screen and (max-width: 900px),
 	.users-table td:nth-of-type(9):before { content: "Is Activated"; }
 }
 
-#edit-users-table table {
+.admin-table table {
     border: none;
 }
 
-#edit-users-table tr:nth-of-type(2n+1) {
+.admin-table tr:nth-of-type(2n+1) {
     background: unset;
 }
 
-#edit-users-table td, th {
+.admin-table td, th {
     padding: 6px;
     border: none;
     text-align: left;
@@ -62,8 +62,8 @@ input[type=submit] {
 only screen and (max-width: 900px),
 (min-device-width: 808px) and (max-device-width: 1024px)  {
 
-    #edit-users-table tr { border: none; }
-    #edit-users-table td, th { text-align: center };
+    .admin-table tr { border: none; }
+    .admin-table td, th { text-align: center };
 }
 
 .users-extra-options {

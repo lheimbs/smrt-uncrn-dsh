@@ -1,0 +1,157 @@
+{% from "macros.html" import render_flashes %}
+{% from "macros.html" import render_pagination %}
+{% extends "base.html" %}
+
+{% block extra_assets %}
+{% assets "datatables_js" %}
+    <script type="text/javascript" src="{{ ASSET_URL }}"></script>
+{% endassets %}
+{% assets "datatables_css" %}
+    <link rel="stylesheet" href="{{ ASSET_URL }}" />
+{% endassets %}
+{% endblock %}
+
+{% block content %}
+{% include "adminbar.html" %}
+
+<div>
+
+    <div class="flashes">
+        {{ render_flashes('error') }}
+        {{ render_flashes('warning') }}
+        {{ render_flashes('info') }}
+        {{ render_flashes('success') }}
+    </div>
+
+    <table class="shopping-table data-table stripe" id="shopping-items-table">
+        <thead>
+            <tr> <!-- class="card"--> 
+                <th>Id</th>
+                <th>Name</th>
+                <th>Price</th>
+                <th>Volume</th>
+                <th>Price per volume</th>
+                <th>Sale</th>
+                <th>Note</th>
+                <th>Category</th>
+                <th></th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody id="table-shopping-items-data">
+            
+        </tbody>
+        <tfoot>
+            <tr>
+                <th>Id</th>
+                <th>Name</th>
+                <th>Price</th>
+                <th>Volume</th>
+                <th>Price per volume</th>
+                <th>Sale</th>
+                <th>Note</th>
+                <th>Category</th>
+                <th class="edit"></th>
+                <th></th>
+            </tr>
+        </tfoot>
+    </table>
+</div>
+
+<script type="text/javascript">
+    function getNewItemLink() {
+        return {{ url_for('admin_bp.new_shopping_item') }};
+    }
+    function getEditItemLink(ident) {
+        return "{{ url_for('admin_bp.edit_shopping_item', id=ident) }}";
+    }
+    function getDeleteItemLink() {
+        return {{ url_for('admin_bp.new_shopping_item') }};
+    }
+
+
+    $(function() {
+        $('#shopping-items-table tfoot th').each( function () {
+            var title = $(this).text();
+            console.log(this.className);
+            var excepts = ['Delete', 'Edit'];
+            var ints = ['Id', 'Price'];
+            if (!title) {
+                $(this).html("");
+            }
+            else if (ints.includes(title)) {
+                $(this).html( '<input type="number" placeholder="'+title+'" />' );
+            }
+            else if (title === "Sale") {
+                $(this).html( '<input type="checkbox" placeholder="'+title+'" />' );
+            }
+            else {
+                $(this).html( '<input type="text" placeholder="'+title+'" />' );
+            }
+        });
+
+        var table = $("#shopping-items-table").DataTable( {
+            "initComplete": function () {
+                // Apply the search
+                this.api().columns().every( function () {
+                    var that = this;
+    
+                    $( 'input', this.footer() ).on( 'keyup change clear', function () {
+                        
+                        if (this.type === "checkbox") {
+                            var value = this.checked;
+                        }
+                        else {
+                            var value = this.value;
+                        }
+                        console.log("event", value);
+                        if ( that.search() !== value ) {
+                            that
+                                .search( value )
+                                .draw();
+                        }
+                    } );
+                } );
+                $(".card.pager").prepend('<a class="new material-icons" href="">add_circle</a>')
+            },
+            // "processing": true,
+            "serverSide": true,
+            "autoWidth": false,
+            // "stripeClasses": ['strip1', 'strip2'],
+            "ajax": {
+                url: '/admin/shopping/item/query',
+                type: 'POST'
+            },
+            "dom": '<"card"<"data-table top"li>rt><"card pager"p>',
+            "columns": [
+                {"data": "id"},
+                {"data": "name"},
+                {"data": "price"},
+                {"data": "volume"},
+                {"data": "price_per_volume"},
+                {"data": "sale"},
+                {"data": "note"},
+                {"data": "category"},
+                {
+                    "data": "edit",
+                    "searchable": false,
+                    "orderable": false,
+                    fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {
+                        $(nTd).html("<a href='/admin/shopping/item/edit/"+oData.id+"' class='material-icons'>edit</a>");
+                    },
+                },
+                {
+                    "data": "delete",
+                    "searchable": false,
+                    "orderable": false,
+                    fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {
+                        $(nTd).html("<a href='/admin/shopping/item/delete/"+oData.id+"' class='material-icons'>delete_forever</a>");
+                    },
+                },
+            ]
+        });
+    });
+</script>
+
+{% endblock %}
+

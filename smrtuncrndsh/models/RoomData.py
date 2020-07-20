@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 
-from . import db
+from . import db, BaseMixin
 
 
-class RoomData(db.Model):
+class RoomData(db.Model, BaseMixin):
     __tablename__ = 'room_data'
 
     id = db.Column(db.Integer, primary_key=True)

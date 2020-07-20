@@ -41,6 +41,14 @@ def compile_assets(app):
         'js/nouislider/nouislider.js', 'js/nouislider/wNumb.js',
         filters='jsmin', output='gen/nouislider.js'
     )
+    datatables_css = Bundle(
+        'css/datatables/jquery.dataTables.css',  # 'css/datatables/searchPanes.dataTables.css',
+        filters='cssmin', output='gen/datatables.css'
+    )
+    datatables_js = Bundle(
+        'js/datatables/jquery.dataTables.js',  # 'js/datatables/searchPanes.dataTables.js',
+        filters='jsmin', output='gen/datatables.js'
+    )
     bundles = {
         'js_all': js,
         'css_all': css,
@@ -51,6 +59,8 @@ def compile_assets(app):
         'nouislider_css': nouislider_css,
         'nouislider_js': nouislider_js,
         'jquery': jquery,
+        'datatables_js': datatables_js,
+        'datatables_css': datatables_css,
     }
 
     assets.register(bundles)

@@ -1,5 +1,6 @@
 # from flask import current_app
 from flask_sqlalchemy import SQLAlchemy
+# from sqlalchemy.exc import IntegrityError
 
 db = SQLAlchemy()
 
@@ -11,7 +12,7 @@ class BaseMixin(object):
 
     def delete_from_db(self):
         db.session.delete(self)
-        self.db_commit()
+        db.session.commit()
 
     def db_commit(self):
         db.session.commit()

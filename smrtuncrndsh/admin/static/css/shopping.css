@@ -1,35 +1,3 @@
-@media 
-only screen and (max-width: 900px),
-(min-device-width: 808px) and (max-device-width: 1024px)  {
-	/*
-	Label the data
-	*/
-	.shopping-list-table td:nth-of-type(1):before { content: "Edit"; width: 25%; }
-	.shopping-list-table td:nth-of-type(2):before { content: "Delete"; width: 25%; }
-	.shopping-list-table td:nth-of-type(3):before { content: "Date"; width: 25%; }
-	.shopping-list-table td:nth-of-type(4):before { content: "Price"; width: 25%; }
-	.shopping-list-table td:nth-of-type(5):before { content: "Shop"; width: 25%; }
-	.shopping-list-table td:nth-of-type(6):before { content: "Category"; width: 25%; }
-    .shopping-list-table td:nth-of-type(7):before { content: "Items"; width: 25%; }
-
-    .shopping-list-items-table td:nth-of-type(1):before { content: "Item Name"; }
-    .shopping-list-items-table td:nth-of-type(2):before { content: "Item Price"; }
-    
-
-	.shopping-list-table .shopping-items-in-list  {
-        position: relative;
-        left: -40%;
-        width: 140%;
-    }
-
-    .shopping-list-table .link {
-        text-align: left;
-    }
-
-    .shopping-items-in-list span.name {
-        white-space: nowrap;
-    }
-}
 
 .shopping-items-in-list {
     position: relative;
@@ -92,9 +60,15 @@ form .shopping.submit-button {
 }
 
 .pager .new {
-    /* bottom: 1rem;
-    right: 1rem; */
-    align-self: flex-end;
+    align-self: center;
+}
+
+.pager .dataTables_paginate {
+    flex-grow: 1;
+}
+
+.dataTables_wrapper .dataTables_info {
+    padding-top: unset !important;
 }
 
 .pager a {
@@ -123,10 +97,6 @@ details[open=""] > form {
     width: calc(90%/6);
 }
 
- /* {
-    width: calc((100%/7)*2);
-} */
-
 .filter-submit {
     display: flex;
     width: 8%;
@@ -142,10 +112,6 @@ details[open=""] > form {
     width: -moz-available;
 }
 
-details[open=""] {
-    /* height: 10vh; */
-}
-
 summary {
     text-align: center;
 }
@@ -153,4 +119,35 @@ summary {
 .filter-form ul.errors {
     display: flex;
     justify-content: space-evenly;
+}
+
+tfoot input {
+    width: 100%;
+    padding: 3px;
+    box-sizing: border-box;
+}
+
+.data-table.top {
+    display: flex;
+    justify-content: space-between;
+    padding: 10px 0;
+}
+
+@media 
+only screen and (max-width: 900px),
+(min-device-width: 808px) and (max-device-width: 1024px)  {
+
+    .shopping-table .link {
+        text-align: left;
+    }
+
+    .shopping-list-table .shopping-items-in-list  {
+        position: relative;
+        left: -40%;
+        width: 140%;
+    }
+
+    .shopping-items-in-list span.name {
+        white-space: nowrap;
+    }
 }

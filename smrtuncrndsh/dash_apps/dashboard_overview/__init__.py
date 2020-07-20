@@ -1,4 +1,5 @@
 from dash import Dash
+from flask import current_app
 
 from .layout import layout
 from .callbacks import init_callbacks
@@ -11,6 +12,8 @@ def create_dashboard_overview(server):
         server=server,
         routes_pathname_prefix='/dashboard/overview/',
     )
+    if current_app.config['DEBUG']:
+        dash_app.enable_dev_tools(debug=True)
     if (dash_app.logger.hasHandlers()):
         dash_app.logger.handlers.clear()
 

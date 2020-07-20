@@ -2,10 +2,10 @@
 
 # from sqlalchemy import Column, Integer, DateTime, String
 # from models.db import Base
-from . import db
+from . import db, BaseMixin
 
 
-class RfData(db.Model):
+class RfData(db.Model, BaseMixin):
     __tablename__ = 'rf_data'
 
     id = db.Column(db.Integer, primary_key=True)

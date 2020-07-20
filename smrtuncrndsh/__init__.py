@@ -12,7 +12,16 @@ def get_base_dir():
 def register_blueprints(app):
     from .admin import admin_bp                                             # noqa: F401
     from .admin.users import users, edit_user, delete_user, activation, new_user      # noqa: F401
-    from .admin.shopping import shopping_list, edit_shopping_list, new_shopping_list           # noqa: F401
+    from .admin.shopping.lists import shopping_list  # noqa: F401
+    from .admin.shopping.items import shopping_item  # noqa: F401
+    from .admin.shopping.shops import shopping_shop  # noqa: F401
+    from .admin.shopping.categories import shopping_category  # noqa: F401
+    from .admin.room_data import room_data  # noqa: F401
+    from .admin.rf_data import rf_data  # noqa: F401
+    from .admin.mqtt import mqtt  # noqa: F401
+    from .admin.probe_request import probe_request  # noqa: F401
+    from .admin.state import state  # noqa: F401
+    from .admin.tablet_battery import tablet_battery  # noqa: F401
     app.register_blueprint(admin_bp)
 
     from .user import user_bp, user             # noqa: F401

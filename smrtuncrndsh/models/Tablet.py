@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 
-from . import db
+from . import db, BaseMixin
 
 
-class TabletBattery(db.Model):
+class TabletBattery(db.Model, BaseMixin):
     __tablename__ = 'tablet_battery'
 
     id = db.Column(db.Integer, primary_key=True)

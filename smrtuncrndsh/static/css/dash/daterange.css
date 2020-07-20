@@ -1,0 +1,62 @@
+/* Datepicker top date-input */
+.DateRangePickerInput__withBorder {
+    border: 1px solid var(--border-light);  /* make border depending on input color maybe? */
+}
+.DateRangePickerInput {
+    background-color: var(--background-card);
+}
+.DateInput {
+    background: var(--background);
+}
+input:valid {
+    outline: none var(--border-light);
+}
+.DateInput_fangShape {
+    fill: var(--background-card);
+}
+.DateInput_fangStroke {
+    stroke: var(--background);
+    fill: transparent;
+}
+.DateRangePickerInput_arrow {
+    color: var(--font-foreground);
+}
+.DateRangePickerInput_arrow_svg {
+    fill: var(--font-foreground);
+}
+
+/* Datepicker calendar */
+.DateRangePicker_picker {
+    background-color: var(--background-card);
+}
+.DayPicker__horizontal {
+    background: var(--background-card);
+}
+.DayPicker {
+    background: var(--background-card);
+}
+.DayPicker_weekHeader {
+    color: var(--font-foreground);
+}
+.DayPickerNavigation_button__default {
+    border: 1px solid var(--border-light);
+    background-color: var(--background-card);
+    color: var(--font-foreground);
+}
+.DayPickerNavigation_svg__horizontal {
+    fill: var(--font-foreground);
+}
+.CalendarMonthGrid {
+    background: var(--background-card);
+}
+.CalendarMonth {
+    background: var(--background-card);
+}
+.CalendarMonth_caption {
+    color: var(--font-foreground);
+}
+.CalendarDay__default {
+    border: 1px solid var(--border-medium);
+    color: var(--font-foreground);
+    background: var(--background-medium);
+}

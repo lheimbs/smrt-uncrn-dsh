@@ -396,11 +396,14 @@ def init_callbacks(app):                    # noqa: C901
 
         for shop in shops.name:
             expense = sql.get_shopping_expenses_per_shop(shop)
-            df_days = df_days.join(expense)
+            if expense.empty:
+                current_app.logger.debug(f"Shop {shop} has no expenses attributed to it.")
+                continue
+            df_days_new = df_days.join(expense)
             bar = go.Bar(
                 name=shop,
-                x=df_days.index,
-                y=df_days[shop],
+                x=df_days_new.index,
+                y=df_days_new[shop],
                 hovertemplate="%{x|%d.%m.%Y} : %{y:.2f}€",
                 marker={
                     'line': {

@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 
-from . import db
+from . import db, BaseMixin
 
 
-class ProbeRequest(db.Model):
+class ProbeRequest(db.Model, BaseMixin):
     __tablename__ = 'probe_requests'
     __bind_key__ = 'probe_request'
 

@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 
-from . import db
+from . import db, BaseMixin
 
 
-class Mqtt(db.Model):
+class Mqtt(db.Model, BaseMixin):
     __tablename__ = 'mqtt_messages'
 
     id = db.Column(db.Integer, primary_key=True)

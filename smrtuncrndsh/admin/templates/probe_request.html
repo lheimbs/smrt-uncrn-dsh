@@ -1,0 +1,96 @@
+{% from "macros.html" import render_flashes %}
+{% from "macros.html" import render_pagination %}
+{% extends "base.html" %}
+
+{% block content %}
+{% include "adminbar.html" %}
+
+<div class="card">
+
+    <div class="flashes">
+        {{ render_flashes('error') }}
+        {{ render_flashes('warning') }}
+        {{ render_flashes('info') }}
+        {{ render_flashes('success') }}
+    </div>
+
+    <h3>ProbeRequests</h3>
+    {% if form %}
+    {# render form #}
+        <form id="probe-request-form" method="POST">
+            {{ form.csrf_token }}
+
+            <table class="admin-table" cellspacing="0" cellpadding="0">
+                {% for field in form if field.widget.input_type != 'hidden' %}
+                <tr>
+                    <td>{{ field.label }}</td>
+                    <td>
+                        <fieldset class="{{ field.type }}">
+                            {{ field }}
+                            {% if field.errors %}
+                            <ul class="errors">
+                                {% for error in field.errors %}
+                                    <li>{{ error }}</li>
+                                {% endfor %}
+                            </ul>
+                            {% endif %}
+                        </fieldset>
+                    </td>
+                </tr>
+                {% endfor %}
+            </table>
+            <div class="shopping submit-button">
+                <input class="material-icons" type="submit" value="send"/>
+            </div>
+        </form>
+    {% else %}
+        <table class="data-table" id="probe-request-table">
+            <thead>
+                <tr>
+                    <th>Edit</th>
+                    <th>Delete</th>
+                    <th>Id</th>
+                    <th>Date</th>
+                    <th>Mac-Address</th>
+                    <th>Make</th>
+                    <th>ssid</th>
+                    <th>rssi</th>
+                </tr>
+            </thead>
+            <tbody id="table-probe-request-data">
+                {% for item in items.items %}
+                <tr>
+                    <td class="link">
+                        <a href="{{ url_for('admin_bp.edit_probe_request', id=item.id) }}" class="material-icons">edit</a>
+                    </td>
+                    <td class="link">
+                        <a href="{{ url_for('admin_bp.delete_probe_request', id=item.id) }}" class="material-icons">delete_forever</a>
+                    </td>
+                    <td>{{ item.id }}</td>
+                    <td>{{ item.date }}</td>
+                    <td>{{ item.macaddress }}</td>
+                    <td>{{ item.make }}</td>
+                    <td>{{ item.ssid }}</td>
+                    <td>{{ item.rssi }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% endif %}
+</div>
+
+
+{% if not form %}
+    <div class="card pager">
+        <div class="pagination-container">
+            {% if prev_url %}
+            <a class="navigation material-icons" href="{{ prev_url }}">chevron_left</a>
+            {% endif %}
+            {{ render_pagination(items, 'admin_bp.probe_request') }}
+            {% if next_url %}
+            <a class="navigation material-icons" href="{{ next_url }}">chevron_right</a>
+            {% endif %}
+        </div>
+    </div>
+{% endif %}
+{% endblock %}

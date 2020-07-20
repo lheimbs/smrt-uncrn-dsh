@@ -25,11 +25,11 @@
 
         <h3>New Shopping List</h3>
 
-        <form id="users-edit-form" method="POST" action="{{ url_for('admin_bp.new_shopping_list') }}">
+        <form id="list-new-form" method="POST" action="{{ url_for('admin_bp.new_shopping_list') }}">
             {{ form.csrf_token }}
             {{ form.test }}
 
-            <table id="edit-users-table" cellspacing="0" cellpadding="0">
+            <table class="admin-table" cellspacing="0" cellpadding="0">
                 <tr>
                     <td>Date</td>
                     <td>
@@ -134,7 +134,7 @@
     });
 
     $(function() {
-        $("#users-edit-form").submit(function() {
+        $("#list-new-form").submit(function() {
             ids = [];
             $(".choice-id").each(function(){
                 if(($.trim($(this).text()).length>0)){

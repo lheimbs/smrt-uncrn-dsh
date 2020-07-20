@@ -14,8 +14,8 @@ class Liste(db.Model, BaseMixin):
     shop_id = db.Column(db.Integer, db.ForeignKey('shop.id'), nullable=False)
     category_id = db.Column(db.Integer, db.ForeignKey('category.id'))
 
-    shop = db.relationship('Shop')
-    category = db.relationship('Category')
+    shop = db.relationship('Shop', backref='lists')
+    category = db.relationship('Category', backref='lists')
 
     items = association_proxy('liste_items', 'item')
 
@@ -64,7 +64,7 @@ class ListeItem(db.Model, BaseMixin):
     )
 
     # reference to the "Keyword" object
-    item = db.relationship("Item")
+    item = db.relationship("Item", backref='lists')
 
     def __init__(self, item=None, liste=None, special_key=None):
         self.liste = liste
@@ -82,7 +82,6 @@ class Item(db.Model, BaseMixin):
             'price_per_volume',
             'sale',
             'note',
-            'amount',
             name='_unique_item_uc'
         ),
     )
@@ -94,18 +93,19 @@ class Item(db.Model, BaseMixin):
     price_per_volume = db.Column(db.String)
     sale = db.Column(db.Boolean)
     note = db.Column(db.String)
-    amount = db.Column(db.Integer, default=1)
     category_id = db.Column(db.Integer, db.ForeignKey('category.id'))
-    category = db.relationship('Category')
+    category = db.relationship('Category', backref='items')
 
-    def __init__(self, name, price, volume=None, price_per_volume=None, sale=False, note=None, amount=1, category=None):
+    def __init__(
+        self, name, price, volume=None, price_per_volume=None,
+        sale=False, note=None, category=None
+    ):
         self.name = name
         self.price = price
         self.volume = volume
         self.price_per_volume = price_per_volume
         self.note = note
         self.sale = sale
-        self.amount = amount
         self.category = category
 
     def __repr__(self):
@@ -122,6 +122,7 @@ class Item(db.Model, BaseMixin):
 
     def to_dict(self):
         return {
+            'id': self.id,
             'name': self.name,
             'price': self.price,
             'volume': self.volume,
@@ -131,6 +132,30 @@ class Item(db.Model, BaseMixin):
             'category': self.category.to_dict() if self.category else self.category,
         }
 
+    def to_ajax(self):
+        return {
+            'edit': '',
+            'delete': '',
+            'id': self.id,
+            'name': self.name,
+            'price': self.price,
+            'volume': self.volume if self.volume else "-",
+            'price_per_volume': self.price_per_volume if self.price_per_volume else "-",
+            'sale': self.sale if self.sale else "-",
+            'note': self.note if self.note else "-",
+            'category': self.category.name if self.category else '-',
+        }
+
+    def exists(self):
+        return db.session.query(Item.query.filter_by(
+            name=self.name,
+            price=self.price,
+            volume=self.volume,
+            price_per_volume=self.price_per_volume,
+            sale=self.sale,
+            note=self.note
+        ).exists()).scalar()
+
 
 class Shop(db.Model, BaseMixin):
     __tablename__ = 'shop'
@@ -139,7 +164,7 @@ class Shop(db.Model, BaseMixin):
     name = db.Column(db.String, nullable=False, unique=True)
     category_id = db.Column(db.Integer, db.ForeignKey('category.id'))
     # category_name = db.Column(db.String, db.ForeignKey('category.name'))
-    category = db.relationship('Category')
+    category = db.relationship('Category', backref='shops')
 
     def to_dict(self):
         return {
@@ -153,6 +178,12 @@ class Shop(db.Model, BaseMixin):
             f"name='{self.name}', "
             f"category='{self.category}')>"
         )
+
+    def exists(self):
+        return db.session.query(Shop.query.filter_by(
+            name=self.name,
+            category_id=self.category_id,
+        ).exists()).scalar()
 
 
 class Category(db.Model, BaseMixin):
@@ -168,3 +199,13 @@ class Category(db.Model, BaseMixin):
 
     def __repr__(self):
         return f"<Category(id={self.id}, name='{self.name}')>"
+
+    def exists(self):
+        return db.session.query(Category.query.filter_by(
+            name=self.name,
+            price=self.price,
+            volume=self.volume,
+            price_per_volume=self.price_per_volume,
+            sale=self.sale,
+            note=self.note
+        ).exists()).scalar()

@@ -1,8 +1,9 @@
 from flask import current_app
 from sqlalchemy import func
+from sqlalchemy.sql import sqltypes
 
 from ..models import db
-from ..models.Shopping import Liste
+from ..models.Shopping import Liste, Category, Shop
 
 
 def get_multiple_items(liste):
@@ -59,3 +60,85 @@ def min_date():
 
 def max_date():
     return db.session.query(func.max(Liste.date)).scalar()
+
+
+def get_bool_from_string(bool_string):
+    return True if bool_string == 'true' else False
+
+
+def get_request_dict(request):
+    request_dict = {}
+    for key, val in request.items():
+        if key in ['start', 'draw', 'length']:
+            request_dict[key] = int(val)
+        elif key == 'order[0][column]':
+            request_dict['order_col'] = int(val)
+        elif key == 'order[0][dir]':
+            request_dict['order'] = val
+        elif key == 'search[regex]':
+            request_dict['regex'] = get_bool_from_string(val)
+        elif key == 'search[value]':
+            request_dict['search'] = val
+        elif key.startswith('columns['):
+            if 'columns' not in request_dict:
+                request_dict['columns'] = {}
+
+            key = key.replace('columns[', '')
+            new_key = int(key[:key.find(']')])
+            if new_key not in request_dict['columns'].keys():
+                request_dict['columns'][new_key] = {}
+
+            key = key.replace(f'{new_key}][', '').replace('][', '_')[:-1]
+            if val in ('true', 'false'):
+                request_dict['columns'][new_key][key] = get_bool_from_string(val)
+            else:
+                request_dict['columns'][new_key][key] = val
+    return request_dict
+
+
+def get_datatables_search_query(obj, req_dict):
+    query = obj.query
+
+    for col, vals in req_dict['columns'].items():
+        if not hasattr(obj, vals['data']):
+            continue
+        elif not vals['searchable'] and not vals['orderable']:
+            continue
+        elif not req_dict['search'] and not vals['search_value']:
+            continue
+
+        if vals['data'] == 'category':
+            attr = getattr(Category, 'name')
+            query = query.join(obj.category)
+        elif vals['data'] == 'shop':
+            attr = getattr(Shop, vals['data'], 'name')
+            query = query.join(obj.shop)
+        else:
+            attr = getattr(obj, vals['data'])
+
+        if isinstance(attr.property.columns[0].type, sqltypes.String):
+            search = func.lower(req_dict['search'])
+            search_value = func.lower(vals['search_value'])
+            if req_dict['search'] and vals['searchable']:
+                query = query.filter(func.lower(attr).contains(search))
+            if vals['search_value'] and vals['searchable']:
+                query = query.filter(func.lower(attr).contains(search_value))
+        else:
+            search = req_dict['search']
+            search_value = vals['search_value']
+
+            if req_dict['search'] and vals['searchable']:
+                query = query.filter(attr == search)
+            if vals['search_value'] and vals['searchable']:
+                query = query.filter(attr == search_value)
+    return query
+
+
+def get_datatables_order_query(obj, req_dict, query):
+    if req_dict and req_dict['columns'][req_dict['order_col']]['orderable']:
+        if req_dict['order'] == 'asc':
+            attr = getattr(obj, req_dict['columns'][req_dict['order_col']]['data']).asc()
+        else:
+            attr = getattr(obj, req_dict['columns'][req_dict['order_col']]['data']).desc()
+        query = query.order_by(attr)
+    return query

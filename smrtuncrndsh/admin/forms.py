@@ -1,19 +1,22 @@
-from math import floor, ceil
-
 from flask import current_app
 
 from flask_wtf import FlaskForm
 from wtforms import BooleanField
-from wtforms_alchemy import model_form_factory
-from wtforms.fields import HiddenField, FormField, StringField
+from wtforms_alchemy import model_form_factory, ModelFormField
+from wtforms.fields import HiddenField, StringField
 # , StringField, Field, SelectField, SelectMultipleField, SearchField,
-from wtforms.fields.html5 import DateField, DecimalField, DecimalRangeField
-from wtforms.validators import Required, NumberRange, ValidationError
+from wtforms.fields.html5 import DateField, DecimalField, DateTimeField
+from wtforms.validators import Required, ValidationError
 from wtforms.ext.sqlalchemy.fields import QuerySelectField, QuerySelectMultipleField
 
-from .misc import max_price, min_price, min_date, max_date
 from ..models import db
 from ..models.Shopping import Item, Shop, Category
+from ..models.RoomData import RoomData
+from ..models.RfData import RfData
+from ..models.Mqtt import Mqtt
+from ..models.ProbeRequest import ProbeRequest
+from ..models.Tablet import TabletBattery
+from ..models.State import State
 
 BaseModelForm = model_form_factory(FlaskForm)
 
@@ -32,9 +35,35 @@ class ModelForm(BaseModelForm):
         return db.session
 
 
+class CategoryForm(ModelForm):
+    class Meta:
+        model = Category
+
+
+class CategorySelectForm(FlaskForm):
+    # class Meta:
+    #     model = Category
+    name = QuerySelectField(
+        query_factory=lambda: Category.query,
+        get_label='name',
+        allow_blank=True,
+        blank_text="Select a category",
+        description="Category",
+    )
+
+
+class ShopForm(ModelForm):
+    class Meta:
+        model = Shop
+
+    category = ModelFormField(CategorySelectForm)
+
+
 class ItemForm(ModelForm):
     class Meta:
         model = Item
+
+    category = ModelFormField(CategorySelectForm)
 
 
 def get_item_label(item):
@@ -80,14 +109,14 @@ class ListForm(FlaskForm):
 
     shop = QuerySelectField(
         validators=[Required()],
-        query_factory=lambda: Shop.query,
+        query_factory=lambda: Shop.query.order_by(Shop.name),
         get_label='name',
         allow_blank=True,
         blank_text="Select a Shop",
         description="Shop where purchase took place",
     )
     category = QuerySelectField(
-        query_factory=lambda: Category.query,
+        query_factory=lambda: Category.query.order_by(Category.name),
         get_label='name',
         allow_blank=True,
         blank_text="Select a category",
@@ -102,21 +131,7 @@ class ListForm(FlaskForm):
     )
 
 
-class DateRange(FlaskForm):
-    start_date = DateField(label="Start")
-    end_date = DateField(label="End")
-
-    def validate(self):
-        if self.start_date.data and self.end_date.data:
-            print(self.start_date.data, self.end_date.data)
-            return True
-        elif not self.start_date.data and not self.end_date.data:
-            return True
-        return False
-
-
 class FilterForm(FlaskForm):
-    # date_range = FormField(DateRange)
     date_min = DateField(label="Start Date", validators=[])
     date_max = DateField(label="End Date", validators=[])
     price_min = DecimalField(label="Min Price")
@@ -131,3 +146,40 @@ class FilterForm(FlaskForm):
         elif (form.date_max.data and not field.data) \
                 or (not form.date_max.data and field.data):
             raise ValidationError('Both Max date and min date eiher have to be set or not set.')
+
+
+class RoomDataForm(ModelForm):
+    class Meta:
+        model = RoomData
+    date = DateTimeField(validators=[Required()])
+
+
+class MqttForm(ModelForm):
+    class Meta:
+        model = Mqtt
+    # date = DateTimeField()
+    # Date = DateField()
+
+
+class RfDataForm(ModelForm):
+    class Meta:
+        model = RfData
+    date = DateTimeField(validators=[Required()])
+
+
+class ProbeRequestForm(ModelForm):
+    class Meta:
+        model = ProbeRequest
+    date = DateTimeField(validators=[Required()])
+
+
+class StateForm(ModelForm):
+    class Meta:
+        model = State
+    date = DateTimeField(validators=[Required()])
+
+
+class TabletBatteryForm(ModelForm):
+    class Meta:
+        model = TabletBattery
+    date = DateTimeField(validators=[Required()])

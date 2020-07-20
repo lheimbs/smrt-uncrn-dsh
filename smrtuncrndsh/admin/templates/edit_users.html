@@ -18,7 +18,7 @@
         <form id="user-edit-form" method="POST" action="{{ url_for('admin_bp.edit_user', username=user.username) }}">
             {{ form.csrf_token }}
 
-            <table id="edit-users-table" cellspacing="0" cellpadding="0">
+            <table class="admin-table" cellspacing="0" cellpadding="0">
                 <tr>
                     <td>Username</td>
                     <td>
