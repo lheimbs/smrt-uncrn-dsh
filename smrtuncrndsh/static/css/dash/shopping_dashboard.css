@@ -1,0 +1,60 @@
+.shopping-dashboard-content {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    grid-template-areas: 
+        "monthly_expenses monthly_expenses total_cat shopping_cat"
+        "total_expenses total_expenses total_expenses total_expenses";
+
+    grid-gap: 10px;
+}
+
+@media(max-width:768px) {
+    .shopping-dashboard-content {
+        grid-template-columns: 1fr;
+        grid-template-areas: "monthly_expenses"
+                             "total_cat"
+                             "shopping_cat"
+                             "total_expenses";
+    }
+}
+
+.shopping-month-graph-container {
+    grid-area: monthly_expenses;
+    /* display: flex;
+    justify-content: space-around;
+    align-items: center;
+    flex-wrap: wrap; */
+}
+.shopping-category-month-graph-container {
+    grid-area: shopping_cat;
+    /* display: flex;
+    justify-content: space-around;
+    align-items: center;
+    flex-wrap: wrap; */
+}
+.shopping-category-total-graph-container {
+    grid-area: total_cat;
+    /* display: flex;
+    justify-content: space-around;
+    align-items: center;
+    flex-wrap: wrap; */
+}
+.shopping-overview-graph-container {
+    grid-area: total_expenses;
+    /* display: flex;
+    flex-direction: column;
+    align-items: center; */
+}
+
+.shopping-dashboard-content .card {
+    box-shadow: 0 1px 2px 0 rgba(255,255,255,0.05);
+    transition: 0.3s;
+    border-radius: 5px;
+    background-color: var(--background-card);
+    margin: 0;
+    padding: 5px;
+}
+
+.shopping-dashboard-content .card:hover {
+    box-shadow: 0 8px 16px 0 rgba(255,255,255,0.05);
+}

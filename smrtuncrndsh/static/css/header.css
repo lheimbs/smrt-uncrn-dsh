@@ -1,0 +1,60 @@
+header {
+    display: flex;
+    /* justify-content: space-between; */
+    /* align-items: center; */
+    background-color: var(--background-light);
+}
+
+header .header-items-left {
+    display: flex;
+    justify-content: flex-start;
+    width: 33.4%;
+    align-items: center;
+    padding-left: 5%;
+    overflow: hidden;
+    text-overflow: clip;
+    /* min-width: 0; */
+    white-space: nowrap;
+}
+header .header-items-center {
+    display: flex;
+    justify-content: center;
+    width: 33.3%;
+    align-items: center;
+}
+header .header-items-right {
+    display: flex;
+    justify-content: flex-end;
+    width: 33.3%;
+    align-items: center;
+}
+
+
+header a {
+    color: var(--font-foreground);
+    text-align: center;
+    padding: 30px 20px;
+    text-decoration: none;
+}
+
+/* header a.no-icon-header-item {
+    padding: 35px 20px;
+} */
+
+header a.no-icon-header-item button {
+    padding: 0;
+}
+
+header a:active,
+header a:hover,
+body.dashboard-page a.dashboard-page,
+body.dashboard-overview-page a.dashboard-overview-page,
+body.shopping-dashboard-page a.shopping-dashboard-page,
+body.admin-page a.admin-page,
+body.user-page a.user-page,
+body.login-page a.login-page,
+body.home-page a.home-page,
+body.graph-page a.graph-page,
+body.register-page a.register-page {
+    background-color: var(--background-medium);
+}

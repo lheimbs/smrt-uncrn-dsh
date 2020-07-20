@@ -8,13 +8,10 @@ from flask_login import current_user
 from flask import current_app
 
 
-def apply_layout(app, layout, login_only=False, admin_only=False):
+def apply_layout(app, layout, admin_only=False, activated_only=False, template_str='', title=''):
     def serve_layout():
         current_app.logger.debug("serve layout")
-        current_app.logger.debug(current_user.is_anonymous)
-        current_app.logger.debug(current_user.is_authenticated)
-        current_app.logger.debug(current_user.is_admin)
-        if login_only and not current_user.is_authenticated:
+        if activated_only and not current_user.is_activated:
             return html.Div('403 Access Denied')
         elif admin_only and not current_user.is_admin:
             return html.Div('403 Access Denied')
@@ -27,12 +24,12 @@ def apply_layout(app, layout, login_only=False, admin_only=False):
 
     def serve_index(**kwargs):
         current_app.logger.debug("serve index")
-        template = render_template('layout.html')
-        idx = template.index('<div class="container">') + len('<div class="container">')
+        template = render_template('base.html', template=template_str, title=title)
+        idx = template.index('<main>') + len('<main>')
         template = template[:idx] + f'{kwargs["app_entry"]}' + template[idx:]
         idx = template.index('</body>')
         template = template[:idx] + (
-            f'<footer>{kwargs["config"]}{kwargs["scripts"]}{kwargs["renderer"]}</footer>'
+            f'<dash_footer>{kwargs["config"]}{kwargs["scripts"]}{kwargs["renderer"]}</dash_footer>'
         ) + template[idx:]
         return template
 

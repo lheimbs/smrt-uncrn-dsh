@@ -1,24 +1,3 @@
-// var mini = true;
-
-// function toggleMySidebar() {
-//   if (mini) {
-//     // console.log("opening sidebar");
-//     document.getElementById("page_sidebar").style.width = "250px";
-//     document.getElementById("main").style.marginLeft = "250px";
-//     this.mini = false;
-//   } else {
-//     // console.log("closing sidebar");
-//     document.getElementById("page_sidebar").style.width = "85px";
-//     document.getElementById("main").style.marginLeft = "85px";
-//     this.mini = true;
-//   }
-// }
-
-// function sidebar_collapse() {
-//   document.getElementById("page_sidebar").style.width = "85px";
-//   ocument.getElementById("main").style.marginLeft = "85px";
-// }
-
 
 function sidebar_open() {
     document.getElementById("main").classList.remove('sidebar-closed');

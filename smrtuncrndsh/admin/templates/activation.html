@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+
+{% block content %}
+{% include "adminbar.html" %}
+<div class="card">
+    {% if users %}
+        <p>These users are not yet approved to use your page:</p>
+        <form id="user-activate-form" method="POST" action="{{ url_for('admin_bp.activation') }}">
+            {{ form.csrf_token }}
+            <table class="users-activate-table">
+                <tr class="thead">
+                    <th rowspan="2" valign="top">Name</th>
+                    <th rowspan="2" valign="top">Email</th>
+                    <th rowspan="2" valign="top">Username</th>
+                    <th colspan="3" valign="top">Activate?</th>
+                </tr>
+                <tr class="thead">
+                    <td valign="top">Yes</th>
+                    <td valign="top">No</th>
+                    <td valign="top">Delete</th>
+                </tr>
+                <tbody id="table-users-data">
+                    {% for user in users %}
+                        <tr>
+                            <td valign="top">{{ user.name }}</td>
+                            <td valign="top">{{ user.email }}</td>
+                            <td valign="top">{{ user.username }}</td>
+                            {% for radiofield in form[user.username] %}
+                                <td valign="top">
+                                    {{ radiofield }}
+                                </td>
+                            {% endfor %}
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            <div>
+
+            <div class="submit-button">
+                <input class="material-icons" type="submit" value="send"/>
+            </div>
+        </form>
+    {% else %}
+        <p>No activation needed at this moment.</p>
+    {% endif %}
+</div>
+
+{% endblock %}

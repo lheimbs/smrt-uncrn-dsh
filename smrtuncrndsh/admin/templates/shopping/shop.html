@@ -1,0 +1,61 @@
+{% from "macros.html" import render_flashes %}
+{% extends "base.html" %}
+
+{% block extra_assets %}
+{% assets "tablesorter_js" %}
+    <script type="text/javascript" src="{{ ASSET_URL }}"></script>
+{% endassets %}
+{% assets "tablesorter_css" %}
+    <link rel="stylesheet" href="{{ ASSET_URL }}" />
+{% endassets %}
+{% endblock %}
+
+{% block content %}
+{% include "adminbar.html" %}
+
+<div class="card">
+    <div class="flashes">
+        {{ render_flashes('error') }}
+        {{ render_flashes('warning') }}
+        {{ render_flashes('info') }}
+        {{ render_flashes('success') }}
+    </div>
+    <table class="shopping-table data-table" id="shopping-shops-table">
+        <thead>
+            <tr>
+                <th>Edit</th>
+                <th>Delete</th>
+                <th>Id</th>
+                <th>Name</th>
+                <th>Category</th>
+            </tr>
+        </thead>
+        <tbody id="table-shopping-shops-data">
+            {% for shop in shops %}
+            <tr>
+                <td class="link">
+                    <a href="{{ url_for('admin_bp.edit_shopping_shop', id=shop.id) }}" class="material-icons">edit</a>
+                </td>
+                <td class="link">
+                    <a href="{{ url_for('admin_bp.delete_shopping_shop', id=shop.id) }}" class="material-icons">delete_forever</a>
+                </td>
+                <td>{{ shop.id }}</td>
+                <td>{{ shop.name }}</td>
+                <td>{{ shop.category.name if shop.category else '-' }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<div class="card pager">
+    <a class="new material-icons" href="{{ url_for('admin_bp.new_shopping_shop') }}">add_circle</a>
+</div>
+
+<script type="text/javascript">
+    $(function() {
+        $("#shopping-shops-table").tablesorter({dateFormat:"ddmmyyyy"});
+    });
+</script>
+
+{% endblock %}

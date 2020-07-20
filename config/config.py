@@ -2,7 +2,9 @@
 import os
 from dotenv import load_dotenv
 
-BASE_DIR = os.path.abspath(os.path.dirname(__file__))
+from smrtuncrndsh import get_base_dir
+
+BASE_DIR = get_base_dir()
 load_dotenv(os.path.join(BASE_DIR, '.env'))
 
 
@@ -36,6 +38,8 @@ class Config:
         'users': 'sqlite:///data_users.db',
     }
     SQLALCHEMY_TRACK_MODIFICATIONS = False
+
+    SHOPPING_LISTS_PER_PAGE = 10
 
 
 class ProductionConfig(Config):

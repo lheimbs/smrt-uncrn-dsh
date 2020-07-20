@@ -5,4 +5,4 @@ exclude =
     __pycache__,
     docs/source/conf.py,
     migrations,
-max-complexity = 10
+max-complexity = 12
