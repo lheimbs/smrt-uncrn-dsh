@@ -1,22 +1,32 @@
 {% from "macros.html" import render_flashes %}
-{% from "macros.html" import render_pagination %}
 {% extends "base.html" %}
+
+{% block extra_assets %}
+{% assets "datatables_js" %}
+    <script type="text/javascript" src="{{ ASSET_URL }}"></script>
+{% endassets %}
+{% assets "datatables_css" %}
+    <link rel="stylesheet" href="{{ ASSET_URL }}" />
+{% endassets %}
+
+<script src="{{ url_for('admin_bp.tablet_battery_js') }}"></script>
+
+{% endblock %}
 
 {% block content %}
 {% include "adminbar.html" %}
 
-<div class="card">
+<div class="flashes">
+    {{ render_flashes('error') }}
+    {{ render_flashes('warning') }}
+    {{ render_flashes('info') }}
+    {{ render_flashes('success') }}
+</div>
 
-    <div class="flashes">
-        {{ render_flashes('error') }}
-        {{ render_flashes('warning') }}
-        {{ render_flashes('info') }}
-        {{ render_flashes('success') }}
-    </div>
-
-    <h3>Tablet Battery</h3>
-    {% if form %}
+{% if form %}
     {# render form #}
+    <div class="card">
+        <h3>Tablet Battery</h3>
         <form id="tablet-battery-form" method="POST">
             {{ form.csrf_token }}
 
@@ -43,48 +53,28 @@
                 <input class="material-icons" type="submit" value="send"/>
             </div>
         </form>
-    {% else %}
-        <table class="data-table" id="tablet-battery-table">
-            <thead>
-                <tr>
-                    <th>Edit</th>
-                    <th>Delete</th>
-                    <th>Id</th>
-                    <th>Date</th>
-                    <th>Level</th>
-                </tr>
-            </thead>
-            <tbody id="table-tablet-battery-data">
-                {% for item in items.items %}
-                <tr>
-                    <td class="link">
-                        <a href="{{ url_for('admin_bp.edit_tablet_battery', id=item.id) }}" class="material-icons">edit</a>
-                    </td>
-                    <td class="link">
-                        <a href="{{ url_for('admin_bp.delete_tablet_battery', id=item.id) }}" class="material-icons">delete_forever</a>
-                    </td>
-                    <td>{{ item.id }}</td>
-                    <td>{{ item.date }}</td>
-                    <td>{{ item.level }}</td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-    {% endif %}
-</div>
-
-
-{% if not form %}
-    <div class="card pager">
-        <div class="pagination-container">
-            {% if prev_url %}
-            <a class="navigation material-icons" href="{{ prev_url }}">chevron_left</a>
-            {% endif %}
-            {{ render_pagination(items, 'admin_bp.tablet_battery') }}
-            {% if next_url %}
-            <a class="navigation material-icons" href="{{ next_url }}">chevron_right</a>
-            {% endif %}
-        </div>
     </div>
+{% else %}
+    <table class="data-table stripe" id="tablet-battery-table">
+        <thead>
+            <tr>
+                <th class="model_id">Id</th>
+                <th class="col-large">Date</th>
+                <th>Level</th>
+                <th class="edit_delete_header"></th>
+                <th class="edit_delete_header"></th>
+            </tr>
+        </thead>
+        <tfoot>
+            <tr>
+                <th><input type="number" placeholder="Id" /></th>
+                <th><input type="date" placeholder="Date" /></th>
+                <th><input type="number" placeholder="Level" /></th>
+                <th class="edit_delete_footer"></th>
+                <th class="edit_delete_footer"></th>
+            </tr>
+        </tfoot>
+    </table>
 {% endif %}
+
 {% endblock %}

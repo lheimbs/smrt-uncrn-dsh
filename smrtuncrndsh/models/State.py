@@ -18,6 +18,16 @@ class State(db.Model, BaseMixin):
             'state': self.state,
         }
 
+    def to_ajax(self):
+        return {
+            'edit': '',
+            'delete': '',
+            'id': self.id,
+            'date': self.date,
+            'device': self.device if self.device else '-',
+            'state': self.state if self.state else '-',
+        }
+
     def __repr__(self):
         return (
             "<State(id={self.id}, "

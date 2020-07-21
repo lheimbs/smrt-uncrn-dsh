@@ -22,6 +22,24 @@ td, th {
 	text-align: left; 
 }
 
+.data-table {
+	/* table-layout: fixed; */
+	width: 100%;
+}
+
+.data-table th, .data-table td {
+	word-wrap: break-word;
+	word-break: break-all;
+}
+
+.data-table .edit_delete_header, .data-table .model_id {
+	width: 30px;
+}
+
+.col-small { width: 60px; }
+.col-medium { width: 10%; }
+.col-large { width: 30%; }
+
 /* 
 Max width before this PARTICULAR table gets nasty
 This query will take effect for any screen smaller than 760px
@@ -36,12 +54,12 @@ only screen and (max-width: 900px),
 		display: block; 
 	}
 
-	tr { border: 1px solid #ccc; }
+	tr { border: 1px solid var(--border-medium); }
 
 	td { 
 		/* Behave  like a "row" */
 		border: none;
-		border-bottom: 1px solid #eee; 
+		border-bottom: 1px solid var(--border-medium); 
 		position: relative;
 		padding-left: 50%; 
 	}
@@ -60,9 +78,13 @@ only screen and (max-width: 900px),
 		width: 100%;
 	}
 
-    /* .data-table td:nth-of-type(1):before { content: "Edit"; width: 25%; }
-    .data-table td:nth-of-type(2):before { content: "Delete"; width: 25%; }
-	.data-table td:nth-of-type(3):before { content: "Id"; width: 25%; } */
+	.data-table .model_id, .col-small, .col-medium, .col-large {
+		width: inherit;
+	}
+
+    .data-table td:nth-last-of-type(2):before { content: "Edit"; width: 25%; }
+    .data-table td:nth-last-of-type(1):before { content: "Delete"; width: 25%; }
+	.data-table td:nth-of-type(1):before { content: "Id"; width: 25%; }
 
     /* #shopping-list-table td:nth-of-type(4):before { content: "Date"; width: 25%; }
     #shopping-list-table td:nth-of-type(5):before { content: "Price"; width: 25%; }
@@ -73,7 +95,6 @@ only screen and (max-width: 900px),
     #shopping-list-items-table td:nth-of-type(1):before { content: "Item Name"; }
     #shopping-list-items-table td:nth-of-type(2):before { content: "Item Price"; } */
 
-    #shopping-items-table td:nth-of-type(1):before { content: "Id"; width: 25%; }
 	#shopping-items-table td:nth-of-type(2):before { content: "Name"; width: 25%; }
 	#shopping-items-table td:nth-of-type(3):before { content: "Price"; width: 25%; }
 	#shopping-items-table td:nth-of-type(4):before { content: "Volume"; width: 25%; }
@@ -81,44 +102,42 @@ only screen and (max-width: 900px),
 	#shopping-items-table td:nth-of-type(6):before { content: "Sale"; width: 25%; }
 	#shopping-items-table td:nth-of-type(7):before { content: "Note"; width: 25%; }
 	#shopping-items-table td:nth-of-type(8):before { content: "Category"; width: 25%; }
-    #shopping-items-table td:nth-of-type(9):before { content: "Edit"; width: 25%; }
-    #shopping-items-table td:nth-of-type(10):before { content: "Delete"; width: 25%; }
 
-	/* #shopping-shops-table td:nth-of-type(4):before { content: "Name"; width: 25%; }
+	#shopping-shops-table td:nth-of-type(4):before { content: "Name"; width: 25%; }
     #shopping-shops-table td:nth-of-type(5):before { content: "Category"; width: 25%; }
 
-	#shopping-categories-table td:nth-of-type(4):before { content: "Name"; width: 25%; }
+	/* #shopping-categories-table td:nth-of-type(4):before { content: "Name"; width: 25%; } */
 
-    #mqtt-table td:nth-of-type(4):before { content: "Date"; width: 25%; }
-    #mqtt-table td:nth-of-type(5):before { content: "Topic"; width: 25%; }
-    #mqtt-table td:nth-of-type(6):before { content: "Payload"; width: 25%; }
-    #mqtt-table td:nth-of-type(7):before { content: "QOS"; width: 25%; }
-	#mqtt-table td:nth-of-type(8):before { content: "Retain"; width: 25%; }
+    #mqtt-table td:nth-of-type(2):before { content: "Date"; width: 25%; }
+    #mqtt-table td:nth-of-type(3):before { content: "Topic"; width: 25%; }
+    #mqtt-table td:nth-of-type(4):before { content: "Payload"; width: 25%; }
+    #mqtt-table td:nth-of-type(5):before { content: "QOS"; width: 25%; }
+	#mqtt-table td:nth-of-type(6):before { content: "Retain"; width: 25%; }
 	
-    #probe-request-table td:nth-of-type(4):before { content: "Date"; width: 25%; }
+    /* #probe-request-table td:nth-of-type(4):before { content: "Date"; width: 25%; }
     #probe-request-table td:nth-of-type(5):before { content: "Mac-Address"; width: 25%; }
     #probe-request-table td:nth-of-type(6):before { content: "Make"; width: 25%; }
     #probe-request-table td:nth-of-type(7):before { content: "ssid"; width: 25%; }
-	#probe-request-table td:nth-of-type(8):before { content: "rssi"; width: 25%; }
+	#probe-request-table td:nth-of-type(8):before { content: "rssi"; width: 25%; } */
 
-    #rf-data-table td:nth-of-type(4):before { content: "Date"; width: 25%; }
+    /* #rf-data-table td:nth-of-type(4):before { content: "Date"; width: 25%; }
     #rf-data-table td:nth-of-type(5):before { content: "Decimal"; width: 25%; }
     #rf-data-table td:nth-of-type(6):before { content: "Bits"; width: 25%; }
     #rf-data-table td:nth-of-type(7):before { content: "Binary"; width: 25%; }
 	#rf-data-table td:nth-of-type(8):before { content: "Pulse Length"; width: 25%; }
-	#rf-data-table td:nth-of-type(9):before { content: "Protocol"; width: 25%; }
+	#rf-data-table td:nth-of-type(9):before { content: "Protocol"; width: 25%; } */
 
-	#state-table td:nth-of-type(4):before { content: "Date"; width: 25%; }
+	/* #state-table td:nth-of-type(4):before { content: "Date"; width: 25%; }
 	#state-table td:nth-of-type(5):before { content: "Device"; width: 25%; }
-    #state-table td:nth-of-type(6):before { content: "State"; width: 25%; }
+    #state-table td:nth-of-type(6):before { content: "State"; width: 25%; } */
 
-    #room-data-table td:nth-of-type(4):before { content: "Date"; width: 25%; }
-    #room-data-table td:nth-of-type(5):before { content: "Temperature"; width: 25%; }
-    #room-data-table td:nth-of-type(6):before { content: "Humidity"; width: 25%; }
-    #room-data-table td:nth-of-type(7):before { content: "Pressure"; width: 25%; }
-	#room-data-table td:nth-of-type(8):before { content: "Brightness"; width: 25%; }
-	#room-data-table td:nth-of-type(9):before { content: "Altitude"; width: 25%; }
+    #room-data-table td:nth-of-type(2):before { content: "Date"; width: 25%; }
+    #room-data-table td:nth-of-type(3):before { content: "Temperature"; width: 25%; }
+    #room-data-table td:nth-of-type(4):before { content: "Humidity"; width: 25%; }
+    #room-data-table td:nth-of-type(5):before { content: "Pressure"; width: 25%; }
+	#room-data-table td:nth-of-type(6):before { content: "Brightness"; width: 25%; }
+	#room-data-table td:nth-of-type(7):before { content: "Altitude"; width: 25%; }
 
-    #tablet-battery-table td:nth-of-type(4):before { content: "Date"; width: 25%; }
+    /* #tablet-battery-table td:nth-of-type(4):before { content: "Date"; width: 25%; }
     #tablet-battery-table td:nth-of-type(5):before { content: "Level"; width: 25%; } */
 }

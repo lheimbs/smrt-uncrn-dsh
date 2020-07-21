@@ -1,12 +1,14 @@
 import inspect
 
-from flask import abort, render_template, request, redirect, flash, url_for
+from flask import abort, render_template, request, redirect, flash, url_for, \
+    jsonify, make_response
 from flask_login import login_required, current_user
 from sqlalchemy.orm.attributes import InstrumentedAttribute
 
 from . import admin_bp
 from .forms import RfDataForm
 from ..models.RfData import RfData
+from .misc import get_request_dict, get_datatables_order_query, get_datatables_search_query
 
 
 @admin_bp.route('/rf-data/', methods=['GET', 'POST'])
@@ -15,17 +17,45 @@ def rf_data():
     if not current_user.is_admin:
         abort(403)
 
-    page = request.args.get('page', 1, type=int)
-    items = RfData.query.order_by(RfData.date.desc()).paginate(
-        page, 50, False
-    )
+    # page = request.args.get('page', 1, type=int)
+    # items = RfData.query.order_by(RfData.date.desc()).paginate(
+    #     page, 50, False
+    # )
 
     return render_template(
         'rf_data.html',
         title='Admin Panel - Rf Data',
         template='admin-page',
-        items=items,
+        # items=items,
     )
+
+
+@admin_bp.route('/rf_data/query', methods=['POST'])
+@login_required
+def query_rf_data():
+    if not current_user.is_admin:
+        abort(403)
+    args = get_request_dict(request.form)
+
+    query = get_datatables_search_query(RfData, args)
+    query = get_datatables_order_query(RfData, args, query)
+
+    i_d = [
+        i.to_ajax() for i in query.limit(args['length']).offset(args['start']).all()
+    ]
+
+    return make_response(jsonify({
+        'draw': args['draw'],
+        'recordsTotal': RfData.query.count(),
+        'recordsFiltered': query.count(),
+        'data': i_d,
+    }), 200)
+
+
+@admin_bp.route("/rf_data_js")
+@login_required
+def rf_data_js():
+    return render_template("/js/rf_data.js")
 
 
 @admin_bp.route('/rf-data/edit/<int:id>', methods=['POST', 'GET'])

@@ -2,7 +2,8 @@ header {
     display: flex;
     /* justify-content: space-between; */
     /* align-items: center; */
-    background-color: var(--background-light);
+    /* background-color: var(--background-light); */
+    border-bottom: 2px solid var(--border-medium);
 }
 
 header .header-items-left {

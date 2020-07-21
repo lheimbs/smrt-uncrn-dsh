@@ -1,98 +1,87 @@
 {% from "macros.html" import render_flashes %}
-{% from "macros.html" import render_pagination %}
 {% extends "base.html" %}
+
+{% block extra_assets %}
+{% assets "datatables_js" %}
+    <script type="text/javascript" src="{{ ASSET_URL }}"></script>
+{% endassets %}
+{% assets "datatables_css" %}
+    <link rel="stylesheet" href="{{ ASSET_URL }}" />
+{% endassets %}
+
+<script src="{{ url_for('admin_bp.room_data_js') }}"></script>
+
+{% endblock %}
 
 {% block content %}
 {% include "adminbar.html" %}
 
-<div class="card">
-
-    <div class="flashes">
-        {{ render_flashes('error') }}
-        {{ render_flashes('warning') }}
-        {{ render_flashes('info') }}
-        {{ render_flashes('success') }}
-    </div>
-
-    <h3>Room Data</h3>
-    {% if form %}
-    {# render form #}
-        <form id="room-data-form" method="POST">
-            {{ form.csrf_token }}
-
-            <table class="admin-table" cellspacing="0" cellpadding="0">
-                {% for field in form if field.widget.input_type != 'hidden' %}
-                <tr>
-                    <td>{{ field.label }}</td>
-                    <td>
-                        <fieldset class="{{ field.type }}">
-                            {{ field }}
-                            {% if field.errors %}
-                            <ul class="errors">
-                                {% for error in field.errors %}
-                                    <li>{{ error }}</li>
-                                {% endfor %}
-                            </ul>
-                            {% endif %}
-                        </fieldset>
-                    </td>
-                </tr>
-                {% endfor %}
-            </table>
-            <div class="shopping submit-button">
-                <input class="material-icons" type="submit" value="send"/>
-            </div>
-        </form>
-    {% else %}
-        <table class="data-table" id="room-data-table">
-            <thead>
-                <tr>
-                    <th>Edit</th>
-                    <th>Delete</th>
-                    <th>Id</th>
-                    <th>Date</th>
-                    <th>Temperature</th>
-                    <th>Humidity</th>
-                    <th>Pressure</th>
-                    <th>Brightness</th>
-                    <th>Altitude</th>
-                </tr>
-            </thead>
-            <tbody id="table-room-data-data">
-                {% for item in items.items %}
-                <tr>
-                    <td class="link">
-                        <a href="{{ url_for('admin_bp.edit_room_data', id=item.id) }}" class="material-icons">edit</a>
-                    </td>
-                    <td class="link">
-                        <a href="{{ url_for('admin_bp.delete_room_data', id=item.id) }}" class="material-icons">delete_forever</a>
-                    </td>
-                    <td>{{ item.id }}</td>
-                    <td>{{ item.date }}</td>
-                    <td>{{ item.temperature }}</td>
-                    <td>{{ item.humidity }}</td>
-                    <td>{{ item.pressure }}</td>
-                    <td>{{ item.brightness }}</td>
-                    <td>{{ item.altitude }}</td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-    {% endif %}
+<div class="flashes">
+    {{ render_flashes('error') }}
+    {{ render_flashes('warning') }}
+    {{ render_flashes('info') }}
+    {{ render_flashes('success') }}
 </div>
 
+{% if form %}
+{# render form #}
+<div class="card">
+    <h3>Room Data</h3>
+    <form id="room-data-form" method="POST">
+        {{ form.csrf_token }}
 
-{% if not form %}
-    <div class="card pager">
-        <div class="pagination-container">
-            {% if prev_url %}
-            <a class="navigation material-icons" href="{{ prev_url }}">chevron_left</a>
-            {% endif %}
-            {{ render_pagination(items, 'admin_bp.room_data') }}
-            {% if next_url %}
-            <a class="navigation material-icons" href="{{ next_url }}">chevron_right</a>
-            {% endif %}
+        <table class="admin-table" cellspacing="0" cellpadding="0">
+            {% for field in form if field.widget.input_type != 'hidden' %}
+            <tr>
+                <td>{{ field.label }}</td>
+                <td>
+                    <fieldset class="{{ field.type }}">
+                        {{ field }}
+                        {% if field.errors %}
+                        <ul class="errors">
+                            {% for error in field.errors %}
+                                <li>{{ error }}</li>
+                            {% endfor %}
+                        </ul>
+                        {% endif %}
+                    </fieldset>
+                </td>
+            </tr>
+            {% endfor %}
+        </table>
+        <div class="shopping submit-button">
+            <input class="material-icons" type="submit" value="send"/>
         </div>
-    </div>
+    </form>
+</div>
+{% else %}
+    <table class="data-table stripe" id="room-data-table">
+        <thead>
+            <tr>
+                <th class="model_id">Id</th>
+                <th class="col-large">Date</th>
+                <th>Temperature</th>
+                <th>Humidity</th>
+                <th>Pressure</th>
+                <th>Brightness</th>
+                <th>Altitude</th>
+                <th class="edit_delete_header"></th>
+                <th class="edit_delete_header"></th>
+            </tr>
+        </thead>
+        <tfoot>
+            <tr>
+                <th><input type="number" placeholder="Id" /></th>
+                <th><input type="date" placeholder="Date" /></th>
+                <th><input type="number" placeholder="Temperature" /></th>
+                <th><input type="number" placeholder="Humidity" /></th>
+                <th><input type="number" placeholder="Pressure" /></th>
+                <th><input type="number" placeholder="Brightness" /></th>
+                <th><input type="number" placeholder="Altitude" /></th>
+                <th class="edit_delete_footer"></th>
+                <th class="edit_delete_footer"></th>
+            </tr>
+        </tfoot>
+    </table>
 {% endif %}
 {% endblock %}

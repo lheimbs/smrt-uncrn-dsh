@@ -9,6 +9,7 @@
     --foreground-dark: #123456;
     
     --background: #111111;
+    --background-card-transparent:  rgba(34, 34, 34, 0.795);
     --background-card: #222222;
     --background-medium: #252525;
     --background-medium-light: #333;

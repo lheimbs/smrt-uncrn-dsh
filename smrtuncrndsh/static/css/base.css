@@ -8,6 +8,14 @@ html, body {
     background-color: var(--background);
 }
 
+body {
+    background-color: var(--background);
+    background-image: url("/static/img/Abstract-Envelope.svg");
+    background-attachment: fixed;
+    background-size: cover;
+    /* background by SVGBackgrounds.com */
+}
+
 .material-icons,
 .icon-text {
   vertical-align: middle;
@@ -67,4 +75,9 @@ footer {
     main {
         margin-right: 0;
     }
+}
+
+
+.mb-5 {
+    margin-bottom: +5px;
 }

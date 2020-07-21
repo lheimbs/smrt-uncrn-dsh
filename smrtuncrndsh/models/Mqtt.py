@@ -22,6 +22,18 @@ class Mqtt(db.Model, BaseMixin):
             'retain': self.retain,
         }
 
+    def to_ajax(self):
+        return {
+            'edit': '',
+            'delete': '',
+            'id': self.id,
+            'date': self.date,
+            'topic': self.topic if self.topic else '-',
+            'payload': self.payload if self.payload else '-',
+            'qos': self.qos if self.qos else '-',
+            'retain': self.retain if self.retain else '-',
+        }
+
     def __repr__(self):
         return (
             "<Mqtt(id={self.id}, "

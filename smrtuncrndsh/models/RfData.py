@@ -26,6 +26,19 @@ class RfData(db.Model, BaseMixin):
             'protocol': self.protocol,
         }
 
+    def to_ajax(self):
+        return {
+            'edit': '',
+            'delete': '',
+            'id': self.id,
+            'date': self.date,
+            'decimal': self.decimal if self.decimal else '-',
+            'bits': self.bits if self.bits else '-',
+            'binary': self.binary if self.binary else '-',
+            'pulse_length': self.pulse_length if self.pulse_length else '-',
+            'protocol': self.protocol if self.protocol else '-',
+        }
+
     def __repr__(self):
         return (
             "<RfData("

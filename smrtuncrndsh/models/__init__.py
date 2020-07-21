@@ -1,6 +1,6 @@
 # from flask import current_app
 from flask_sqlalchemy import SQLAlchemy
-# from sqlalchemy.exc import IntegrityError
+from sqlalchemy import func
 
 db = SQLAlchemy()
 
@@ -23,6 +23,13 @@ class BaseMixin(object):
         BaseMixin.add_object_to_db(new_obj)
         db.session.add(new_obj)
         db.session.commit()
+
+    # @classmethod
+    # def get_count(model_class):
+    #     query = model_class.query
+    #     count_query = query.statement.with_only_columns([func.count()]).order_by(None)
+    #     count = query.session.execute(count_query).scalar()
+    #     return count
 
 
 def init_db(app):

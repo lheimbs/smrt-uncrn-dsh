@@ -23,6 +23,18 @@ class ProbeRequest(db.Model, BaseMixin):
             'rssi': self.rssi,
         }
 
+    def to_ajax(self):
+        return {
+            'edit': '',
+            'delete': '',
+            'id': self.id,
+            'date': self.date,
+            'macaddress': self.macaddress if self.macaddress else '-',
+            'make': self.make if self.make else '-',
+            'ssid': self.ssid if self.ssid else '-',
+            'rssi': self.rssi if self.rssi else '-',
+        }
+
     def __repr__(self):
         return (
             "<ProbeRequest(id={self.id}, "

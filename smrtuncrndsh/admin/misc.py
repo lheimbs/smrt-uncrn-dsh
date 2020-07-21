@@ -1,3 +1,6 @@
+import dateutil.parser as dt
+from datetime import timedelta
+
 from flask import current_app
 from sqlalchemy import func
 from sqlalchemy.sql import sqltypes
@@ -116,13 +119,19 @@ def get_datatables_search_query(obj, req_dict):
         else:
             attr = getattr(obj, vals['data'])
 
+        # print(vals['search_value'], attr.property.columns[0].type)
         if isinstance(attr.property.columns[0].type, sqltypes.String):
-            search = func.lower(req_dict['search'])
-            search_value = func.lower(vals['search_value'])
-            if req_dict['search'] and vals['searchable']:
-                query = query.filter(func.lower(attr).contains(search))
-            if vals['search_value'] and vals['searchable']:
-                query = query.filter(func.lower(attr).contains(search_value))
+            search = req_dict['search'].lower()
+            query = search_string(
+                attr, query, search, vals['searchable']
+            )
+            search = vals['search_value'].lower()
+            query = search_string(
+                attr, query, search, vals['searchable']
+            )
+        elif isinstance(attr.property.columns[0].type, sqltypes.DateTime):
+            query = search_date(attr, query, req_dict['search'], vals['searchable'])
+            query = search_date(attr, query, vals['search_value'], vals['searchable'])
         else:
             search = req_dict['search']
             search_value = vals['search_value']
@@ -131,6 +140,20 @@ def get_datatables_search_query(obj, req_dict):
                 query = query.filter(attr == search)
             if vals['search_value'] and vals['searchable']:
                 query = query.filter(attr == search_value)
+    return query
+
+
+def search_string(attr, query, search_val, searchable):
+    if search_val and searchable:
+        query = query.filter(func.lower(attr).contains(search_val))
+    return query
+
+
+def search_date(attr, query, search_val, searchable):
+    if search_val and searchable:
+        search_start = dt.parse(search_val)
+        search_end = search_start + timedelta(hours=24)
+        query = query.filter(attr.between(search_start, search_end))
     return query
 
 

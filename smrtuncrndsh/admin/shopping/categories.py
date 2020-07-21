@@ -1,4 +1,5 @@
-from flask import abort, render_template, request, redirect, flash, url_for, Markup, render_template_string
+from flask import abort, render_template, request, redirect, flash, \
+    url_for, Markup, render_template_string, jsonify, make_response
 from flask_login import login_required, current_user
 
 # from psycopg2.errors import ForeignKeyViolation
@@ -8,6 +9,7 @@ from .. import admin_bp
 from ..forms import CategoryForm
 from ...models import db
 from ...models.Shopping import Category
+from ..misc import get_request_dict, get_datatables_order_query, get_datatables_search_query
 
 
 @admin_bp.route('/shopping/category/')
@@ -16,13 +18,37 @@ def shopping_category():
     if not current_user.is_admin:
         abort(403)
 
-    categories = Category.query.order_by(Category.name).all()
+    # categories = Category.query.order_by(Category.name).all()
     return render_template(
         'shopping/category.html',
         title='Admin Panel - Shopping Categories',
         template='admin-page',
-        categories=categories,
+        # categories=categories,
     )
+
+
+@admin_bp.route('/shopping/category/query', methods=['POST'])
+@login_required
+def query_shopping_categories():
+    if not current_user.is_admin:
+        abort(403)
+    args = get_request_dict(request.form)
+
+    query = get_datatables_search_query(Category, args)
+    query = get_datatables_order_query(Category, args, query)
+
+    # print('length', args['length'], 'start', args['start'])
+    i_d = [
+        i.to_ajax() for i in query.limit(args['length']).offset(args['start']).all()
+    ]
+
+    return make_response(jsonify({
+        'draw': args['draw'],
+        'recordsTotal': Category.query.count(),
+        'recordsFiltered': query.count(),
+        'data': i_d,
+    }), 200)
+    # return make_response(jsonify({"message": "OK"}), 200)
 
 
 @admin_bp.route('/shopping/category/new/', methods=['POST', 'GET'])
@@ -109,3 +135,9 @@ def delete_shopping_category(id):
     else:
         flash(f"Category with id {id} does not exist in database.", 'info')
     return redirect(url_for('admin_bp.shopping_category'))
+
+
+@admin_bp.route("/category_js")
+@login_required
+def category_js():
+    return render_template("/js/category.js")

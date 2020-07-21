@@ -4,7 +4,7 @@ nav {
     display: flex;
     flex-direction: column;
 
-    background-color: var(--background);
+    /* background-color: var(--background); */
     border-right: 2px solid var(--border-medium);
     white-space: nowrap;
     text-align: center;

@@ -7,7 +7,6 @@ from ..forms import ItemForm
 from ...models.Shopping import Item  # , Category
 from ...models import db
 from ..misc import get_request_dict, get_datatables_order_query, get_datatables_search_query
-# from ..misc.datatables import get_request_dict, get_datatables_order_query, get_datatables_search_query
 
 
 @admin_bp.route('/shopping/item/')
@@ -28,14 +27,13 @@ def shopping_item():
 @admin_bp.route('/shopping/item/query', methods=['POST'])
 @login_required
 def query_shopping_items():
-    # if not current_user.is_admin:
-    #     abort(403)
+    if not current_user.is_admin:
+        abort(403)
     args = get_request_dict(request.form)
 
     query = get_datatables_search_query(Item, args)
     query = get_datatables_order_query(Item, args, query)
 
-    # print('length', args['length'], 'start', args['start'])
     i_d = [
         i.to_ajax() for i in query.limit(args['length']).offset(args['start']).all()
     ]
@@ -46,7 +44,6 @@ def query_shopping_items():
         'recordsFiltered': query.count(),
         'data': i_d,
     }), 200)
-    # return make_response(jsonify({"message": "OK"}), 200)
 
 
 @admin_bp.route('/shopping/item/new/', methods=['POST', 'GET'])
@@ -70,7 +67,7 @@ def new_shopping_item():
             flash("An Item with these attributes already exists.", 'error')
             return redirect(request.url)
         else:
-            item.category = form.category.data['name']
+            item.category = form.category.data
             item.save_to_db()
             flash(f"Successfully added Item {item.name}.", 'success')
             return redirect(url_for("admin_bp.shopping_item"))
@@ -103,7 +100,7 @@ def edit_shopping_item(id):
         ppv = form.price_per_volume.data
         sale = form.sale.data
         note = form.note.data
-        category = form.category.data['name']
+        category = form.category.data
 
         test_dupl_item = Item.query.filter_by(
             name=name, price=price, volume=volume,
@@ -111,7 +108,7 @@ def edit_shopping_item(id):
             category=category
         ).all()
         if test_dupl_item:
-            flash("An Item with these attributes already exists.", 'error')
+            flash("An Item with these attributes already exists.", 'warning')
             return redirect(request.url)
 
         item = change_item_attr(name, price, volume, ppv, sale, note, category, item)
@@ -133,7 +130,6 @@ def delete_shopping_item(id):
     if not current_user.is_admin:
         abort(403)
 
-    print("delete item")
     item = Item.query.filter_by(id=id).first_or_404()
     if item and item.lists:
         links = set()
@@ -175,7 +171,13 @@ def change_item_attr(name, price, volume, ppv, sale, note, category, item):
     if item.category != category:
         item.category = category
         flash(
-            f"Successfully changed Shops Category to {category.name if category else None}.",
+            f"Successfully changed Items Category to {category.name if category else None}.",
             'success'
         )
     return item
+
+
+@admin_bp.route("/item_js")
+@login_required
+def item_js():
+    return render_template("/js/item.js")

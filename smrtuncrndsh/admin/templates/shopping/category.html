@@ -2,58 +2,43 @@
 {% extends "base.html" %}
 
 {% block extra_assets %}
-{% assets "tablesorter_js" %}
+{% assets "datatables_js" %}
     <script type="text/javascript" src="{{ ASSET_URL }}"></script>
 {% endassets %}
-{% assets "tablesorter_css" %}
+{% assets "datatables_css" %}
     <link rel="stylesheet" href="{{ ASSET_URL }}" />
 {% endassets %}
+
+<script src="{{ url_for('admin_bp.category_js') }}"></script>
+
 {% endblock %}
 
 {% block content %}
 {% include "adminbar.html" %}
 
-<div class="card">
-    <div class="flashes">
-        {{ render_flashes('error') }}
-        {{ render_flashes('warning') }}
-        {{ render_flashes('info') }}
-        {{ render_flashes('success') }}
-    </div>
-    <table class="shopping-table data-table" id="shopping-categories-table">
-        <thead>
-            <tr>
-                <th>Edit</th>
-                <th>Delete</th>
-                <th>Id</th>
-                <th>Name</th>
-            </tr>
-        </thead>
-        <tbody id="table-shopping-categories-data">
-            {% for category in categories %}
-            <tr>
-                <td class="link">
-                    <a href="{{ url_for('admin_bp.edit_shopping_category', id=category.id) }}" class="material-icons">edit</a>
-                </td>
-                <td class="link">
-                    <a href="{{ url_for('admin_bp.delete_shopping_category', id=category.id) }}" class="material-icons">delete_forever</a>
-                </td>
-                <td>{{ category.id }}</td>
-                <td>{{ category.name }}</td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+<div class="flashes">
+    {{ render_flashes('error') }}
+    {{ render_flashes('warning') }}
+    {{ render_flashes('info') }}
+    {{ render_flashes('success') }}
 </div>
-
-<div class="card pager">
-    <a class="new material-icons" href="{{ url_for('admin_bp.new_shopping_category') }}">add_circle</a>
-</div>
-
-<script type="text/javascript">
-    $(function() {
-        $("#shopping-categories-table").tablesorter({dateFormat:"ddmmyyyy"});
-    });
-</script>
+<table class="shopping-table data-table stripe" id="shopping-categories-table">
+    <thead>
+        <tr>
+            <th class="model_id">Id</th>
+            <th>Name</th>
+            <th class="edit_delete_header"></th>
+            <th class="edit_delete_header"></th>
+        </tr>
+    </thead>
+    <tfoot>
+        <tr>
+            <th><input type="number" placeholder="Id" /></th>
+            <th><input type="text" placeholder="Name" /></th>
+            <th class="edit_delete_footer"></th>
+            <th class="edit_delete_footer"></th>
+        </tr>
+    </tfoot>
+</table>
 
 {% endblock %}

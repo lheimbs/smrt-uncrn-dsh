@@ -150,4 +150,8 @@ only screen and (max-width: 900px),
     .shopping-items-in-list span.name {
         white-space: nowrap;
     }
+
+    .edit_delete_header, .edit_delete_footer {
+        padding: 0;
+    }
 }

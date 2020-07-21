@@ -68,15 +68,22 @@ class User(UserMixin, db.Model, BaseMixin):
             'last_login': self.last_login
         }
 
+    def to_ajax(self):
+        return {
+            'edit': '',
+            'delete': '',
+            'id': self.id,
+            'date': self.date,
+            'name': self.name if self.name else '-',
+            'username': self.username if self.username else '-',
+            'email': self.email if self.email else '-',
+            'last_login': self.last_login if self.last_login else '-',
+            'created_on': self.created_on if self.created_on else '-',
+            'is_admin': self.is_admin,
+            'is_activated': self.is_activated,
+
+        }
+
     # Required for administrative interface
     def __unicode__(self):
         return self.username
-
-
-# class AccessRequested(db.Model):
-#     __bind_key__ = 'users'
-#     __tablename__ = 'flaskregister-requested-users'
-
-#     user = db.Column(
-#         User
-#     )

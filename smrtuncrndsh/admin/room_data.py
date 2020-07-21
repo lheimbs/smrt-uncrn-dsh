@@ -1,12 +1,13 @@
 import inspect
 
-from flask import abort, render_template, request, redirect, flash, url_for
+from flask import abort, render_template, request, redirect, flash, url_for, jsonify, make_response
 from flask_login import login_required, current_user
 from sqlalchemy.orm.attributes import InstrumentedAttribute
 
 from . import admin_bp
 from .forms import RoomDataForm
 from ..models.RoomData import RoomData
+from .misc import get_request_dict, get_datatables_order_query, get_datatables_search_query
 
 
 @admin_bp.route('/room-data/', methods=['GET', 'POST'])
@@ -15,17 +16,41 @@ def room_data():
     if not current_user.is_admin:
         abort(403)
 
-    page = request.args.get('page', 1, type=int)
-    items = RoomData.query.order_by(RoomData.date.desc()).paginate(
-        page, 50, False
-    )
+    # page = request.args.get('page', 1, type=int)
+    # items = RoomData.query.order_by(RoomData.date.desc()).paginate(
+    #     page, 50, False
+    # )
 
     return render_template(
         'room_data.html',
         title='Admin Panel - Room Data',
         template='admin-page',
-        items=items,
+        # items=items,
     )
+
+
+@admin_bp.route('/room-data/query', methods=['POST'])
+@login_required
+def query_room_data():
+    if not current_user.is_admin:
+        abort(403)
+    args = get_request_dict(request.form)
+
+    query = get_datatables_search_query(RoomData, args)
+    query = get_datatables_order_query(RoomData, args, query)
+
+    # print('length', args['length'], 'start', args['start'])
+    i_d = [
+        i.to_ajax() for i in query.limit(args['length']).offset(args['start']).all()
+    ]
+
+    return make_response(jsonify({
+        'draw': args['draw'],
+        'recordsTotal': RoomData.query.count(),
+        'recordsFiltered': query.count(),
+        'data': i_d,
+    }), 200)
+    # return make_response(jsonify({"message": "OK"}), 200)
 
 
 @admin_bp.route('/room-data/edit/<int:id>', methods=['POST', 'GET'])
@@ -114,3 +139,9 @@ def change_rd_attr(date, temperature, humidity, pressure, brightness, altitude, 
         rd.altitude = altitude
         flash(f"Successfully changed altitude to {altitude}.", 'success')
     return rd
+
+
+@admin_bp.route("/room_data_js")
+@login_required
+def room_data_js():
+    return render_template("/js/room_data.js")

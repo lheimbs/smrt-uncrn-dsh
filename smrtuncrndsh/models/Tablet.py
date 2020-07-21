@@ -16,6 +16,15 @@ class TabletBattery(db.Model, BaseMixin):
             'level': self.battery,
         }
 
+    def to_ajax(self):
+        return {
+            'edit': '',
+            'delete': '',
+            'id': self.id,
+            'date': self.date,
+            'level': self.level if self.level else '-',
+        }
+
     def __repr__(self):
         return (
             "<TabletBattery("

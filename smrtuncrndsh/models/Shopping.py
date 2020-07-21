@@ -35,6 +35,18 @@ class Liste(db.Model, BaseMixin):
             f"items={[item.name for item in self.items]})>"
         )
 
+    def to_ajax(self):
+        return {
+            'edit': '',
+            'delete': '',
+            'id': self.id,
+            'date': self.date,
+            'price': self.price,
+            'shop': self.shop.name if self.shop else '-',
+            'category': self.category.name if self.category else '-',
+            'items': [item.name for item in self.items],
+        }
+
     def to_dict(self):
         return {
             'id': self.id,
@@ -172,6 +184,15 @@ class Shop(db.Model, BaseMixin):
             'category': self.category.to_dict() if self.category else self.category,
         }
 
+    def to_ajax(self):
+        return {
+            'edit': '',
+            'delete': '',
+            'id': self.id,
+            'name': self.name,
+            'category': self.category.name if self.category else '-',
+        }
+
     def __repr__(self):
         return (
             f"<Shop(id={self.id}, "
@@ -194,6 +215,14 @@ class Category(db.Model, BaseMixin):
 
     def to_dict(self):
         return {
+            'name': self.name,
+        }
+
+    def to_ajax(self):
+        return {
+            'edit': '',
+            'delete': '',
+            'id': self.id,
             'name': self.name,
         }
 

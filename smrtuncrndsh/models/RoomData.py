@@ -24,6 +24,19 @@ class RoomData(db.Model, BaseMixin):
             'altitude': self.altitude,
         }
 
+    def to_ajax(self):
+        return {
+            'edit': '',
+            'delete': '',
+            'id': self.id,
+            'date': self.date,
+            'temperature': f"{self.temperature:.2f}" if self.temperature else '-',
+            'humidity': self.humidity if self.humidity else '-',
+            'pressure': self.pressure if self.pressure else '-',
+            'brightness': self.brightness if self.brightness else '-',
+            'altitude': f"{self.altitude:.2f}" if self.altitude else '-',
+        }
+
     def __repr__(self):
         return (
             "<RoomData("

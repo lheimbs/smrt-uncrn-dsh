@@ -52,19 +52,30 @@ class CategorySelectForm(FlaskForm):
     )
 
 
-class ShopForm(ModelForm):
-    class Meta:
-        model = Shop
+class ShopForm(FlaskForm):
+    name = StringField(label="Name", validators=[Required()])
 
-    category = ModelFormField(CategorySelectForm)
+    category = QuerySelectField(
+        query_factory=lambda: Category.query,
+        get_label='name',
+        allow_blank=True,
+        blank_text="Select a category",
+        description="Category",
+    )
+    # category = ModelFormField(CategorySelectForm)
 
 
 class ItemForm(ModelForm):
     class Meta:
         model = Item
 
-    category = ModelFormField(CategorySelectForm)
-
+    category = QuerySelectField(
+        query_factory=lambda: Category.query,
+        get_label='name',
+        allow_blank=True,
+        blank_text="Select a category",
+        description="Category",
+    )
 
 def get_item_label(item):
     return (

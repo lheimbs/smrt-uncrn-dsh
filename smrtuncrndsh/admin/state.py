@@ -1,12 +1,14 @@
 import inspect
 
-from flask import abort, render_template, request, redirect, flash, url_for
+from flask import abort, render_template, request, redirect, flash, url_for, \
+    jsonify, make_response
 from flask_login import login_required, current_user
 from sqlalchemy.orm.attributes import InstrumentedAttribute
 
 from . import admin_bp
 from .forms import StateForm
 from ..models.State import State
+from .misc import get_request_dict, get_datatables_order_query, get_datatables_search_query
 
 
 @admin_bp.route('/state/', methods=['GET', 'POST'])
@@ -15,17 +17,45 @@ def state():
     if not current_user.is_admin:
         abort(403)
 
-    page = request.args.get('page', 1, type=int)
-    items = State.query.order_by(State.date.desc()).paginate(
-        page, 50, False
-    )
+    # page = request.args.get('page', 1, type=int)
+    # items = State.query.order_by(State.date.desc()).paginate(
+    #     page, 50, False
+    # )
 
     return render_template(
         'state.html',
         title='Admin Panel - States',
         template='admin-page',
-        items=items,
+        # items=items,
     )
+
+
+@admin_bp.route('/state/query', methods=['POST'])
+@login_required
+def query_state():
+    if not current_user.is_admin:
+        abort(403)
+    args = get_request_dict(request.form)
+
+    query = get_datatables_search_query(State, args)
+    query = get_datatables_order_query(State, args, query)
+
+    i_d = [
+        i.to_ajax() for i in query.limit(args['length']).offset(args['start']).all()
+    ]
+
+    return make_response(jsonify({
+        'draw': args['draw'],
+        'recordsTotal': State.query.count(),
+        'recordsFiltered': query.count(),
+        'data': i_d,
+    }), 200)
+
+
+@admin_bp.route("/state_js")
+@login_required
+def state_js():
+    return render_template("/js/state.js")
 
 
 @admin_bp.route('/state/edit/<int:id>', methods=['POST', 'GET'])

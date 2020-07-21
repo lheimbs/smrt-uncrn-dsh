@@ -1,13 +1,12 @@
-from flask import abort, render_template, request, redirect, flash, url_for, Markup, render_template_string
+from flask import abort, render_template, request, redirect, flash, url_for, \
+    Markup, render_template_string, jsonify, make_response
 from flask_login import login_required, current_user
-
-# from psycopg2.errors import ForeignKeyViolation
-# from sqlalchemy.exc import IntegrityError
 
 from .. import admin_bp
 from ..forms import ShopForm
 from ...models import db
 from ...models.Shopping import Shop
+from ..misc import get_request_dict, get_datatables_order_query, get_datatables_search_query
 
 
 @admin_bp.route('/shopping/shop/')
@@ -16,13 +15,36 @@ def shopping_shop():
     if not current_user.is_admin:
         abort(403)
 
-    shops = Shop.query.order_by(Shop.name).all()
+    # shops = Shop.query.order_by(Shop.name).all()
     return render_template(
         'shopping/shop.html',
         title='Admin Panel - Shopping Shops',
         template='admin-page',
-        shops=shops,
+        # shops=shops,
     )
+
+
+@admin_bp.route('/shopping/shop/query', methods=['POST'])
+@login_required
+def query_shopping_shops():
+    if not current_user.is_admin:
+        abort(403)
+    args = get_request_dict(request.form)
+
+    query = get_datatables_search_query(Shop, args)
+    query = get_datatables_order_query(Shop, args, query)
+
+    # print('length', args['length'], 'start', args['start'])
+    i_d = [
+        i.to_ajax() for i in query.limit(args['length']).offset(args['start']).all()
+    ]
+
+    return make_response(jsonify({
+        'draw': args['draw'],
+        'recordsTotal': Shop.query.count(),
+        'recordsFiltered': query.count(),
+        'data': i_d,
+    }), 200)
 
 
 @admin_bp.route('/shopping/shop/new/', methods=['POST', 'GET'])
@@ -40,7 +62,7 @@ def new_shopping_shop():
             return redirect(request.url)
         else:
             new_shop = Shop(name=shopname)
-            new_shop.category = form.category.data['name']
+            new_shop.category = form.category.data
             new_shop.save_to_db()
             flash(f"Successfully added Shop {shopname}.", 'success')
             return redirect(url_for("admin_bp.shopping_shop"))
@@ -57,29 +79,27 @@ def new_shopping_shop():
 def edit_shopping_shop(id):
     if not current_user.is_admin:
         abort(403)
-
     shop = Shop.query.filter_by(id=id).first_or_404()
     form = ShopForm(obj=shop)
     form.populate_obj(shop)
-    # print(dir(form.category), type(form.category))
-    form.category.populate_obj(shop, 'category')
 
-    if form.validate_on_submit():
-        # form.category.validate()
-        shopname = form.name.data
-        shopcategory = form.category.data['name']
-        if shop.name != shopname:
-            shop.name = shopname
-            flash(f"Successfully changed Shop to {shopname}.", 'success')
-        if shop.category != shopcategory:
-            shop.category = shopcategory
-            flash(
-                f"Successfully changed Shops Category to {shopcategory.name if shopcategory else shopcategory}.",
-                'success'
-            )
-        shop.db_commit()
+    with db.session.no_autoflush:
+        if form.validate_on_submit():
+            shopname = form.name.data
+            shopcategory = form.category.data
 
-        return redirect(url_for("admin_bp.shopping_shop"))
+            test_dupl_shop = Shop.query.filter_by(
+                name=shopname,
+                category=shopcategory
+            ).all()
+            if test_dupl_shop:
+                flash("A Shop with these attributes already exists.", 'warning')
+                return redirect(request.url)
+
+            shop = change_shop_attr(shopname, shopcategory, shop)
+            shop.db_commit()
+
+            return redirect(url_for("admin_bp.shopping_shop"))
     return render_template(
         'shopping/edit_shop.html',
         title='Admin Panel - Shopping Shops - New',
@@ -115,3 +135,22 @@ def delete_shopping_shop(id):
         else:
             flash(f"Shop with id {id} does not exist in database.", 'warning')
     return redirect(url_for('admin_bp.shopping_shop'))
+
+
+@admin_bp.route("/shop_js")
+@login_required
+def shop_js():
+    return render_template("/js/shop.js")
+
+
+def change_shop_attr(name, category, shop):
+    if shop.name != name:
+        shop.name = name
+        flash(f"Successfully changed name to {name}.", 'success')
+    if shop.category != category:
+        shop.category = category
+        flash(
+            f"Successfully changed Shops Category to {category.name if category else None}.",
+            'success'
+        )
+    return shop
