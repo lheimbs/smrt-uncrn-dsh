@@ -103,8 +103,8 @@ only screen and (max-width: 900px),
 	#shopping-items-table td:nth-of-type(7):before { content: "Note"; width: 25%; }
 	#shopping-items-table td:nth-of-type(8):before { content: "Category"; width: 25%; }
 
-	#shopping-shops-table td:nth-of-type(4):before { content: "Name"; width: 25%; }
-    #shopping-shops-table td:nth-of-type(5):before { content: "Category"; width: 25%; }
+	#shopping-shops-table td:nth-of-type(2):before { content: "Name"; width: 25%; }
+    #shopping-shops-table td:nth-of-type(3):before { content: "Category"; width: 25%; }
 
 	#shopping-categories-table td:nth-of-type(2):before { content: "Name"; width: 25%; }
 
