@@ -11,38 +11,7 @@ from .import sql
 from ..variables import COLORS
 
 
-def init_callbacks(app):                    # noqa: C901
-    @app.callback(
-        [
-            Output('data-history-overlay', 'style'),
-            Output('data-hist-sidebar-content', 'style'),
-        ],
-        [
-            Input('data-history-overlay', 'loading_state'),
-            Input('data-history-show-hide-switch', 'on'),
-        ],
-    )
-    def display_data_history_overlay(state, toggle_button):
-        if not toggle_button:
-            return {'width': '0'}, {'marginLeft': '0'}
-        return {'width': '15vw'}, {'marginLeft': '15vw'}
-
-    app.clientside_callback(
-        '''
-        window.onload = function getGraphWidth() {
-            if(!document.getElementById("data-history-graph")) {
-                width = 0;
-            }
-            else {
-                var width = document.getElementById("data-history-graph").clientWidth;
-            }
-            return width;
-        };
-        ''',
-        Output('data-history-graph-current-width', 'data'),
-        [Input('data-history-graph', 'loading_state')]
-    )
-
+def init_callbacks(app):
     @app.callback(
         Output('data-history-graph', 'figure'),
         [

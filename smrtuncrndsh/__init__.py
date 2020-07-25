@@ -2,7 +2,6 @@
 import os
 from flask import Flask
 from flask_migrate import Migrate
-# from extra.get_config import get_config
 
 
 def get_base_dir():
@@ -35,15 +34,17 @@ def register_blueprints(app):
 
 
 def register_dash(app):
-    # Import Dash applications
-    from smrtuncrndsh.dash_apps.dashboard import create_dashboard
-    create_dashboard(app)
+    # Import and register Dash applications
+    from smrtuncrndsh.dash_apps.layout import register_dash_app
 
-    from smrtuncrndsh.dash_apps.shopping import create_shopping_dashboard
-    create_shopping_dashboard(app)
+    from smrtuncrndsh.dash_apps.dashboard import make_dash_app as dashboard
+    register_dash_app(app, dashboard(), 'activation_required')
 
-    from smrtuncrndsh.dash_apps.dashboard_overview import create_dashboard_overview
-    create_dashboard_overview(app)
+    from smrtuncrndsh.dash_apps.dashboard_overview import make_dash_app as dashboard_overview
+    register_dash_app(app, dashboard_overview(), 'activation_required')
+
+    from smrtuncrndsh.dash_apps.shopping import make_dash_app as shopping
+    register_dash_app(app, shopping(), 'activation_required')
 
 
 def create_app():
@@ -68,7 +69,7 @@ def create_app():
 
         register_blueprints(app)
         register_dash(app)
-
+        # register_shopping(app)
         # Compile CSS
         from smrtuncrndsh.assets import compile_assets
         compile_assets(app)

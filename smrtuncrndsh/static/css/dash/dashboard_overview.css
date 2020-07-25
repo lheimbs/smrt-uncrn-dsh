@@ -1,6 +1,6 @@
 .dahboard-overview-container {
     display: grid;
-    grid-template-rows: 1fr 5fr;
+    /* grid-template-rows: 1fr 5fr; */
     grid-template-areas: 
         "values daterange"
         "overview_graph overview_graph";

@@ -1,17 +1,37 @@
+from functools import wraps
 from datetime import datetime
 
-from flask import flash, redirect, url_for, render_template, request, Blueprint
-from flask_login import LoginManager, AnonymousUserMixin, current_user, login_user
+from flask import flash, redirect, url_for, render_template, request, Blueprint, current_app
+from flask_login import current_user, login_user, login_required
+from flask_login.config import EXEMPT_METHODS
 
 from ..models.Users import User
 from .forms import SignupForm, LoginForm
+from .Login_Manager import LoginManagerWithActivation, MyAnonymousUser
 
-login_manager = LoginManager()
+
+login_manager = LoginManagerWithActivation()
 
 
-class MyAnonymousUser(AnonymousUserMixin):
-    is_admin = False
-    is_activated = False
+def activation_required(func):
+    '''
+    Just like login_required:
+    This will ensure that the current user is
+    logged in and activated before calling the actual view. (If they are
+    not, it calls the :attr:`LoginManager.unauthorized` callback.)
+    '''
+    @wraps(func)
+    @login_required
+    def decorated_view(*args, **kwargs):
+        if request.method in EXEMPT_METHODS:
+            return func(*args, **kwargs)
+        elif current_app.config.get('LOGIN_DISABLED'):
+            return func(*args, **kwargs)
+        elif not current_user.is_activated:
+            print("user not activated")
+            return current_app.login_manager.unactivated()
+        return func(*args, **kwargs)
+    return decorated_view
 
 
 def init_login(app):
@@ -67,7 +87,12 @@ def register():
     form = SignupForm()
     if form.validate_on_submit():
         existing_user = User.query.filter_by(username=form.username.data).first()
-        if existing_user is None:
+        existing_user_email = User.query.filter_by(email=form.email.data).first()
+        if existing_user is not None:
+            flash('A user already exists with that username.', 'error')
+        elif existing_user_email is not None:
+            flash('A user already exists with that email.', 'error')
+        else:
             user = User(
                 name=form.name.data,
                 username=form.username.data,
@@ -81,7 +106,6 @@ def register():
                 user.last_login = datetime.now()
                 user.db_commit()
             return redirect(url_for('user_bp.user'))
-        flash('A user already exists with that username.', 'error')
     return render_template(
         'register.html',
         title='Create an Account.',

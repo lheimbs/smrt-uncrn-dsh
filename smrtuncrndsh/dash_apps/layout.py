@@ -1,30 +1,39 @@
 """Plotly Dash HTML layout override."""
-import os
-import uuid
 
-import dash_html_components as html
-from flask import render_template
-from flask_login import current_user
-from flask import current_app
+from dash import Dash
+from flask import render_template, current_app
+from flask_login import login_required
+
+from smrtuncrndsh.auth import activation_required
 
 
-def apply_layout(app, layout, admin_only=False, activated_only=False, template_str='', title=''):
-    def serve_layout():
-        current_app.logger.debug("serve layout")
-        if activated_only and not current_user.is_activated:
-            return html.Div('403 Access Denied')
-        elif admin_only and not current_user.is_admin:
-            return html.Div('403 Access Denied')
+def register_dash_app(app, dash_app, *args):
+    dash_app.init_app(app)
 
-        session_id = str(uuid.uuid4())
-        return html.Div([
-            html.Div(session_id, id='session_id', style={'display': 'none'}),
-            layout
-        ])
+    if app.config['DEBUG']:
+        dash_app.enable_dev_tools(debug=True)
+    if dash_app.logger.hasHandlers():
+        dash_app.logger.handlers.clear()
 
-    def serve_index(**kwargs):
+    if 'activation_required' in args:
+        for view_name, view_method in dash_app.server.view_functions.items():
+            if view_name.startswith(dash_app.config['routes_pathname_prefix']):
+                dash_app.server.view_functions[view_name] = activation_required(view_method)
+    elif 'login_required' in args:
+        for view_name, view_method in dash_app.server.view_functions.items():
+            if view_name.startswith(dash_app.config['routes_pathname_prefix']):
+                dash_app.server.view_functions[view_name] = login_required(view_method)
+
+
+class DashFlaskyfied(Dash):
+    def __init__(self, template_str='', title='', *args, **kwargs):
+        Dash.__init__(self, *args, **kwargs)
+        self.template_str = template_str
+        self.title = title
+
+    def interpolate_index(self, **kwargs):
         current_app.logger.debug("serve index")
-        template = render_template('base.html', template=template_str, title=title)
+        template = render_template('base.html', template=self.template_str, title=self.title)
         idx = template.index('<main>') + len('<main>')
         template = template[:idx] + f'{kwargs["app_entry"]}' + template[idx:]
         idx = template.index('</body>')
@@ -32,69 +41,3 @@ def apply_layout(app, layout, admin_only=False, activated_only=False, template_s
             f'<dash_footer>{kwargs["config"]}{kwargs["scripts"]}{kwargs["renderer"]}</dash_footer>'
         ) + template[idx:]
         return template
-
-    app.config.suppress_callback_exceptions = True
-    app.interpolate_index = serve_index
-    app.layout = serve_layout
-
-
-def dash_template_from_jinja():
-    template = render_template('dash.html')
-    idx = template.index('<div class="container">') + len('<div class="container">')
-    template = template[:idx] + r'{%app_entry%}{%config%}{%scripts%}{%renderer%}' + template[idx:]
-    print(template)
-
-    return template
-
-
-def dash_template():
-    html_layout = '''
-    <!DOCTYPE html>
-    <html>
-        <head>
-            {%metas%}
-            <title>{%title%}</title>
-            {%favicon%}
-            {%css%}
-            <meta charset="utf-8" />
-            <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-            <meta name="HandheldFriendly" content="True" />
-            <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-            <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons" />
-        </head>
-
-        <body style="margin: 0">
-    '''
-    # <link rel="stylesheet" href="{{ url_for('static', filename='dist/css/styles.css') }}" />
-
-    with open(
-        os.path.join(os.getcwd(), 'smrtuncrndsh', 'templates', 'sidebar.html'),
-        'r'
-    ) as sidebar:
-        for line in sidebar.readlines():
-            html_layout += line
-
-    html_layout += '<div id="main" class="main">'
-
-    with open(
-        os.path.join(os.getcwd(), 'smrtuncrndsh', 'templates', 'infobar.html'),
-        'r'
-    ) as infobar:
-        for line in infobar.readlines():
-            html_layout += line
-
-    html_layout += '''
-                <div class="container">
-                
-                    {%app_entry%}
-                </div>
-            </div>
-            <footer>
-                {%config%}
-                {%scripts%}
-                {%renderer%}
-            </footer>
-        </body>
-    </html>
-    '''
-    return html_layout
