@@ -1,10 +1,17 @@
+{% from "macros.html" import render_flashes %}
 {% extends "base.html" %}
 
 {% block content %}
 {% if current_user.is_admin %}
     {% include "adminbar.html" %}
 {% endif %}
-<div class="user-welcome">
+<div class="flashes">
+    {{ render_flashes('error') }}
+    {{ render_flashes('warning') }}
+    {{ render_flashes('info') }}
+    {{ render_flashes('success') }}
+</div>
+<div class="user-welcome card">
     <h1 style="text-align: center;">Welcome {{ user.name if user.name else 'Admin' }}</h1>
     <hr>
     <p>Username: {{ user.username }}</p>

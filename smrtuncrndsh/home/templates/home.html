@@ -1,17 +1,24 @@
+{% from "macros.html" import render_flashes %}
+
 {% extends "base.html" %}
 
 {% block content %}
+
+<div class="flashes">
+        {{ render_flashes('error') }}
+        {{ render_flashes('warning') }}
+        {{ render_flashes('info') }}
+        {{ render_flashes('success') }}
+    </div> 
+
 <div class="banner-image-wrapper">
-  <div class="banner-text">
-      <h1 class="greeting">Welcome</h1>
-  </div>
+    <div class="banner-text">
+          <h1 class="greeting">Welcome</h1>
+    </div>
 </div>
 <div class="card">
-  
-  <p class="subtitle">Demo for embedding Plotly Dash within Flask Apps (View source on <a href="https://github.com/toddbirchard/plotlydash-flask-tutorial">Github</a>).</p>
-  <a href="/dashapp/" class="dash-link">
-    <span>Embdedded Plotly Dash</span>
-    <i class="fas fa-arrow-right"></i>
-  </a>
+     
+    
+    <p class="subtitle">This is my personal Website, through with im currently learning web-development with python.</p>
 </div>
 {% endblock %}

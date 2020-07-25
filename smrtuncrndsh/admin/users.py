@@ -1,5 +1,5 @@
-from flask import current_app, abort, render_template, redirect, url_for, flash
-from flask_login import login_required, current_user
+from flask import current_app, render_template, redirect, url_for, flash
+from flask_login import current_user
 from flask_wtf import FlaskForm
 from wtforms import RadioField
 from wtforms.ext.sqlalchemy.orm import model_form
@@ -10,11 +10,7 @@ from ..auth.forms import SignupForm
 
 
 @admin_bp.route('/users/')
-@login_required
 def users():
-    if not current_user.is_admin:
-        abort(403)
-
     users_obj = User.query.all()
     return render_template(
         'users.html',
@@ -25,11 +21,7 @@ def users():
 
 
 @admin_bp.route('/users/edit/<username>', methods=['POST', 'GET'])
-@login_required
 def edit_user(username):
-    if not current_user.is_admin:
-        abort(403)
-
     current_app.logger.debug(f"Edit User View, user: {username}")
     user = User.query.filter_by(username=username).scalar()
     UserForm = model_form(User, base_class=FlaskForm, exclude=['password', 'created_on', 'last_login'])
@@ -59,11 +51,7 @@ def edit_user(username):
 
 
 @admin_bp.route('/users/delete/<username>')
-@login_required
 def delete_user(username):
-    if not current_user.is_admin:
-        abort(403)
-
     if username:
         user = User.query.filter_by(username=username).scalar()
         if user and user.id != current_user.id:
@@ -73,11 +61,7 @@ def delete_user(username):
 
 
 @admin_bp.route('/users/new/', methods=['GET', 'POST'])
-@login_required
 def new_user():
-    if not current_user.is_admin:
-        abort(403)
-
     form = SignupForm()
 
     if form.validate_on_submit():
@@ -104,11 +88,7 @@ def new_user():
 
 
 @admin_bp.route('/activation/', methods=['GET', 'POST'])
-@login_required
 def activation():
-    if not current_user.is_admin:
-        abort(403)
-
     class ActivateForm(FlaskForm):
         pass
 
