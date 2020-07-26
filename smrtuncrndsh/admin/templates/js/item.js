@@ -26,6 +26,7 @@ $(function() {
         // "processing": true,
         "serverSide": true,
         "autoWidth": false,
+        "stateSave":  true,
         // "stripeClasses": ['strip1', 'strip2'],
         "ajax": {
             url: "{{ url_for('admin_bp.query_shopping_items') }}",

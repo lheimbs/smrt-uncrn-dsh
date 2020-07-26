@@ -309,7 +309,7 @@ table.dataTable td {
 .dataTables_wrapper .dataTables_paginate .paginate_button.current, .dataTables_wrapper .dataTables_paginate .paginate_button.current:hover {
   border-radius: 3px;
   color: var(--font-foreground) !important;
-  /* border: 1px solid #979797; */
+  border: 1px solid var(--background);
   /* background-color: white; */
   /* background: -webkit-gradient(linear, left top, left bottom, color-stop(0%, white), color-stop(100%, #dcdcdc)); */
   /* Chrome,Safari4+ */

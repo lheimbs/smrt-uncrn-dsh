@@ -29,13 +29,28 @@ def add_remove_items_from_liste(new_items, repeated_items, liste=None):
         if item.id in repeated_items.keys() and new_items.count(item) < repeated_items[item.id]:
             current_app.logger.debug(f"Add {repeated_items[item.id] - new_items.count(item)} items of {item.id}")
             for _ in range(repeated_items[item.id] - new_items.count(item)):
+                current_app.logger.debug(f"Add item {item.name} (id: {item.id})")
                 add_items.append(item)
     new_items += add_items
 
-    # remove deleted items or add new items to actual database
+    # add new items or remove deleted items to actual database
     for item in liste.items:
         db_count = liste.items.count(item)
         new_count = new_items.count(item)
+        # print(item.id, db_count, new_count)
+        if db_count < new_count:
+            for _ in range(new_count - db_count):
+                current_app.logger.debug(f"Add <Item({item.id}, {item.name})> to list with id {liste.id}.")
+                liste.items.append(item)
+        elif db_count > new_count:
+            for _ in range(db_count - new_count):
+                current_app.logger.debug(f"Remove <Item({item.id}, {item.name})> from list with id {liste.id}.")
+                liste.items.remove(item)
+
+    for item in new_items:
+        db_count = liste.items.count(item)
+        new_count = new_items.count(item)
+        # print(item.id, db_count, new_count)
         if db_count < new_count:
             for _ in range(new_count - db_count):
                 current_app.logger.debug(f"Add <Item({item.id}, {item.name})> to list with id {liste.id}.")

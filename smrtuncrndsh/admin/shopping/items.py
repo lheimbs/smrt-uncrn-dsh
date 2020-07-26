@@ -104,11 +104,14 @@ def edit_shopping_item(id):
 
         test_dupl_item = Item.query.filter_by(
             name=name, price=price, volume=volume,
-            price_per_volume=ppv, sale=sale, note=note,
-            category=category
-        ).all()
-        if test_dupl_item:
+            price_per_volume=ppv, sale=sale, note=note
+        ).first()
+
+        if test_dupl_item and item != test_dupl_item:
             flash("An Item with these attributes already exists.", 'warning')
+            return redirect(request.url)
+        elif test_dupl_item and test_dupl_item.category == category:
+            flash("Change something for changes to take effect.", 'info')
             return redirect(request.url)
 
         item = change_item_attr(name, price, volume, ppv, sale, note, category, item)

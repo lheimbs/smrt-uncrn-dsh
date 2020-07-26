@@ -150,6 +150,7 @@
 
     $(function() {
         $("#list-edit-form").submit(function() {
+            //$(".select-items-multi-chosen").trigger("chosen:updated");
             ids = [];
             $(".choice-id").each(function(){
                 if(($.trim($(this).text()).length>0)){

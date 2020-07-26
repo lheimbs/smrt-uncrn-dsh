@@ -33,7 +33,7 @@ td, th {
 }
 
 .data-table .edit_delete_header, .data-table .model_id {
-	width: 30px;
+	width: 36px;
 }
 
 .col-small { width: 60px; }
