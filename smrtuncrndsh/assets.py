@@ -33,12 +33,12 @@ def compile_assets(app):
         'js/chosen/chosen.jquery.js',
         filters='jsmin', output='gen/chosen.js'
     )
-    nouislider_css = Bundle(
-        'css/nouislider/nouislider.css',
+    jrange_css = Bundle(
+        'css/jrange/jquery.range.css',
         filters='cssmin', output='gen/nouislider.css'
     )
-    nouislider_js = Bundle(
-        'js/nouislider/nouislider.js', 'js/nouislider/wNumb.js',
+    jrange_js = Bundle(
+        'js/jrange/jquery.range.js',
         filters='jsmin', output='gen/nouislider.js'
     )
     datatables_css = Bundle(
@@ -49,6 +49,16 @@ def compile_assets(app):
         'js/datatables/jquery.dataTables.js',  # 'js/datatables/searchPanes.dataTables.js',
         filters='jsmin', output='gen/datatables.js'
     )
+
+    daterangepicker_css = Bundle(
+        'css/daterangepicker/daterangepicker.css',
+        filters='cssmin', output='gen/daterangepicker.css'
+    )
+    daterangepicker_js = Bundle(
+        'js/daterangepicker/moment.min.js', 'js/daterangepicker/daterangepicker.js',
+        filters='jsmin', output='gen/daterangepicker.js'
+    )
+
     bundles = {
         'js_all': js,
         'css_all': css,
@@ -56,11 +66,13 @@ def compile_assets(app):
         'tablesorter_js': tablesorter_js,
         'chosen_css': chosen_css,
         'chosen_js': chosen_js,
-        'nouislider_css': nouislider_css,
-        'nouislider_js': nouislider_js,
+        'jrange_css': jrange_css,
+        'jrange_js': jrange_js,
         'jquery': jquery,
         'datatables_js': datatables_js,
         'datatables_css': datatables_css,
+        'daterangepicker_js': daterangepicker_js,
+        'daterangepicker_css': daterangepicker_css,
     }
 
     assets.register(bundles)
