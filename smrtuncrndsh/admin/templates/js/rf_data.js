@@ -35,13 +35,34 @@ $(function() {
         },
         "dom": '<"card mb-5"<"data-table top"li>rt><"card-fill pager"p>',
         "columns": [
-            {"data": "id"},
-            {"data": "date"},
-            {"data": "decimal"},
-            {"data": "bits"},
-            {"data": "binary"},
-            {"data": "pulse_length"},
-            {"data": "protocol"},
+            {
+                "data": "id",
+                "render": $.fn.dataTable.render.number(),
+            },
+            {
+                "data": "date",
+                "render": $.fn.dataTable.render.text(),
+            },
+            {
+                "data": "decimal",
+                "render": $.fn.dataTable.render.text(),
+            },
+            {
+                "data": "bits",
+                "render": $.fn.dataTable.render.number(),
+            },
+            {
+                "data": "binary",
+                "render": $.fn.dataTable.render.text(),
+            },
+            {
+                "data": "pulse_length",
+                "render": $.fn.dataTable.render.number(),
+            },
+            {
+                "data": "protocol",
+                "render": $.fn.dataTable.render.number(),
+            },
             {
                 "data": "edit",
                 "searchable": false,

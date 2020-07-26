@@ -34,14 +34,38 @@ $(function() {
         },
         "dom": '<"card mb-5"<"data-table top"li>rt><"card-fill pager"p>',
         "columns": [
-            {"data": "id"},
-            {"data": "name"},
-            {"data": "price"},
-            {"data": "volume"},
-            {"data": "price_per_volume"},
-            {"data": "sale"},
-            {"data": "note"},
-            {"data": "category"},
+            {
+                "data": "id",
+                "render": $.fn.dataTable.render.number(),
+            },
+            {
+                "data": "name",
+                "render": $.fn.dataTable.render.text(),
+            },
+            {
+                "data": "price",
+                "render": $.fn.dataTable.render.number(' ', ',', 2, '', ' €'),
+            },
+            {
+                "data": "volume",
+                "render": $.fn.dataTable.render.text(),
+            },
+            {
+                "data": "price_per_volume",
+                "render": $.fn.dataTable.render.text(),
+            },
+            {
+                "data": "sale",
+                "render": $.fn.dataTable.render.text(),
+            },
+            {
+                "data": "note",
+                "render": $.fn.dataTable.render.text(),
+            },
+            {
+                "data": "category",
+                "render": $.fn.dataTable.render.text(),
+            },
             {
                 "data": "edit",
                 "searchable": false,

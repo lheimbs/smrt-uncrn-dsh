@@ -30,8 +30,14 @@ $(function() {
         },
         "dom": '<"card mb-5"<"data-table top"li>rt><"card-fill pager"p>',
         "columns": [
-            {"data": "id"},
-            {"data": "name"},
+            {
+                "data": "id",
+                "render": $.fn.dataTable.render.number(),
+            },
+            {
+                "data": "name",
+                "render": $.fn.dataTable.render.text(),
+            },
             {
                 "data": "edit",
                 "searchable": false,

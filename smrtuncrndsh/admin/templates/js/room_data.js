@@ -26,20 +26,40 @@ $(function() {
         "processing": true,
         "serverSide": true,
         "autoWidth": false,
-        // "stripeClasses": ['strip1', 'strip2'],
         "ajax": {
             url: "{{ url_for('admin_bp.query_room_data') }}",
             type: 'POST'
         },
         "dom": '<"card mb-5"<"data-table top"li>rt><"card-fill pager"p>',
         "columns": [
-            {"data": "id"},
-            {"data": "date"},
-            {"data": "temperature"},
-            {"data": "humidity"},
-            {"data": "pressure"},
-            {"data": "brightness"},
-            {"data": "altitude"},
+            {
+                "data": "id",
+                "render": $.fn.dataTable.render.number(),
+            },
+            {
+                "data": "date",
+                "render": $.fn.dataTable.render.text(),
+            },
+            {
+                "data": "temperature",
+                "render": $.fn.dataTable.render.number(' ', ',', 2, '', ' °C'),
+            },
+            {
+                "data": "humidity",
+                "render": $.fn.dataTable.render.number(' ', ',', 2, '', ' %'),
+            },
+            {
+                "data": "pressure",
+                "render": $.fn.dataTable.render.number(' ', ',', 2, '', ' hPa'),
+            },
+            {
+                "data": "brightness",
+                "render": $.fn.dataTable.render.number(' ', ',', 2, '', ' lx'),
+            },
+            {
+                "data": "altitude",
+                "render": $.fn.dataTable.render.number(' ', ',', 2, '', ' m'),
+            },
             {
                 "data": "edit",
                 "searchable": false,

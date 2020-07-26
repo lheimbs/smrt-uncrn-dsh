@@ -62,7 +62,6 @@ $(function() {
         "processing": true,
         "serverSide": true,
         "autoWidth": false,
-        // "stripeClasses": ['strip1', 'strip2'],
         "ajax": {
             url: "{{ url_for('admin_bp.query_shopping_list') }}",
             type: 'POST'
@@ -79,7 +78,7 @@ $(function() {
             },
             {
                 "data": "price",
-                "render": $.fn.dataTable.render.number(' ', ',', 2, '€'),
+                "render": $.fn.dataTable.render.number(' ', ',', 2, '', ' €'),
             },
             {
                 "data": "shop",

@@ -23,19 +23,26 @@ $(function() {
             } );
             $(".card-fill.pager").prepend('<a class="new material-icons" href="{{ url_for("admin_bp.new_shopping_shop") }}">add_circle</a>')
         },
-        // "processing": true,
         "serverSide": true,
         "autoWidth": false,
-        // "stripeClasses": ['strip1', 'strip2'],
         "ajax": {
             url: "{{ url_for('admin_bp.query_shopping_shops') }}",
             type: 'POST'
         },
         "dom": '<"card mb-5"<"data-table top"li>rt><"card-fill pager"p>',
         "columns": [
-            {"data": "id"},
-            {"data": "name"},
-            {"data": "category"},
+            {
+                "data": "id",
+                "render": $.fn.dataTable.render.number(),
+            },
+            {
+                "data": "name",
+                "render": $.fn.dataTable.render.text(),
+            },
+            {
+                "data": "category",
+                "render": $.fn.dataTable.render.text(),
+            },
             {
                 "data": "edit",
                 "searchable": false,

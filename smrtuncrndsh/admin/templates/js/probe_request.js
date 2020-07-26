@@ -29,19 +29,36 @@ $(function() {
         "processing": true,
         "serverSide": true,
         "autoWidth": false,
-        // "stripeClasses": ['strip1', 'strip2'],
         "ajax": {
             url: "{{ url_for('admin_bp.query_probe_request') }}",
             type: 'POST'
         },
         "dom": '<"card mb-5"<"data-table top"li>rt><"card-fill pager"p>',
         "columns": [
-            {"data": "id"},
-            {"data": "date"},
-            {"data": "macaddress"},
-            {"data": "make"},
-            {"data": "ssid"},
-            {"data": "rssi"},
+            {
+                "data": "id",
+                "render": $.fn.dataTable.render.number(),
+            },
+            {
+                "data": "date",
+                "render": $.fn.dataTable.render.text(),
+            },
+            {
+                "data": "macaddress",
+                "render": $.fn.dataTable.render.text(),
+            },
+            {
+                "data": "make",
+                "render": $.fn.dataTable.render.text(),
+            },
+            {
+                "data": "ssid",
+                "render": $.fn.dataTable.render.text(),
+            },
+            {
+                "data": "rssi",
+                "render": $.fn.dataTable.render.number(),
+            },
             {
                 "data": "edit",
                 "searchable": false,

@@ -29,17 +29,28 @@ $(function() {
         "processing": true,
         "serverSide": true,
         "autoWidth": false,
-        // "stripeClasses": ['strip1', 'strip2'],
         "ajax": {
             url: "{{ url_for('admin_bp.query_state') }}",
             type: 'POST'
         },
         "dom": '<"card mb-5"<"data-table top"li>rt><"card-fill pager"p>',
         "columns": [
-            {"data": "id"},
-            {"data": "date"},
-            {"data": "device"},
-            {"data": "state"},
+            {
+                "data": "id",
+                "render": $.fn.dataTable.render.number(),
+            },
+            {
+                "data": "date",
+                "render": $.fn.dataTable.render.text(),
+            },
+            {
+                "data": "device",
+                "render": $.fn.dataTable.render.text(),
+            },
+            {
+                "data": "state",
+                "render": $.fn.dataTable.render.text(),
+            },
             {
                 "data": "edit",
                 "searchable": false,

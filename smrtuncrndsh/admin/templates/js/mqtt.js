@@ -36,12 +36,30 @@ $(function() {
         },
         "dom": '<"card mb-5"<"data-table top"li>rt><"card-fill pager"p>',
         "columns": [
-            {"data": "id"},
-            {"data": "date"},
-            {"data": "topic"},
-            {"data": "payload"},
-            {"data": "qos"},
-            {"data": "retain"},
+            {
+                "data": "id",
+                "render": $.fn.dataTable.render.number(),
+            },
+            {
+                "data": "date",
+                "render": $.fn.dataTable.render.text(),
+            },
+            {
+                "data": "topic",
+                "render": $.fn.dataTable.render.text(),
+            },
+            {
+                "data": "payload",
+                "render": $.fn.dataTable.render.text(),
+            },
+            {
+                "data": "qos",
+                "render": $.fn.dataTable.render.text(),
+            },
+            {
+                "data": "retain",
+                "render": $.fn.dataTable.render.text(),
+            },
             {
                 "data": "edit",
                 "searchable": false,
