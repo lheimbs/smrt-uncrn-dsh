@@ -1,8 +1,7 @@
 import inspect
 
-from flask import abort, render_template, request, redirect, flash, url_for, \
-    jsonify, make_response
-from flask_login import login_required, current_user
+from flask import render_template, request, redirect, flash, url_for, \
+    jsonify, make_response, Response, abort
 from sqlalchemy.orm.attributes import InstrumentedAttribute
 
 from . import admin_bp
@@ -12,29 +11,16 @@ from .misc import get_request_dict, get_datatables_order_query, get_datatables_s
 
 
 @admin_bp.route('/mqtt/', methods=['GET', 'POST'])
-@login_required
 def mqtt():
-    if not current_user.is_admin:
-        abort(403)
-
-    # page = request.args.get('page', 1, type=int)
-    # items = Mqtt.query.order_by(Mqtt.date.desc()).paginate(
-    #     page, 50, False
-    # )
-
     return render_template(
         'mqtt.html',
         title='Admin Panel - Mqtt',
         template='admin-page',
-        # items=items,
     )
 
 
 @admin_bp.route('/mqtt/query', methods=['POST'])
-@login_required
 def query_mqtt():
-    if not current_user.is_admin:
-        abort(403)
     args = get_request_dict(request.form)
 
     query = get_datatables_search_query(Mqtt, args)
@@ -56,17 +42,12 @@ def query_mqtt():
 
 
 @admin_bp.route("/mqtt_js")
-@login_required
 def mqtt_js():
-    return render_template("/js/mqtt.js")
+    return Response(render_template("/js/mqtt.js"), mimetype="text/javascript")
 
 
 @admin_bp.route('/mqtt/edit/<int:id>', methods=['POST', 'GET'])
-@login_required
 def edit_mqtt(id):
-    if not current_user.is_admin:
-        abort(403)
-
     mqtt = Mqtt.query.filter_by(id=id).first_or_404()
     form = MqttForm(obj=mqtt)
 
@@ -101,11 +82,7 @@ def edit_mqtt(id):
 
 
 @admin_bp.route('/mqtt/delete/<int:id>', methods=['GET', 'POST'])
-@login_required
 def delete_mqtt(id):
-    if not current_user.is_admin:
-        abort(403)
-
     mqtt = Mqtt.query.filter_by(id=id).scalar()
     if mqtt:
         mqtt.delete_from_db()

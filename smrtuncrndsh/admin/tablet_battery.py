@@ -1,7 +1,7 @@
 import inspect
 
 from flask import render_template, request, redirect, flash, url_for, \
-    jsonify, make_response
+    jsonify, make_response, Response
 from sqlalchemy.orm.attributes import InstrumentedAttribute
 
 from . import admin_bp
@@ -40,7 +40,7 @@ def query_tablet_battery():
 
 @admin_bp.route("/tablet_battery_js")
 def tablet_battery_js():
-    return render_template("/js/tablet_battery.js")
+    return Response(render_template("/js/tablet_battery.js"), mimetype="text/javascript")
 
 
 @admin_bp.route('/tablet-battery/edit/<int:id>', methods=['POST', 'GET'])

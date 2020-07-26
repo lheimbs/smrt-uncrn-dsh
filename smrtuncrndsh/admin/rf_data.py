@@ -1,8 +1,7 @@
 import inspect
 
-from flask import abort, render_template, request, redirect, flash, url_for, \
-    jsonify, make_response
-from flask_login import login_required, current_user
+from flask import render_template, request, redirect, flash, url_for, \
+    jsonify, make_response, Response
 from sqlalchemy.orm.attributes import InstrumentedAttribute
 
 from . import admin_bp
@@ -12,29 +11,16 @@ from .misc import get_request_dict, get_datatables_order_query, get_datatables_s
 
 
 @admin_bp.route('/rf-data/', methods=['GET', 'POST'])
-@login_required
 def rf_data():
-    if not current_user.is_admin:
-        abort(403)
-
-    # page = request.args.get('page', 1, type=int)
-    # items = RfData.query.order_by(RfData.date.desc()).paginate(
-    #     page, 50, False
-    # )
-
     return render_template(
         'rf_data.html',
         title='Admin Panel - Rf Data',
         template='admin-page',
-        # items=items,
     )
 
 
 @admin_bp.route('/rf_data/query', methods=['POST'])
-@login_required
 def query_rf_data():
-    if not current_user.is_admin:
-        abort(403)
     args = get_request_dict(request.form)
 
     query = get_datatables_search_query(RfData, args)
@@ -53,17 +39,12 @@ def query_rf_data():
 
 
 @admin_bp.route("/rf_data_js")
-@login_required
 def rf_data_js():
-    return render_template("/js/rf_data.js")
+    return Response(render_template("/js/rf_data.js"), mimetype="text/javascript")
 
 
 @admin_bp.route('/rf-data/edit/<int:id>', methods=['POST', 'GET'])
-@login_required
 def edit_rf_data(id):
-    if not current_user.is_admin:
-        abort(403)
-
     rf = RfData.query.filter_by(id=id).first_or_404()
     form = RfDataForm(obj=rf)
 
@@ -100,11 +81,7 @@ def edit_rf_data(id):
 
 
 @admin_bp.route('/rf-data/delete/<int:id>', methods=['GET', 'POST'])
-@login_required
 def delete_rf_data(id):
-    if not current_user.is_admin:
-        abort(403)
-
     rf = RfData.query.filter_by(id=id).scalar()
     if rf:
         rf.delete_from_db()

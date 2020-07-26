@@ -1,16 +1,14 @@
-from flask import current_app, abort, render_template, request, \
+from flask import current_app, render_template, request, \
     redirect, flash, url_for, jsonify, make_response, Response
-from flask_login import login_required, current_user
 
 from .. import admin_bp
-from ..forms import ListForm, FilterForm
-from ..misc import add_remove_items_from_liste, get_multiple_items, max_price, min_price, min_date, max_date
-from ...models.Shopping import Liste, Shop, Category  # , Item
+from ..forms import ListForm
+from ..misc import add_remove_items_from_liste, get_multiple_items, max_price, min_price
+from ...models.Shopping import Liste
 from ..misc import get_request_dict, get_datatables_order_query, get_datatables_search_query
 
 
 @admin_bp.route('/shopping/list/', methods=['GET', 'POST'])
-@login_required
 def shopping_list():
     return render_template(
         'shopping/list.html',
@@ -24,9 +22,7 @@ def shopping_list():
 
 
 @admin_bp.route('/shopping/list/query', methods=['POST'])
-@login_required
 def query_shopping_list():
-
     args = get_request_dict(request.form)
 
     query = get_datatables_search_query(Liste, args)
@@ -45,11 +41,7 @@ def query_shopping_list():
 
 
 @admin_bp.route('/shopping/list/edit/<id>', methods=['POST', 'GET'])
-@login_required
 def edit_shopping_list(id):
-    if not current_user.is_admin:
-        abort(403)
-
     current_app.logger.debug(f"Edit shopping list View, list id: {id}")
     liste = Liste.query.filter_by(id=id).scalar()
 
@@ -83,11 +75,7 @@ def edit_shopping_list(id):
 
 
 @admin_bp.route('/shopping/list/delete/<id>', methods=['POST', 'GET'])
-@login_required
 def delete_shopping_list(id):
-    if not current_user.is_admin:
-        abort(403)
-
     if id:
         liste = Liste.query.filter_by(id=id).scalar()
         if liste:
@@ -99,11 +87,7 @@ def delete_shopping_list(id):
 
 
 @admin_bp.route('/shopping/list/new', methods=['POST', 'GET'])
-@login_required
 def new_shopping_list():
-    if not current_user.is_admin:
-        abort(403)
-
     list_form = ListForm()
 
     if list_form.validate_on_submit():

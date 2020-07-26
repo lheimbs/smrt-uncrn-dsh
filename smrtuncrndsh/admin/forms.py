@@ -2,11 +2,10 @@ from flask import current_app
 
 from flask_wtf import FlaskForm
 from wtforms import BooleanField
-from wtforms_alchemy import model_form_factory, ModelFormField
+from wtforms_alchemy import model_form_factory
 from wtforms.fields import HiddenField, StringField
-# , StringField, Field, SelectField, SelectMultipleField, SearchField,
 from wtforms.fields.html5 import DateField, DecimalField, DateTimeField
-from wtforms.validators import Required, ValidationError
+from wtforms.validators import Required
 from wtforms.ext.sqlalchemy.fields import QuerySelectField, QuerySelectMultipleField
 
 from ..models import db
@@ -77,6 +76,7 @@ class ItemForm(ModelForm):
         description="Category",
     )
 
+
 def get_item_label(item):
     return (
         f"{item.name} {item.price}€"
@@ -140,23 +140,6 @@ class ListForm(FlaskForm):
         allow_blank=False,
         get_label=get_item_label
     )
-
-
-class FilterForm(FlaskForm):
-    date_min = DateField(label="Start Date", validators=[])
-    date_max = DateField(label="End Date", validators=[])
-    price_min = DecimalField(label="Min Price")
-    price_max = DecimalField(label="Max Price")
-    shop = StringField(label="Shop")
-    category = StringField(label="Category")
-    item = StringField(label="Items")
-
-    def validate_date_min(form, field):
-        if form.date_max.data and field.data and form.date_max.data < field.data:
-            raise ValidationError('Max date has to be higher than min date.')
-        elif (form.date_max.data and not field.data) \
-                or (not form.date_max.data and field.data):
-            raise ValidationError('Both Max date and min date eiher have to be set or not set.')
 
 
 class RoomDataForm(ModelForm):

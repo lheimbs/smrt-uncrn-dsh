@@ -1,8 +1,7 @@
 import inspect
 
-from flask import abort, render_template, request, redirect, flash, url_for, \
-    jsonify, make_response
-from flask_login import login_required, current_user
+from flask import render_template, request, redirect, flash, url_for, \
+    jsonify, make_response, Response
 from sqlalchemy.orm.attributes import InstrumentedAttribute
 
 from . import admin_bp
@@ -12,29 +11,16 @@ from .misc import get_request_dict, get_datatables_order_query, get_datatables_s
 
 
 @admin_bp.route('/state/', methods=['GET', 'POST'])
-@login_required
 def state():
-    if not current_user.is_admin:
-        abort(403)
-
-    # page = request.args.get('page', 1, type=int)
-    # items = State.query.order_by(State.date.desc()).paginate(
-    #     page, 50, False
-    # )
-
     return render_template(
         'state.html',
         title='Admin Panel - States',
         template='admin-page',
-        # items=items,
     )
 
 
 @admin_bp.route('/state/query', methods=['POST'])
-@login_required
 def query_state():
-    if not current_user.is_admin:
-        abort(403)
     args = get_request_dict(request.form)
 
     query = get_datatables_search_query(State, args)
@@ -53,17 +39,12 @@ def query_state():
 
 
 @admin_bp.route("/state_js")
-@login_required
 def state_js():
-    return render_template("/js/state.js")
+    return Response(render_template("/js/state.js"), mimetype="text/javascript")
 
 
 @admin_bp.route('/state/edit/<int:id>', methods=['POST', 'GET'])
-@login_required
 def edit_state(id):
-    if not current_user.is_admin:
-        abort(403)
-
     state = State.query.filter_by(id=id).first_or_404()
     form = StateForm(obj=state)
 
@@ -94,11 +75,7 @@ def edit_state(id):
 
 
 @admin_bp.route('/state/delete/<int:id>', methods=['GET', 'POST'])
-@login_required
 def delete_state(id):
-    if not current_user.is_admin:
-        abort(403)
-
     state = State.query.filter_by(id=id).scalar()
     if state:
         state.delete_from_db()

@@ -1,8 +1,7 @@
 import inspect
 
-from flask import abort, render_template, request, redirect, flash, url_for, \
-    jsonify, make_response
-from flask_login import login_required, current_user
+from flask import render_template, request, redirect, flash, url_for, \
+    jsonify, make_response, Response
 from sqlalchemy.orm.attributes import InstrumentedAttribute
 
 from . import admin_bp
@@ -12,29 +11,16 @@ from .misc import get_request_dict, get_datatables_order_query, get_datatables_s
 
 
 @admin_bp.route('/probe-request/', methods=['GET', 'POST'])
-@login_required
 def probe_request():
-    if not current_user.is_admin:
-        abort(403)
-
-    # page = request.args.get('page', 1, type=int)
-    # items = ProbeRequest.query.order_by(ProbeRequest.date.desc()).paginate(
-    #     page, 50, False
-    # )
-
     return render_template(
         'probe_request.html',
         title='Admin Panel - Probe Requests',
         template='admin-page',
-        # items=items,
     )
 
 
 @admin_bp.route('/probe_request/query', methods=['POST'])
-@login_required
 def query_probe_request():
-    if not current_user.is_admin:
-        abort(403)
     args = get_request_dict(request.form)
 
     query = get_datatables_search_query(ProbeRequest, args)
@@ -53,17 +39,12 @@ def query_probe_request():
 
 
 @admin_bp.route("/probe_request_js")
-@login_required
 def probe_request_js():
-    return render_template("/js/probe_request.js")
+    return Response(render_template("/js/probe_request.js"), mimetype="text/javascript")
 
 
 @admin_bp.route('/probe-request/edit/<int:id>', methods=['POST', 'GET'])
-@login_required
 def edit_probe_request(id):
-    if not current_user.is_admin:
-        abort(403)
-
     probe_request = ProbeRequest.query.filter_by(id=id).first_or_404()
     form = ProbeRequestForm(obj=probe_request)
 
@@ -98,11 +79,7 @@ def edit_probe_request(id):
 
 
 @admin_bp.route('/probe-request/delete/<int:id>', methods=['GET', 'POST'])
-@login_required
 def delete_probe_request(id):
-    if not current_user.is_admin:
-        abort(403)
-
     probe_request = ProbeRequest.query.filter_by(id=id).scalar()
     if probe_request:
         probe_request.delete_from_db()

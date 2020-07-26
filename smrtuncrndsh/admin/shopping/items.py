@@ -1,6 +1,5 @@
-from flask import abort, render_template, flash, jsonify, make_response
-from flask import request, redirect, url_for, Markup, render_template_string
-from flask_login import login_required, current_user
+from flask import render_template, flash, jsonify, make_response, \
+    request, redirect, url_for, Markup, render_template_string, Response
 
 from .. import admin_bp
 from ..forms import ItemForm
@@ -10,34 +9,23 @@ from ..misc import get_request_dict, get_datatables_order_query, get_datatables_
 
 
 @admin_bp.route('/shopping/item/')
-@login_required
 def shopping_item():
-    if not current_user.is_admin:
-        abort(403)
-
-    # items = Item.query.order_by(Item.name).all()
     return render_template(
         'shopping/item.html',
         title='Admin Panel - Shopping Items',
         template='admin-page',
-        # items=items,
     )
 
 
 @admin_bp.route('/shopping/item/query', methods=['POST'])
-@login_required
 def query_shopping_items():
-    if not current_user.is_admin:
-        abort(403)
     args = get_request_dict(request.form)
 
     query = get_datatables_search_query(Item, args)
     query = get_datatables_order_query(Item, args, query)
-
     i_d = [
         i.to_ajax() for i in query.limit(args['length']).offset(args['start']).all()
     ]
-
     return make_response(jsonify({
         'draw': args['draw'],
         'recordsTotal': Item.query.count(),
@@ -47,11 +35,7 @@ def query_shopping_items():
 
 
 @admin_bp.route('/shopping/item/new/', methods=['POST', 'GET'])
-@login_required
 def new_shopping_item():
-    if not current_user.is_admin:
-        abort(403)
-
     form = ItemForm()
 
     if form.validate_on_submit():
@@ -81,11 +65,7 @@ def new_shopping_item():
 
 
 @admin_bp.route('/shopping/item/edit/<int:id>', methods=['POST', 'GET'])
-@login_required
 def edit_shopping_item(id):
-    if not current_user.is_admin:
-        abort(403)
-
     item = Item.query.filter_by(id=id).scalar()
     if not item:
         flash("Sorry this item does not exist anymore. Try refreshing the site.", 'error')
@@ -128,11 +108,7 @@ def edit_shopping_item(id):
 
 
 @admin_bp.route('/shopping/item/delete/<int:id>', methods=['GET', 'POST'])
-@login_required
 def delete_shopping_item(id):
-    if not current_user.is_admin:
-        abort(403)
-
     item = Item.query.filter_by(id=id).first_or_404()
     if item and item.lists:
         links = set()
@@ -181,6 +157,5 @@ def change_item_attr(name, price, volume, ppv, sale, note, category, item):
 
 
 @admin_bp.route("/item_js")
-@login_required
 def item_js():
-    return render_template("/js/item.js")
+    return Response(render_template("/js/item.js"), mimetype="text/javascript")

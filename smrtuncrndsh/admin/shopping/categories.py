@@ -1,9 +1,5 @@
-from flask import abort, render_template, request, redirect, flash, \
+from flask import render_template, request, redirect, Response, flash, \
     url_for, Markup, render_template_string, jsonify, make_response
-from flask_login import login_required, current_user
-
-# from psycopg2.errors import ForeignKeyViolation
-# from sqlalchemy.exc import IntegrityError
 
 from .. import admin_bp
 from ..forms import CategoryForm
@@ -13,31 +9,21 @@ from ..misc import get_request_dict, get_datatables_order_query, get_datatables_
 
 
 @admin_bp.route('/shopping/category/')
-@login_required
 def shopping_category():
-    if not current_user.is_admin:
-        abort(403)
-
-    # categories = Category.query.order_by(Category.name).all()
     return render_template(
         'shopping/category.html',
         title='Admin Panel - Shopping Categories',
         template='admin-page',
-        # categories=categories,
     )
 
 
 @admin_bp.route('/shopping/category/query', methods=['POST'])
-@login_required
 def query_shopping_categories():
-    if not current_user.is_admin:
-        abort(403)
     args = get_request_dict(request.form)
 
     query = get_datatables_search_query(Category, args)
     query = get_datatables_order_query(Category, args, query)
 
-    # print('length', args['length'], 'start', args['start'])
     i_d = [
         i.to_ajax() for i in query.limit(args['length']).offset(args['start']).all()
     ]
@@ -48,15 +34,10 @@ def query_shopping_categories():
         'recordsFiltered': query.count(),
         'data': i_d,
     }), 200)
-    # return make_response(jsonify({"message": "OK"}), 200)
 
 
 @admin_bp.route('/shopping/category/new/', methods=['POST', 'GET'])
-@login_required
 def new_shopping_category():
-    if not current_user.is_admin:
-        abort(403)
-
     form = CategoryForm()
 
     if form.validate_on_submit():
@@ -78,11 +59,7 @@ def new_shopping_category():
 
 
 @admin_bp.route('/shopping/category/edit/<int:id>', methods=['POST', 'GET'])
-@login_required
 def edit_shopping_category(id):
-    if not current_user.is_admin:
-        abort(403)
-
     category = Category.query.filter_by(id=id).first_or_404()
     form = CategoryForm(obj=category)
 
@@ -103,11 +80,7 @@ def edit_shopping_category(id):
 
 
 @admin_bp.route('/shopping/category/delete/<int:id>', methods=['GET', 'POST'])
-@login_required
 def delete_shopping_category(id):
-    if not current_user.is_admin:
-        abort(403)
-
     category = Category.query.filter_by(id=id).first_or_404()
     if category and (category.lists or category.shops or category.items):
         links = []
@@ -138,6 +111,5 @@ def delete_shopping_category(id):
 
 
 @admin_bp.route("/category_js")
-@login_required
 def category_js():
-    return render_template("/js/category.js")
+    return Response(render_template("/js/category.js"), mimetype="text/javascript")

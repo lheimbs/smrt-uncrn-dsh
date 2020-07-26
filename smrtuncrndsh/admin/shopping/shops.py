@@ -1,6 +1,5 @@
-from flask import abort, render_template, request, redirect, flash, url_for, \
-    Markup, render_template_string, jsonify, make_response
-from flask_login import login_required, current_user
+from flask import render_template, request, redirect, flash, url_for, \
+    Markup, render_template_string, jsonify, make_response, Response
 
 from .. import admin_bp
 from ..forms import ShopForm
@@ -10,31 +9,21 @@ from ..misc import get_request_dict, get_datatables_order_query, get_datatables_
 
 
 @admin_bp.route('/shopping/shop/')
-@login_required
 def shopping_shop():
-    if not current_user.is_admin:
-        abort(403)
-
-    # shops = Shop.query.order_by(Shop.name).all()
     return render_template(
         'shopping/shop.html',
         title='Admin Panel - Shopping Shops',
         template='admin-page',
-        # shops=shops,
     )
 
 
 @admin_bp.route('/shopping/shop/query', methods=['POST'])
-@login_required
 def query_shopping_shops():
-    if not current_user.is_admin:
-        abort(403)
     args = get_request_dict(request.form)
 
     query = get_datatables_search_query(Shop, args)
     query = get_datatables_order_query(Shop, args, query)
 
-    # print('length', args['length'], 'start', args['start'])
     i_d = [
         i.to_ajax() for i in query.limit(args['length']).offset(args['start']).all()
     ]
@@ -48,11 +37,7 @@ def query_shopping_shops():
 
 
 @admin_bp.route('/shopping/shop/new/', methods=['POST', 'GET'])
-@login_required
 def new_shopping_shop():
-    if not current_user.is_admin:
-        abort(403)
-
     form = ShopForm()
 
     if form.validate_on_submit():
@@ -75,10 +60,7 @@ def new_shopping_shop():
 
 
 @admin_bp.route('/shopping/shop/edit/<int:id>', methods=['POST', 'GET'])
-@login_required
 def edit_shopping_shop(id):
-    if not current_user.is_admin:
-        abort(403)
     shop = Shop.query.filter_by(id=id).first_or_404()
     form = ShopForm(obj=shop)
     form.populate_obj(shop)
@@ -110,11 +92,7 @@ def edit_shopping_shop(id):
 
 
 @admin_bp.route('/shopping/shop/delete/<int:id>', methods=['GET', 'POST'])
-@login_required
 def delete_shopping_shop(id):
-    if not current_user.is_admin:
-        abort(403)
-
     if id:
         shop = Shop.query.filter_by(id=id).first_or_404()
         if shop and shop.lists:
@@ -138,9 +116,8 @@ def delete_shopping_shop(id):
 
 
 @admin_bp.route("/shop_js")
-@login_required
 def shop_js():
-    return render_template("/js/shop.js")
+    return Response(render_template("/js/shop.js"), mimetype="text/javascript")
 
 
 def change_shop_attr(name, category, shop):
