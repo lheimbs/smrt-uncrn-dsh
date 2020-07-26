@@ -1,136 +1,47 @@
-from flask import current_app, abort, render_template, request, redirect, flash, url_for
+from flask import current_app, abort, render_template, request, \
+    redirect, flash, url_for, jsonify, make_response, Response
 from flask_login import login_required, current_user
 
 from .. import admin_bp
 from ..forms import ListForm, FilterForm
 from ..misc import add_remove_items_from_liste, get_multiple_items, max_price, min_price, min_date, max_date
 from ...models.Shopping import Liste, Shop, Category  # , Item
+from ..misc import get_request_dict, get_datatables_order_query, get_datatables_search_query
 
 
 @admin_bp.route('/shopping/list/', methods=['GET', 'POST'])
 @login_required
 def shopping_list():
-    if not current_user.is_admin:
-        abort(403)
-
-    page = request.args.get('page', 1, type=int)
-    lists = Liste.query.order_by(Liste.date.desc()).paginate(
-        page, current_app.config['SHOPPING_LISTS_PER_PAGE'], False
-    )
-    form = FilterForm()
-    data = {
-        'min_price': min_price(),
-        'max_price': max_price(),
-        'min_date': min_date().isoformat(),
-        'max_date': max_date().isoformat(),
-        'current_min_price': min_price(),
-        'current_max_price': max_price(),
-        'current_min_date': min_date().isoformat(),
-        'current_max_date': max_date().isoformat(),
-        'current_shop': "",
-        'current_category': "",
-        'current_item': "",
-    }
-
-    if form.validate():
-        form_min_date = form.date_min.data
-        form_max_date = form.date_max.data
-        form_min_price = float(form.price_min.data) if form.price_min.data else 0
-        form_max_price = float(form.price_max.data) if form.price_max.data else 0
-        form_shop = form.shop.data
-        form_category = form.category.data
-        form_item = form.item.data
-        current_app.logger.debug(
-            f"{form_min_date, form_max_date, form_min_price}, "
-            f"{form_max_price, form_shop, form_category, form_item}"
-        )
-
-        lists_query = Liste.query
-        if form_min_date and form_max_date and form_min_date <= form_max_date:
-            current_app.logger.debug("Apply daterange filter")
-            lists_query = lists_query.filter(
-                Liste.date > form_min_date,
-                Liste.date < form_max_date,
-            )
-            data['current_min_date'] = form_min_date.isoformat()
-            data['current_max_date'] = form_max_date.isoformat()
-        else:
-            data['current_min_date'] = min_date().isoformat()
-            data['current_max_date'] = max_date().isoformat()
-        if form_min_price and form_max_price and form_min_price <= form_max_price:
-            current_app.logger.debug("Apply price range filter")
-            lists_query = lists_query.filter(
-                Liste.price > form_min_price,
-                Liste.price < form_max_price,
-            )
-            data['current_min_price'] = form_min_price
-            data['current_max_price'] = form_max_price
-        else:
-            data['current_min_price'] = form_min_price
-            data['current_max_price'] = form_max_price
-        if form_shop:
-            current_app.logger.debug("Apply shop filter")
-            lists_query = lists_query.join(Liste.shop).filter(Shop.name == form_shop)
-            data['current_shop'] = form_shop
-        else:
-            data['current_shop'] = ''
-        if form_category:
-            current_app.logger.debug("Apply vategory filter")
-            lists_query = lists_query.join(Liste.category).filter(Category.name == form_category)
-            data['current_category'] = form_category
-        else:
-            data['current_category'] = ''
-        if form_item:
-            current_app.logger.debug("Apply item filter")
-            # for item in form_item.split(','):
-            #     lists_query = lists_query.filter(
-            #         Liste.items.has(Item.name == item)
-            #     )
-
-        if form_min_date == min_date() and form_max_date == max_date() and \
-                form_min_price == min_price() and form_max_price == max_price() and \
-                not form_shop and not form_category and not form_item:
-            lists = lists_query.order_by(Liste.date.desc()).paginate(
-                page, current_app.config['SHOPPING_LISTS_PER_PAGE'], False
-            )
-        else:
-            lists = lists_query.order_by(Liste.date.desc()).paginate(
-                1, lists_query.count(), False
-            )
-
-        next_url = url_for('admin_bp.shopping_list', page=lists.next_num) if lists.has_next else None
-        prev_url = url_for('admin_bp.shopping_list', page=lists.prev_num) if lists.has_prev else None
-
-        return render_template(
-            'shopping/list.html',
-            form=form,
-            title='Admin Panel - Shopping Lists',
-            template='admin-page',
-            next_url=next_url,
-            prev_url=prev_url,
-            lists=lists,
-            data=data,
-        )
-    else:
-        if form.errors:
-            current_app.logger.debug(form.errors)
-
-        # return redirect(request.url)
-
-    next_url = url_for('admin_bp.shopping_list', page=lists.next_num) if lists.has_next else None
-    prev_url = url_for('admin_bp.shopping_list', page=lists.prev_num) if lists.has_prev else None
-
-    # .all()  # .limit(30)
     return render_template(
         'shopping/list.html',
         title='Admin Panel - Shopping Lists',
         template='admin-page',
-        form=form,
-        lists=lists,
-        next_url=next_url,
-        prev_url=prev_url,
-        data=data,
+        data={
+            'min_price': min_price(),
+            'max_price': max_price(),
+        }
     )
+
+
+@admin_bp.route('/shopping/list/query', methods=['POST'])
+@login_required
+def query_shopping_list():
+
+    args = get_request_dict(request.form)
+
+    query = get_datatables_search_query(Liste, args)
+    query = get_datatables_order_query(Liste, args, query)
+
+    i_d = [
+        i.to_ajax() for i in query.limit(args['length']).offset(args['start']).all()
+    ]
+
+    return make_response(jsonify({
+        'draw': args['draw'],
+        'recordsTotal': Liste.query.count(),
+        'recordsFiltered': query.count(),
+        'data': i_d,
+    }), 200)
 
 
 @admin_bp.route('/shopping/list/edit/<id>', methods=['POST', 'GET'])
@@ -220,3 +131,8 @@ def new_shopping_list():
         title='Admin Panel - New Shopping Liste',
         template="admin-page",
     )
+
+
+@admin_bp.route("/list_js")
+def list_js():
+    return Response(render_template("/js/list.js"), mimetype="text/javascript")

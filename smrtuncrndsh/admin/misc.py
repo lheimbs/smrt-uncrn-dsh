@@ -6,7 +6,7 @@ from sqlalchemy import func
 from sqlalchemy.sql import sqltypes
 
 from ..models import db
-from ..models.Shopping import Liste, Category, Shop
+from ..models.Shopping import Liste, Category, Shop, Item
 
 
 def get_multiple_items(liste):
@@ -118,35 +118,38 @@ def get_datatables_search_query(obj, req_dict):
     query = obj.query
 
     for col, vals in req_dict['columns'].items():
+        vals['data'] = vals['data'].replace('[</br>]', '') if vals['data'].endswith('[</br>]') else vals['data']
         if not hasattr(obj, vals['data']):
+            # current_app.logger.debug(f"Object <{obj}> has no attribute '{vals['data']}'.")
             continue
         elif not vals['searchable'] and not vals['orderable']:
+            # current_app.logger.debug(f"'{vals['data']}' is not searchable AND orderable.")
             continue
         elif not req_dict['search'] and not vals['search_value']:
+            # current_app.logger.debug(f"No search value provided for column '{vals['data']}'.")
             continue
 
-        if vals['data'] == 'category':
-            attr = getattr(Category, 'name')
-            query = query.join(obj.category)
-        elif vals['data'] == 'shop':
-            attr = getattr(Shop, vals['data'], 'name')
-            query = query.join(obj.shop)
-        else:
-            attr = getattr(obj, vals['data'])
+        attr, query = get_attr_based_on_category(vals['data'], query, obj)
 
-        # print(vals['search_value'], attr.property.columns[0].type)
-        if isinstance(attr.property.columns[0].type, sqltypes.String):
-            search = req_dict['search'].lower()
-            query = search_string(
-                attr, query, search, vals['searchable']
-            )
+        if vals['data'] == 'items':
+            search_req = req_dict['search'].lower()
             search = vals['search_value'].lower()
-            query = search_string(
-                attr, query, search, vals['searchable']
-            )
+            query = search_items_string(query, search_req, vals['searchable'])
+            query = search_items_string(query, search, vals['searchable'])
+        elif isinstance(attr.property.columns[0].type, sqltypes.String):
+            search_req = req_dict['search'].lower()
+            search = vals['search_value'].lower()
+            query = search_string(attr, query, search_req, vals['searchable'])
+            query = search_string(attr, query, search, vals['searchable'])
         elif isinstance(attr.property.columns[0].type, sqltypes.DateTime):
             query = search_date(attr, query, req_dict['search'], vals['searchable'])
             query = search_date(attr, query, vals['search_value'], vals['searchable'])
+        elif isinstance(attr.property.columns[0].type, sqltypes.Date):
+            query = search_date_range(attr, query, req_dict['search'], vals['searchable'])
+            query = search_date_range(attr, query, vals['search_value'], vals['searchable'])
+        elif isinstance(attr.property.columns[0].type, sqltypes.Float):
+            query = search_num_range(attr, query, req_dict['search'], vals['searchable'])
+            query = search_num_range(attr, query, vals['search_value'], vals['searchable'])
         else:
             search = req_dict['search']
             search_value = vals['search_value']
@@ -158,9 +161,27 @@ def get_datatables_search_query(obj, req_dict):
     return query
 
 
+def get_attr_based_on_category(category, query, obj):
+    if category == 'category':
+        attr = getattr(Category, 'name')
+        query = query.join(obj.category)
+    elif category == 'shop':
+        attr = getattr(Shop, 'name')
+        query = query.join(obj.shop)
+    else:
+        attr = getattr(obj, category)
+    return attr, query
+
+
 def search_string(attr, query, search_val, searchable):
     if search_val and searchable:
         query = query.filter(func.lower(attr).contains(search_val))
+    return query
+
+
+def search_items_string(query, search_val, searchable):
+    if search_val and searchable:
+        query = query.filter(Liste.items.any(func.lower(Item.name).contains(search_val)))
     return query
 
 
@@ -169,6 +190,28 @@ def search_date(attr, query, search_val, searchable):
         search_start = dt.parse(search_val)
         search_end = search_start + timedelta(hours=24)
         query = query.filter(attr.between(search_start, search_end))
+    return query
+
+
+def search_date_range(attr, query, search_val, searchable):
+    if search_val and searchable:
+        search_start, search_end = search_val.split(' - ')
+        search_start = dt.parse(search_start)
+        search_end = dt.parse(search_end)
+        query = query.filter(attr.between(search_start, search_end))
+    return query
+
+
+def search_num_range(attr, query, search_val, searchable):
+    if search_val and searchable:
+
+        search_vals = search_val.split(',')
+        if len(search_vals) > 1:
+            search_start = float(search_vals[0])
+            search_end = float(search_vals[1])
+            query = query.filter(attr >= search_start).filter(attr < search_end)
+        else:
+            query = query.filter(attr == search_val)
     return query
 
 

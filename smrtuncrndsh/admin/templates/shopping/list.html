@@ -1,198 +1,75 @@
 {% from "macros.html" import render_flashes %}
-{% from "macros.html" import render_pagination %}
 {% extends "base.html" %}
 
 {% block extra_assets %}
-{% assets "tablesorter_js" %}
+{% assets "jrange_js" %}
     <script type="text/javascript" src="{{ ASSET_URL }}"></script>
 {% endassets %}
-{% assets "tablesorter_css" %}
+{% assets "jrange_css" %}
     <link rel="stylesheet" href="{{ ASSET_URL }}" />
 {% endassets %}
-{% assets "nouislider_js" %}
+
+{% assets "datatables_js" %}
     <script type="text/javascript" src="{{ ASSET_URL }}"></script>
 {% endassets %}
-{% assets "nouislider_css" %}
+{% assets "datatables_css" %}
     <link rel="stylesheet" href="{{ ASSET_URL }}" />
 {% endassets %}
+
+{% assets "daterangepicker_js" %}
+    <script type="text/javascript" src="{{ ASSET_URL }}"></script>
+{% endassets %}
+{% assets "daterangepicker_css" %}
+    <link rel="stylesheet" href="{{ ASSET_URL }}" />
+{% endassets %}
+
+<script src="{{ url_for('admin_bp.list_js') }}"></script>
+
 {% endblock %}
 
 {% block content %}
 {% include "adminbar.html" %}
 
-<div class="card">
-    <div class="flashes">
-        {{ render_flashes('error') }}
-        {{ render_flashes('warning') }}
-        {{ render_flashes('info') }}
-        {{ render_flashes('success') }}
-    </div>
-    <details>
-        <summary>Filter Shopping Lists</summary>
-        <form id="filter-form" action="" method="post" autocomplete="off" class="filter-form">
-            {{ form.csrf_token }}
-            <div class="filter-form-container">
-                
-                <div class="filter-date-range">
-                    <div class="tooltip filter-date-range-tooltip">
-                        <div id="date-min-max-slider"></div>
-                        {{ form.date_min(style="display: none") }}
-                        {{ form.date_max(style="display: none") }}
-                        <span class="tooltiptext bottom">Select min and max date</span>
-                    </div>
-                </div>
-                <div class="filter-price-range">
-                    <div class="tooltip filter-price-range-tooltip">
-                        <div id="price-min-max-slider"></div>
-                        {{ form.price_min(style="display: none") }}
-                        {{ form.price_max(style="display: none") }}
-                        <span class="tooltiptext bottom">Select min and max price</span>
-                    </div>
-                </div>
-                <div class="filter-shop-container tooltip">
-                    {% if data[current_shop] %}
-                        {{ form.shop(value=data[current_shop]) }}
-                    {% else %}
-                        {{ form.shop(placeholder="Shop") }}
-                    {% endif %}
-                    <span class="tooltiptext">{{ form.shop.label.text }}</span>
-                </div>
-                <div class="filter-category-container tooltip">
-                    {% if data[current_category] %}
-                        {{ form.category(value=data[current_category]) }}
-                    {% else %}
-                        {{ form.category(placeholder="Category") }}
-                    {% endif %}
-                    <span class="tooltiptext">{{ form.category.label.text }}</span>
-                </div>
-                <!-- <div class="filter-item-container tooltip">
-                    {{ form.item(placeholder="Comma separated list") }}
-                    <span class="tooltiptext">{{ form.item.label.text }}</span>
-                </div> -->
-                <div class="filter-submit">
-                    <button class="material-icons cancel-filters" onclick="cancelFilters();">close</button>
-                    <input class="material-icons" type="submit" value="send"/>
-                </div>
-            </div>
-            {% if form.date_min.errors or form.date_max.errors  or form.price_min.errors or form.price_max.errors or form.shop.errors or form.category.errors or form.item.errors %}
-            <ul class="errors">
-                {% for error in form.date_min.errors %}
-                    <li>{{ form.date_min.label.text }}: {{ error }}</li>
-                {% endfor %}
-                {% for error in form.date_max.errors %}
-                    <li>{{ form.date_max.label.text }}: {{ error }}</li>
-                {% endfor %}
-                {% for error in form.price_min.errors %}
-                    <li>{{ form.price_min.label.text }}: {{ error }}</li>
-                {% endfor %}
-                {% for error in form.price_max.errors %}
-                    <li>{{ form.price_max.label.text }}: {{ error }}</li>
-                {% endfor %}
-                {% for error in form.shop.errors %}
-                    <li>{{ form.shop.label.text }}: {{ error }}</li>
-                {% endfor %}
-                {% for error in form.category.errors %}
-                    <li>{{ form.category.label.text }}: {{ error }}</li>
-                {% endfor %}
-                {% for error in form.item.errors %}
-                    <li>{{ form.item.label.text }}: {{ error }}</li>
-                {% endfor %}
-                </ul>
-                {% endif %}
-            </div>
-        </form>
-    </details>
+<div class="flashes">
+    {{ render_flashes('error') }}
+    {{ render_flashes('warning') }}
+    {{ render_flashes('info') }}
+    {{ render_flashes('success') }}
 </div>
 
-<div class="card">
-    <table class="shopping-table data-table" id="shopping-list-table">
-        <thead>
-            <tr>
-                <th>Edit</th>
-                <th>Delete</th>
-                <th>Id</th>
-                <th>Date</th>
-                <th>Price</th>
-                <th>Shop</th>
-                <th>Category</th>
-                <th>Items</th>
-            </tr>
-        </thead>
-        <tbody id="table-shopping-list-data">
-            {% for list in lists.items %}
-            <tr>
-                <td class="link">
-                    <a href="{{ url_for('admin_bp.edit_shopping_list', id=list.id) }}" class="material-icons">edit</a>
-                </td>
-                <td class="link">
-                    <a href="{{ url_for('admin_bp.delete_shopping_list', id=list.id) }}" class="material-icons">delete_forever</a>
-                </td>
-                <td>{{ list.id }}</td>
-                <td>{{ list.date.strftime('%d.%m.%Y') if list.date else '-' }}</td>
-                <td>{{ list.price }}</td>
-                <td>{{ list.shop.name if list.shop else '-' }}</td>
-                <td>{{ list.category.name if list.category else '-' }}</td>
-                <td>
-                    <div class="shopping-items-in-list">
-                        {% for item in list.items %}
-                        <div class="item-row">
-                            <span class="name">{{ item.name }}</span>
-                            <span class="price">{{ item.price }}</span>
-                        </div>
-                        {% endfor %}
-                    </div>
+<table class="shopping-table data-table" id="shopping-list-table">
+    <thead>
+        <tr>
+            <th class="model_id">Id</th>
+            <th>Date</th>
+            <th>Price</th>
+            <th>Shop</th>
+            <th>Category</th>
+            <th class="col-large">Items</th>
+            <th class="edit_delete_header"></th>
+            <th class="edit_delete_header"></th>
+        </tr>
+    </thead>
+    <tfoot>
+        <tr>
+            <th><input type="number" placeholder="Id" /></th>
+            <th><input type="text" name="daterange" placeholder="Daterange" value="" /></th>
+            <th><input type="hidden" class="price-slider" placeholder="Price" /></th>
+            <th><input type="text" placeholder="Shop" /></th>
+            <th><input type="text" placeholder="Category" /></th>
+            <th><input type="text" placeholder="Item" /></th>
+            <th class="edit_delete_footer"></th>
+            <th class="edit_delete_footer"></th>
+        </tr>
+    </tfoot>
+</table>
 
-                </td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
-</div>
-
-<div class="card pager">
-    <div class="pagination-container">
-        {% if prev_url %}
-        <a class="navigation material-icons" href="{{ prev_url }}">chevron_left</a>
-        {% endif %}
-        {{ render_pagination(lists, 'admin_bp.shopping_list') }}
-        {% if next_url %}
-        <a class="navigation material-icons" href="{{ next_url }}">chevron_right</a>
-        {% endif %}
-    </div>
-    
-    <a class="new material-icons" href="{{ url_for('admin_bp.new_shopping_list') }}">add_circle</a>
-</div>
-
-<script type="text/javascript" src="{{ url_for('admin_bp.static', filename='js/shopping_list.js') }}"></script>
 <script type="text/javascript">
-
-    $(function() {
-        $("#shopping-list-table").tablesorter({dateFormat:"ddmmyyyy"});
-    });
-
-    function getMinDate() {
-        return {{ data['min_date']|tojson }};
-    }
-    function getMaxDate() {
-        return {{ data['max_date']|tojson }};
-    }
-    function getCurrMinDate() {
-        return {{ data['current_min_date']|tojson }};
-    }
-    function getCurrMaxDate() {
-        return {{ data['current_max_date']|tojson }};
-    }
     function getMinPrice() {
         return parseFloat({{ data['min_price']|string|tojson|safe }});
     }
     function getMaxPrice() {
         return parseFloat({{ data['max_price']|string|tojson|safe }});
-    }
-    function getCurrMinPrice() {
-        return parseFloat({{ data['current_min_price']|string|tojson|safe }});
-    }
-    function getCurrMaxPrice() {
-        return parseFloat({{ data['current_max_price']|string|tojson|safe }});
     }
 </script>
     
