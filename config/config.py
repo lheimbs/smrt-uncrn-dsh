@@ -41,6 +41,24 @@ class Config:
 
     SHOPPING_LISTS_PER_PAGE = 10
 
+    CSP = {
+        # Fonts from fonts.google.com
+        'font-src': "'self' themes.googleusercontent.com *.gstatic.com",
+        # Used by generated code from http://www.google.com/fonts
+        'style-src': [
+            "'self'",
+            "ajax.googleapis.com fonts.googleapis.com ",
+            "*.gstatic.com",
+            "'unsafe-inline'",  # sucks but idk how to mitigate this sadly
+        ],
+        "script-src": [
+            "'self'",
+            # Due to https://github.com/plotly/dash/issues/630:
+            "'sha256-jZlsGVOhUAIcH+4PVs7QuGZkthRMgvT2n0ilH6/zTM0='",
+            # "'unsafe-inline'",
+        ]
+    }
+
 
 class ProductionConfig(Config):
     """Uses production database server."""

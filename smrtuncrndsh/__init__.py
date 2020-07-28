@@ -2,6 +2,11 @@
 import os
 from flask import Flask
 from flask_migrate import Migrate
+from flask_wtf.csrf import CSRFProtect
+from flask_talisman import Talisman
+
+csrf = CSRFProtect()
+talisman = Talisman()
 
 
 def get_base_dir():
@@ -54,6 +59,8 @@ def create_app():
     from config import init_config
     init_config(app)
 
+    csrf.init_app(app)
+
     from .models import init_db
     init_db(app)
 
@@ -69,10 +76,16 @@ def create_app():
 
         register_blueprints(app)
         register_dash(app)
-        # register_shopping(app)
+
         # Compile CSS
         from smrtuncrndsh.assets import compile_assets
         compile_assets(app)
+
+        talisman.init_app(
+            app,
+            content_security_policy=app.config['CSP'],
+            content_security_policy_nonce_in=['script-src'],
+        )
 
         return app
 
