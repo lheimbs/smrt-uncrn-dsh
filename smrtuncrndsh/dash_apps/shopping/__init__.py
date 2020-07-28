@@ -1,12 +1,15 @@
-from ..layout import DashFlaskyfied
+from ..layout import CustomDash
 from .layout import layout
 from .callbacks import init_callbacks
 
+
 def make_dash_app():
-    dash_app = DashFlaskyfied(
+    dash_app = CustomDash(
+        name=__name__,
+        assets_folder='static',
         server=False,
         routes_pathname_prefix='/shopping/dashboard/',
-        template_str="shopping-dashboard-page",
+        template="shopping-dashboard-page",
         title="Shopping Dashboard",
     )
     dash_app.layout = layout

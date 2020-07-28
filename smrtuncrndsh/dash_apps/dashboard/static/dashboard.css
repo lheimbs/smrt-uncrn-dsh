@@ -78,3 +78,18 @@
 #day-data-graph {
     height: 25vh;
 }
+
+/* progressbar stylings */
+.circle-progress-circle {
+    stroke: var(--foreground-dark);
+}
+
+#temperature-display .circle-progress-value {
+    stroke: var(--colorway-0);
+}
+#humidity-display .circle-progress-value {
+    stroke: var(--colorway-1);
+}
+#pressure-display .circle-progress-value {
+    stroke: var(--colorway-2);
+}
