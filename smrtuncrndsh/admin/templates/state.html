@@ -10,6 +10,7 @@
 {% endassets %}
 
 <script src="{{ url_for('admin_bp.state_js') }}"></script>
+<script src="{{ url_for('admin_bp.static', filename='js/search.js') }}"></script>
 
 {% endblock %}
 
@@ -72,8 +73,8 @@
                 <th><input type="date" placeholder="Date" /></th>
                 <th><input type="text" placeholder="Device" /></th>
                 <th><input type="text" placeholder="State" /></th>
-                <th class="edit_delete_footer"></th>
-                <th class="edit_delete_footer"></th>
+                <th class="edit_delete_footer"><button id="search-cancel" class="material-icons">clear</button></th>
+                <th class="edit_delete_footer"><button id="search-go" class="material-icons">search</button></th>
             </tr>
         </tfoot>
     </table>

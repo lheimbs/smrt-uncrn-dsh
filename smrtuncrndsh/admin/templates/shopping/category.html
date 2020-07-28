@@ -10,6 +10,7 @@
 {% endassets %}
 
 <script src="{{ url_for('admin_bp.category_js') }}"></script>
+<script src="{{ url_for('admin_bp.static', filename='js/search.js') }}"></script>
 
 {% endblock %}
 
@@ -35,8 +36,8 @@
         <tr>
             <th><input type="number" placeholder="Id" /></th>
             <th><input type="text" placeholder="Name" /></th>
-            <th class="edit_delete_footer"></th>
-            <th class="edit_delete_footer"></th>
+            <th class="edit_delete_footer"><button id="search-cancel" class="material-icons">clear</button></th>
+            <th class="edit_delete_footer"><button id="search-go" class="material-icons">search</button></th>
         </tr>
     </tfoot>
 </table>

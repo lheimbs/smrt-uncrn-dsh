@@ -24,6 +24,7 @@
 {% endassets %}
 
 <script src="{{ url_for('admin_bp.list_js') }}"></script>
+<script src="{{ url_for('admin_bp.static', filename='js/search.js') }}"></script>
 
 {% endblock %}
 
@@ -54,17 +55,17 @@
         <tr>
             <th><input type="number" placeholder="Id" /></th>
             <th><input type="text" name="daterange" placeholder="Daterange" value="" /></th>
-            <th><input type="hidden" class="price-slider" placeholder="Price" /></th>
+            <th><input type="hidden" class="price-slider" placeholder="Price" value="{{ data['min_price'] }},{{ data['max_price'] }}" /></th>
             <th><input type="text" placeholder="Shop" /></th>
             <th><input type="text" placeholder="Category" /></th>
             <th><input type="text" placeholder="Item" /></th>
-            <th class="edit_delete_footer"></th>
-            <th class="edit_delete_footer"></th>
+            <th class="edit_delete_footer"><button id="search-cancel" class="material-icons">clear</button></th>
+            <th class="edit_delete_footer"><button id="search-go" class="material-icons">search</button></th>
         </tr>
     </tfoot>
 </table>
 
-<script type="text/javascript">
+<script nonce="{{ csp_nonce() }}" type="text/javascript">
     function getMinPrice() {
         return parseFloat({{ data['min_price']|string|tojson|safe }});
     }

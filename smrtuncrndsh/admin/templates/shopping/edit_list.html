@@ -120,7 +120,7 @@
 <div class="shopping-extra-options">
     
 </div>
-<script>
+<script nonce="{{ csp_nonce() }}">
     function reset_selected(e) {
         // remove result-selected class from all li under the dropdown
         $('.chosen-drop .chosen-results li').removeClass('result-selected');

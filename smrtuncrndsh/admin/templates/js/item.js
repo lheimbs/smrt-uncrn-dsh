@@ -1,33 +1,12 @@
 $(function() {
     var table = $("#shopping-items-table").DataTable( {
         "initComplete": function () {
-            // Apply the search
-            this.api().columns().every( function () {
-                var that = this;
-
-                $( 'input', this.footer() ).on( 'keyup change clear', function () {
-                    
-                    if (this.type === "checkbox") {
-                        var value = this.checked;
-                    }
-                    else {
-                        var value = this.value;
-                    }
-
-                    if ( that.search() !== value ) {
-                        that
-                            .search( value )
-                            .draw();
-                    }
-                } );
-            } );
             $(".card-fill.pager").prepend('<a class="new material-icons" href="{{ url_for("admin_bp.new_shopping_item") }}">add_circle</a>')
         },
-        // "processing": true,
+        "processing": true,
         "serverSide": true,
         "autoWidth": false,
         "stateSave":  true,
-        // "stripeClasses": ['strip1', 'strip2'],
         "ajax": {
             url: "{{ url_for('admin_bp.query_shopping_items') }}",
             type: 'POST'
@@ -36,7 +15,7 @@ $(function() {
         "columns": [
             {
                 "data": "id",
-                "render": $.fn.dataTable.render.number(),
+                "render": $.fn.dataTable.render.text(),
             },
             {
                 "data": "name",
@@ -86,4 +65,18 @@ $(function() {
             },
         ]
     });
+
+    register_search(table);
+});
+
+
+
+var csrf_token = "{{ csrf_token() }}";
+
+$.ajaxSetup({
+    beforeSend: function(xhr, settings) {
+        if (!/^(GET|HEAD|OPTIONS|TRACE)$/i.test(settings.type) && !this.crossDomain) {
+            xhr.setRequestHeader("X-CSRFToken", csrf_token);
+        }
+    }
 });
