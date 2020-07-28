@@ -1,10 +1,16 @@
-from flask import render_template
+from flask import render_template, jsonify
+from flask_wtf.csrf import CSRFError
 
 
 def register_handlers(app):
     # if app.config.get('DEBUG') is True:
     #     app.logger.debug('Skipping error handlers in Debug mode')
     #     return
+
+    @app.errorhandler(CSRFError)
+    def handle_csrf_error(error):
+        app.logger.error(f"CSRF Error: {error.description}")
+        return jsonify(error.description), 400
 
     @app.errorhandler(403)
     def forbidden_page(*args, **kwargs):
