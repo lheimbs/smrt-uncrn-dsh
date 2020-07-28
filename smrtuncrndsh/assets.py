@@ -17,14 +17,6 @@ def compile_assets(app):
         'js/jquery/jquery.min.js',
         filters='jsmin', output='gen/jquery.js'
     )
-    tablesorter_css = Bundle(
-        'css/tablesorter/*.css',
-        filters='cssmin', output='gen/tablesorter.css'
-    )
-    tablesorter_js = Bundle(
-        'js/tablesorter/*.js',
-        filters='jsmin', output='gen/tablesorter.js'
-    )
     chosen_css = Bundle(
         'css/chosen/chosen.min.css',
         filters='cssmin', output='gen/chosen.css'
@@ -35,18 +27,18 @@ def compile_assets(app):
     )
     jrange_css = Bundle(
         'css/jrange/jquery.range.css',
-        filters='cssmin', output='gen/nouislider.css'
+        filters='cssmin', output='gen/jrange.css'
     )
     jrange_js = Bundle(
         'js/jrange/jquery.range.js',
-        filters='jsmin', output='gen/nouislider.js'
+        filters='jsmin', output='gen/jrange.js'
     )
     datatables_css = Bundle(
-        'css/datatables/jquery.dataTables.css',  # 'css/datatables/searchPanes.dataTables.css',
+        'css/datatables/jquery.dataTables.css',
         filters='cssmin', output='gen/datatables.css'
     )
     datatables_js = Bundle(
-        'js/datatables/jquery.dataTables.js',  # 'js/datatables/searchPanes.dataTables.js',
+        'js/datatables/jquery.dataTables.js',
         filters='jsmin', output='gen/datatables.js'
     )
 
@@ -59,11 +51,14 @@ def compile_assets(app):
         filters='jsmin', output='gen/daterangepicker.js'
     )
 
+    plotly_js = Bundle(
+        'js/plotly/plotly.basic.js',
+        filters='jsmin', output='gen/plotly.js'
+    )
+
     bundles = {
         'js_all': js,
         'css_all': css,
-        'tablesorter_css': tablesorter_css,
-        'tablesorter_js': tablesorter_js,
         'chosen_css': chosen_css,
         'chosen_js': chosen_js,
         'jrange_css': jrange_css,
@@ -73,6 +68,7 @@ def compile_assets(app):
         'datatables_css': datatables_css,
         'daterangepicker_js': daterangepicker_js,
         'daterangepicker_css': daterangepicker_css,
+        'plotly_js': plotly_js,
     }
 
     assets.register(bundles)
