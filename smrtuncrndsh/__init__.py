@@ -61,6 +61,10 @@ def create_app():
 
     csrf.init_app(app)
 
+    # Compile CSS
+    from smrtuncrndsh.assets import compile_assets
+    compile_assets(app)
+
     from .models import init_db
     init_db(app)
 
@@ -74,18 +78,13 @@ def create_app():
         from .models import db
         migrate = Migrate(app, db)          # noqa: F841
 
-        register_blueprints(app)
-        register_dash(app)
-
-        # Compile CSS
-        from smrtuncrndsh.assets import compile_assets
-        compile_assets(app)
-
         talisman.init_app(
             app,
             content_security_policy=app.config['CSP'],
             content_security_policy_nonce_in=['script-src'],
         )
+        register_blueprints(app)
+        register_dash(app)
 
         return app
 
