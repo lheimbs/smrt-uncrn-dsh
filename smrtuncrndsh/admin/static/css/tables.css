@@ -32,9 +32,8 @@ td, th {
 	word-break: break-all;
 }
 
-.data-table .edit_delete_header, .data-table .model_id {
-	width: 36px;
-}
+.data-table .edit_delete_header { width: 30px; }
+.data-table .model_id { width: 62px; }
 
 .col-small { width: 60px; }
 .col-medium { width: 10%; }
