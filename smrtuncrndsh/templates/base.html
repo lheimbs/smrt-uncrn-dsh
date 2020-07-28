@@ -18,18 +18,12 @@
     {% assets "js_all" %}
         <script type="text/javascript" src="{{ ASSET_URL }}"></script>
     {% endassets %}
-    {% block extra_assets %}
-    {% endblock %}
+
+    {% block extra_assets %}{% endblock %}
+    {% block extra_scripts %}{% endblock %}
 </head>
 
 <body class="container {{ template }}">
-    {% block extra_scripts %}
-    <script>
-        function delete_flash(flash){
-            $(flash).parent().remove()
-        }
-    </script>
-    {% endblock %}
     <header>
         {% include 'header.html' %}
     </header>
@@ -41,9 +35,10 @@
     <main>
         {% block content %}{% endblock %}
     </main>
-    
+
     <footer>
         {% include 'footer.html' %}
+        {% block dash_footer %}{% endblock %}
     </footer>
 </body>
 

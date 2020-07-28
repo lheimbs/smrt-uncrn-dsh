@@ -16,6 +16,14 @@
 
 
 {% macro render_flashes(class) %}
+    {% block extra_scripts %}
+    <script nonce="{{ csp_nonce() }}">
+        function delete_flash(flash){
+            $(flash).parent().remove()
+        }
+    </script>
+    {% endblock %}
+
     {% with msgs = get_flashed_messages(category_filter=[class]) %}
         {% for msg in msgs %}
             <div class="flash {{ class }} message">
