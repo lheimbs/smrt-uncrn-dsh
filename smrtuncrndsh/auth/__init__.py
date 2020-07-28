@@ -28,7 +28,7 @@ def activation_required(func):
         elif current_app.config.get('LOGIN_DISABLED'):
             return func(*args, **kwargs)
         elif not current_user.is_activated:
-            print("user not activated")
+            current_app.logger.warning(f"User {current_user} not activated")
             return current_app.login_manager.unactivated()
         return func(*args, **kwargs)
     return decorated_view
