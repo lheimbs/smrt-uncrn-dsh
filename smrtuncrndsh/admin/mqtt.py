@@ -97,7 +97,6 @@ def get_order(order_type, order_order):
 
     query = Mqtt.date.desc()
     if order_type in obj_attrs.keys() and order_order in ['desc', 'asc']:
-        print("order ", order_type, " ", order_order)
         if order_order == 'asc':
             query = obj_attrs[order_type].asc()
         else:
