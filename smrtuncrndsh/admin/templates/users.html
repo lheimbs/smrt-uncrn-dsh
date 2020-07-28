@@ -1,0 +1,53 @@
+{% from "macros.html" import render_flashes %}
+{% extends "base.html" %}
+
+{% block content %}
+{% include "adminbar.html" %}
+<div class="card">
+    <div class="flashes">
+        {{ render_flashes('error') }}
+        {{ render_flashes('warning') }}
+        {{ render_flashes('info') }}
+        {{ render_flashes('success') }}
+    </div>
+    <table class="users-table">
+        <thead>
+            <tr>
+                <th>Edit</th>
+                <th>Delete</th>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Username</th>
+                <th>Created On</th>
+                <th>Last Login</th>
+                <th>Is Admin</th>
+                <th>Is Activated</th>
+            </tr>
+        </thead>
+        <tbody id="table-users-data">
+            {% for user in all_users %}
+            <tr>
+                <td class="link">
+                    <a href="{{ url_for('admin_bp.edit_user', username=user.username) }}" class="material-icons">edit</a>
+                </td>
+                <td class="link">
+                    <a href="{{ url_for('admin_bp.delete_user', username=user.username) }}" class="material-icons">delete_forever</a>
+                </td>
+                <td>{{ user.name }}</td>
+                <td>{{ user.email }}</td>
+                <td>{{ user.username }}</td>
+                <td>{{ user.created_on.strftime('%d.%m.%Y %H:%M:%S') if user.created_on else '-' }}</td>
+                <td>{{ user.last_login.strftime('%d.%m.%Y %H:%M:%S') if user.last_login else '-' }}</td>
+                <td>{{ user.is_admin }}</td>
+                <td>{{ user.is_activated }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<div class="users-extra-options card">
+    <a class="material-icons" href="{{ url_for('admin_bp.new_user') }}">add_circle</a>
+    <a class="material-icons" href="{{ url_for('admin_bp.activation') }}">verified_user</a>
+</div>
+{% endblock %}

@@ -1,0 +1,87 @@
+{% from "macros.html" import render_flashes %}
+{% extends "base.html" %}
+
+{% block extra_assets %}
+{% assets "datatables_js" %}
+    <script type="text/javascript" src="{{ ASSET_URL }}"></script>
+{% endassets %}
+{% assets "datatables_css" %}
+    <link rel="stylesheet" href="{{ ASSET_URL }}" />
+{% endassets %}
+
+<script src="{{ url_for('admin_bp.probe_request_js') }}"></script>
+<script src="{{ url_for('admin_bp.static', filename='js/search.js') }}"></script>
+
+{% endblock %}
+
+{% block content %}
+{% include "adminbar.html" %}
+
+<div class="flashes">
+    {{ render_flashes('error') }}
+    {{ render_flashes('warning') }}
+    {{ render_flashes('info') }}
+    {{ render_flashes('success') }}
+</div>
+
+{% if form %}
+    {# render form #}
+    <div class="card">
+        <h3>ProbeRequests</h3>
+        <form id="probe-request-form" method="POST">
+            {{ form.csrf_token }}
+
+            <table class="admin-table" cellspacing="0" cellpadding="0">
+                {% for field in form if field.widget.input_type != 'hidden' %}
+                <tr>
+                    <td>{{ field.label }}</td>
+                    <td>
+                        <fieldset class="{{ field.type }}">
+                            {{ field }}
+                            {% if field.errors %}
+                            <ul class="errors">
+                                {% for error in field.errors %}
+                                    <li>{{ error }}</li>
+                                {% endfor %}
+                            </ul>
+                            {% endif %}
+                        </fieldset>
+                    </td>
+                </tr>
+                {% endfor %}
+            </table>
+            <div class="shopping submit-button">
+                <input class="material-icons" type="submit" value="send"/>
+            </div>
+        </form>
+    </div>
+{% else %}
+    <table class="data-table stripe" id="probe-request-table">
+        <thead>
+            <tr>
+                <th class="model_id">Id</th>
+                <th class="col-large">Date</th>
+                <th>Mac-Address</th>
+                <th>Make</th>
+                <th>SSID</th>
+                <th>RSSI</th>
+                <th class="edit_delete_header"></th>
+                <th class="edit_delete_header"></th>
+            </tr>
+        </thead>
+        <tfoot>
+            <tr>
+                <th><input type="number" placeholder="Id" /></th>
+                <th><input type="date" placeholder="Date" /></th>
+                <th><input type="text" placeholder="Mac-Address" /></th>
+                <th><input type="text" placeholder="Make" /></th>
+                <th><input type="number" placeholder="SSID" /></th>
+                <th><input type="number" placeholder="RSSI" /></th>
+                <th class="edit_delete_footer"><button id="search-cancel" class="material-icons">clear</button></th>
+                <th class="edit_delete_footer"><button id="search-go" class="material-icons">search</button></th>
+            </tr>
+        </tfoot>
+    </table>
+{% endif %}
+
+{% endblock %}

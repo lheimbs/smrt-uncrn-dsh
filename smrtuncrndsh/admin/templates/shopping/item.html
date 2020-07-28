@@ -1,0 +1,58 @@
+{% from "macros.html" import render_flashes %}
+{% extends "base.html" %}
+
+{% block extra_assets %}
+{% assets "datatables_js" %}
+    <script type="text/javascript" src="{{ ASSET_URL }}"></script>
+{% endassets %}
+{% assets "datatables_css" %}
+    <link rel="stylesheet" href="{{ ASSET_URL }}" />
+{% endassets %}
+
+<script src="{{ url_for('admin_bp.item_js') }}"></script>
+<script src="{{ url_for('admin_bp.static', filename='js/search.js') }}"></script>
+
+{% endblock %}
+
+{% block content %}
+{% include "adminbar.html" %}
+
+<div class="flashes">
+    {{ render_flashes('error') }}
+    {{ render_flashes('warning') }}
+    {{ render_flashes('info') }}
+    {{ render_flashes('success') }}
+</div>
+
+<table class="shopping-table data-table stripe" id="shopping-items-table">
+    <thead>
+        <tr>
+            <th class="model_id">Id</th>
+            <th class="col-large">Name</th>
+            <th class="col-medium">Price</th>
+            <th>Volume</th>
+            <th>Price per volume</th>
+            <th class="small">Sale</th>
+            <th>Note</th>
+            <th>Category</th>
+            <th class="edit_delete_header"></th>
+            <th class="edit_delete_header"></th>
+        </tr>
+    </thead>
+    <tfoot>
+        <tr>
+            <th><input type="number" placeholder="Id" /></th>
+            <th><input type="text" placeholder="Name" /></th>
+            <th><input type="number" placeholder="Price" /></th>
+            <th><input type="text" placeholder="Volume" /></th>
+            <th><input type="text" placeholder="Price per volume" /></th>
+            <th><input type="checkbox" placeholder="Sale" /></th>
+            <th><input type="text" placeholder="Note" /></th>
+            <th><input type="text" placeholder="Category" /></th>
+            <th class="edit_delete_footer"><button id="search-cancel" class="material-icons">clear</button></th>
+            <th class="edit_delete_footer"><button id="search-go" class="material-icons">search</button></th>
+        </tr>
+    </tfoot>
+</table>
+
+{% endblock %}

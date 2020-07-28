@@ -1,0 +1,38 @@
+.flashes {
+    width: 100%;
+}
+
+.flash.message {
+
+    box-shadow: 0 1px 2px 0 rgba(255,255,255,0.05);
+    transition: .3s;
+    border-radius: 5px;
+    background-color: var(--background-card-transparent);
+    margin: 2% 5%;
+    padding: .5%;
+
+    display: flex;
+    justify-content: space-between;
+
+    /* padding: 10px; */
+    /* border-radius: 5px; */
+}
+
+/* .flash.message .close {
+} */
+
+.flash.success.message {
+    border: 1px solid var(--success);
+}
+
+.flash.info.message {
+    border: 1px solid var(--font-foreground);
+}
+
+.flash.warning.message {
+    border: 1px solid var(--orange);
+}
+
+.flash.error.message {
+    border: 1px solid var(--error);
+}

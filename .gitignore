@@ -10,12 +10,19 @@ Jupyter/
 *.db-journal
 db_to_sqlalchemy.py
 
+# ignore generated web assets
+.webassets-cache/
+gen/
+
 *.pickle
 token.*
 credentials.json
 
 # ignore jupyter stuff
 *.ipynb*
+
+# git merge original files
+*.orig
 
 
 # Byte-compiled / optimized / DLL files

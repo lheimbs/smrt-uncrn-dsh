@@ -1,0 +1,87 @@
+html, body {
+    margin: 0;
+    padding: 0;
+
+    width: auto;
+    height: 100vh;
+
+    background-color: var(--background);
+}
+
+body {
+    background-color: var(--background);
+    background-image: url("/static/img/Abstract-Envelope.svg");
+    background-attachment: fixed;
+    background-size: cover;
+    /* background by SVGBackgrounds.com */
+}
+
+.material-icons,
+.icon-text {
+  vertical-align: middle;
+}
+
+.container {
+    display: grid;
+
+    grid-template-areas:
+      "header header"
+      "nav content"
+      "footer footer";
+
+    grid-template-columns: 200px 1fr;
+    grid-template-rows: auto 1fr;
+    grid-gap: var(--container-grid-gap);
+}
+
+header {
+    grid-area: header;
+    height: var(--header-height);
+}
+
+nav {
+    /* height: 100%; */
+    grid-area: nav;
+}
+
+main {
+    grid-area: content;
+    margin-right: 10px;
+    overflow-y: auto;
+}
+
+footer {
+    height: var(--footer-height);
+    grid-area: footer;
+}
+
+@media (max-width: 768px) {
+    .container {
+        display: block;
+        /* grid-gap: 0px;
+        grid-template-areas:
+            "header"
+            "nav"
+            "content"
+            "footer";
+
+        grid-template-columns: 1fr;
+        grid-template-rows: */
+            /* auto Header */
+            /* minmax(75px, auto) Nav */
+            /* 1fr Content */
+            /* auto; Footer */
+    }
+
+    main {
+        margin-right: 0;
+    }
+    header .header-items-left {
+        padding-left: 5px;
+    }
+}
+
+
+.mb-5 {
+    margin-bottom: +5px;
+}

@@ -1,0 +1,17 @@
+<a class="home-page" href="{{ url_for('home_bp.home') }}">
+    <i class="material-icons">home</i><span class="name">home</span>
+</a>
+<a class="dashboard-page" href="/dashboard/">
+    <i class="material-icons">dashboard</i><span class="name">dashboard</span>
+</a>
+<a class="dashboard-overview-page" href="/dashboard/overview">
+    <i class="material-icons">dashboard</i><span class="name">dashboard overview</span>
+</a>
+<a class="shopping-dashboard-page" href="/shopping/dashboard/">
+    <i class="material-icons">local_grocery_store</i><span class="name">shopping dash</span>
+</a>
+{% if current_user.is_authenticated and current_user.is_admin %}
+    <a class="admin-page" href="{{ url_for('admin_bp.users') }}">
+        <i class="material-icons">admin_panel_settings</i><span class="name">admin</span>
+    </a>
+{% endif %}

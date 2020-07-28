@@ -1,0 +1,29 @@
+.dahboard-overview-container {
+    display: grid;
+    /* grid-template-rows: 1fr 5fr; */
+    grid-template-areas: 
+        "values daterange"
+        "overview_graph overview_graph";
+
+    grid-gap: var(--container-grid-gap);
+}
+
+.values-select-container {
+    grid-area: values;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.daterange-select-container {
+    grid-area: daterange;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.overview-graph-container {
+    grid-area: overview_graph;
+}

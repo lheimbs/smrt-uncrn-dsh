@@ -1,0 +1,167 @@
+{% from "macros.html" import render_flashes %}
+{% extends "base.html" %}
+
+{% block extra_assets %}
+{% assets "chosen_js" %}
+    <script type="text/javascript" src="{{ ASSET_URL }}"></script>
+{% endassets %}
+{% assets "chosen_css" %}
+    <link rel="stylesheet" href="{{ ASSET_URL }}" />
+{% endassets %}
+{% endblock %}
+
+{% block content %}
+{% include "adminbar.html" %}
+
+<div class="card">
+    <div class="form-wrapper">
+
+        <div class="flashes">
+            {{ render_flashes('error') }}
+            {{ render_flashes('warning') }}
+            {{ render_flashes('info') }}
+            {{ render_flashes('success') }}
+        </div>
+
+        <h3>Edit Shopping Liste {{ liste.id }}</h3>
+
+        <form id="list-edit-form" method="POST" action="{{ url_for('admin_bp.edit_shopping_list', id=liste.id) }}">
+            {{ form.csrf_token }}
+            {{ form.test }}
+
+            <table class="admin-table" cellspacing="0" cellpadding="0">
+                <tr>
+                    <td>Date</td>
+                    <td>
+                        <fieldset class="date">
+                            {{ form.date }}
+                            {% if form.date.errors %}
+                            <ul class="errors">
+                                {% for error in form.date.errors %}
+                                    <li>{{ error }}</li>
+                                {% endfor %}
+                            </ul>
+                            {% endif %}
+                        </fieldset>
+                    </td>
+                </tr>
+                <tr>
+                    <td>Price</td>
+                    <td>
+                        <fieldset class="price">
+                            {{ form.price }}
+                            {% if form.price.errors %}
+                            <ul class="errors">
+                                {% for error in form.price.errors %}
+                                    <li>{{ error }}</li>
+                                {% endfor %}
+                            </ul>
+                            {% endif %}
+                        </fieldset>
+                    </td>
+                </tr>
+                <tr>
+                    <td>Shop</td>
+                    <td>
+                        <fieldset class="shop">
+                            {{ form.shop(class="js-example-basic-single") }}
+                            {% if form.shop.errors %}
+                              <ul class="errors">
+                                {% for error in form.shop.errors %}
+                                    <li>{{ error }}</li>
+                                {% endfor %}
+                              </ul>
+                            {% endif %}
+                        </fieldset>
+                    </td>
+                </tr>
+                <tr>
+                    <td>Category</td>
+                    <td>
+                        <fieldset class="category">
+                            {{ form.category(class="js-example-basic-single") }}
+                            {% if form.category.errors %}
+                              <ul class="errors">
+                                {% for error in form.category.errors %}
+                                    <li>{{ error }}</li>
+                                {% endfor %}
+                              </ul>
+                            {% endif %}
+                        </fieldset>
+                    </td>
+                </tr>
+                <tr>
+                    <td>Items</td>
+                    <td>
+                        <fieldset class="items">
+                            {{ form.items_obj(class="select-items-multi-chosen", multiple="multiple") }}
+                            {% if form.items_obj.errors %}
+                              <ul class="errors">
+                                {% for error in form.items_obj.errors %}
+                                    <li>{{ error }}</li>
+                                {% endfor %}
+                              </ul>
+                            {% endif %}
+                            {% for id, amount in multiples.items() %}
+                              <span class="multi-items-amount" value="{{ id }}" style="display: none;">{{ amount }}</span>
+                            {% endfor %}
+                        </fieldset>
+                    </td>
+                </tr>
+            </table>
+            <div class="shopping submit-button">
+                <input class="material-icons" type="submit" value="send"/>
+                <a class="material-icons" href="{{ url_for('admin_bp.delete_shopping_list', id=liste.id) }}">delete</a>
+                <a class="material-icons" href="{{ url_for('admin_bp.new_shopping_list') }}">add_circle</a>
+            </div>
+        </form>
+    </div>
+</div>
+<div class="shopping-extra-options">
+    
+</div>
+<script nonce="{{ csp_nonce() }}">
+    function reset_selected(e) {
+        // remove result-selected class from all li under the dropdown
+        $('.chosen-drop .chosen-results li').removeClass('result-selected');
+        // add active-result class to all li which are missing the respective class
+        $('.chosen-drop .chosen-results li').each(function() {
+            if (!$(this).hasClass('active-result'))
+            $(this).addClass('active-result');
+        });
+    }
+
+        
+    $(document).ready(function() {
+        $(".multi-items-amount").each(function() {
+            var val=$( this ).attr("value");
+            var amount=$( this ).text();
+            console.log("Add id '"+val+"' "+amount+"x to options");
+            for (var i = 1; i < amount; i++) { 
+                $("#items_obj option[value='"+val+"']").first().clone().appendTo("#items_obj");
+            }
+        });
+        $(".select-items-multi-chosen").chosen();
+    });
+
+    $(function() {
+        $('.chosen-container-multi').on('mousemove keyup', reset_selected)
+    });
+
+    $(function() {
+        $("#list-edit-form").submit(function() {
+            //$(".select-items-multi-chosen").trigger("chosen:updated");
+            ids = [];
+            $(".choice-id").each(function(){
+                if(($.trim($(this).text()).length>0)){
+                ids.push($(this).text());
+                }
+            });
+            $("#test").val(ids);
+        });
+    });
+
+    
+    </script>
+
+{% endblock %}

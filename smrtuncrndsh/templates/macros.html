@@ -1,0 +1,55 @@
+{% macro render_pagination(pagination, endpoint) %}
+<div class=pagination>
+{%- for page in pagination.iter_pages() %}
+    {% if page %}
+        {% if page != pagination.page %}
+            <a href="{{ url_for(endpoint, page=page) }}">{{ page }}</a>
+        {% else %}
+            <strong>{{ page }}</strong>
+        {% endif %}
+    {% else %}
+        <span class=ellipsis>…</span>
+    {% endif %}
+{%- endfor %}
+</div>
+{% endmacro %}
+
+
+{% macro render_flashes(class) %}
+    {% block extra_scripts %}
+    <script nonce="{{ csp_nonce() }}">
+        function delete_flash(flash){
+            $(flash).parent().remove()
+        }
+    </script>
+    {% endblock %}
+
+    {% with msgs = get_flashed_messages(category_filter=[class]) %}
+        {% for msg in msgs %}
+            <div class="flash {{ class }} message">
+                <span>{{ msg }}</span>
+                <i class="close material-icons" onclick="delete_flash(this);">close</i>
+            </div>
+        {% endfor %}
+    {% endwith %}
+{% endmacro %}
+
+
+{% macro render_error_page(error_num, error_text) %}
+
+<div class="error_wrapper">
+<!--h1>404 Error Page #1</h1-->
+<section class="error-container">
+  <span><span>{{ error_num[0] }}</span></span>
+  <span>{{ error_num[1] }}</span>
+  <span><span>{{ error_num[2] }}</span></span>
+</section>
+<p class="zoom-area">{{ error_text }}</p>
+
+<!--div class="link-container">
+  <a target="_blank" href="https://www.silocreativo.com/en/creative-examples-404-error-css/" class="more-link">Visit the original article</a>
+</div-->
+</div>
+
+
+{% endmacro %}

@@ -1,0 +1,57 @@
+
+:root {
+    /* COLORS  */
+    --font-foreground: #cccccc;
+    --font-link: #818181;
+    --font-link-hover: #f1f1f1;
+
+    --foreground: #7FDBFF;
+    --foreground-dark: #123456;
+    
+    --background: #111111;
+    --background-card-transparent:  rgba(34, 34, 34, 0.795);
+    --background-card: #222222;
+    --background-medium: #252525;
+    --background-medium-light: #333;
+    --background-light: #444444;
+    --background-lighter: #555555;
+
+    --border-light: #d6d6d6;
+    --border-medium: #333333;
+    --border-dark: #0f0f0f;
+
+    --dark-1: #222222;
+    --dark-2: #333333;
+
+    --orange: rgb(255, 115, 0);
+    --pink: #D15C95;
+
+    --error: #960c0c;
+    --success: #17960c;
+
+    /*  SIZES */
+    --container-grid-gap: 10px;
+    --footer-height: 0;
+
+
+    --colorway-0: #fc5c65;
+    --colorway-1: #26de81;
+    --colorway-2: #fd9644;
+    --colorway-3: #2bcbba;
+    --colorway-4: #a55eea;
+    --colorway-5: #bff739;
+    --colorway-6: #45aaf2;
+    --colorway-7: #fed330;
+    --colorway-8: #4b7bec;
+    --colorway-9: #778ca3;
+    --colorway-10: #eb3b5a;
+    --colorway-11: #2d98da;
+    --colorway-12: #fa8231;
+    --colorway-13: #3867d6;
+    --colorway-14: #f7b731;
+    --colorway-15: #8854d0;
+    --colorway-16: #20bf6b;
+    --colorway-17: #a5b1c2;
+    --colorway-18: #0fb9b1;
+    --colorway-19: #4b6584;
+}
