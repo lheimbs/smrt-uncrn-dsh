@@ -276,7 +276,7 @@ def init_callbacks(app):                    # noqa: C901
             Output('computer-status-container', 'className'),
         ],
         [Input('data-overview-update', 'n_intervals')],
-        [State('computer-status-container', 'className'),]
+        [State('computer-status-container', 'className')]
     )
     def computer_status(n, className):
         state = sql.get_latest_state("computer")
@@ -297,7 +297,7 @@ def init_callbacks(app):                    # noqa: C901
             Output('voiceassistant-status-container', 'className'),
         ],
         [Input('data-overview-update', 'n_intervals')],
-        [State('voiceassistant-status-container', 'className'),]
+        [State('voiceassistant-status-container', 'className')]
     )
     def voiceassistant_status(n, className):
         state = sql.get_latest_state("voice_assistant")
@@ -318,7 +318,7 @@ def init_callbacks(app):                    # noqa: C901
             Output('bme-status-container', 'className'),
         ],
         [Input('data-overview-update', 'n_intervals')],
-        [State('bme-status-container', 'className'),]
+        [State('bme-status-container', 'className')]
     )
     def bme_status(n, className):
         state = sql.get_latest_state("esp_bme_rf")
@@ -339,7 +339,7 @@ def init_callbacks(app):                    # noqa: C901
             Output('rpi-status-container', 'className'),
         ],
         [Input('data-overview-update', 'n_intervals')],
-        [State('rpi-status-container', 'className'),]
+        [State('rpi-status-container', 'className')]
     )
     def rpi_status(n, className):
         state = sql.get_latest_state("raspberry_pi")
