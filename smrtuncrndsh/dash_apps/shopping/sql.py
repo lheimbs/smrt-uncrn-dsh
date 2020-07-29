@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 from datetime import datetime
+from collections import Counter
 
 import pandas as pd
 from flask import current_app
@@ -64,3 +65,15 @@ def get_unique_shopping_shops():
         columns=['name'],
     )
     return shops
+
+
+def get_total_item_categories():
+    cats = {}
+    for liste in Liste.query:
+        for item in liste.items:
+            name = item.category.name if item.category else None
+            if name in cats.keys():
+                cats[name] += item.price
+            else:
+                cats[name] = item.price
+    return pd.DataFrame(cats.items(), columns=['category', 'price'])

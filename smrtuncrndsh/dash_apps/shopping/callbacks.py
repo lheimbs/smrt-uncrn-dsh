@@ -38,13 +38,14 @@ def init_callbacks(app):                    # noqa: C901
                 'color': COLORS['font-foreground'],
             },
             'legend': {
-                'orientation': 'h',
+                'orientation': 'v',
+                'bgcolor': COLORS['dark-1'],
             },
             'margin': {
                 'l': 10, 'r': 10, 'b': 0, 't': 40, 'pad': 0,
             },
-            'paper_bgcolor': COLORS['background'],
-            'plot_bgcolor': COLORS['background'],
+            'paper_bgcolor': COLORS['transparent'],
+            'plot_bgcolor': COLORS['transparent'],
             'title': {
                 'text': "Monthly expenses Overview",
                 'x': 0.5,
@@ -191,13 +192,16 @@ def init_callbacks(app):                    # noqa: C901
                 'color': COLORS['font-foreground'],
             },
             'legend': {
-                'orientation': 'h',
+                'orientation': 'v',
+                # 'bgcolor': COLORS['dark-1'],
+                # 'y': -2,
+                # 'yanchor': 'bottom',
             },
             'margin': {
                 'l': 10, 'r': 10, 'b': 40, 't': 40, 'pad': 0,
             },
-            'paper_bgcolor': COLORS['background'],
-            'plot_bgcolor': COLORS['background'],
+            'paper_bgcolor': COLORS['transparent'],
+            # 'plot_bgcolor': COLORS['background'],
             'title': {
                 'text': "Total category Overview",
                 'x': 0.5,
@@ -242,10 +246,10 @@ def init_callbacks(app):                    # noqa: C901
         return fig
 
     @app.callback(
-        Output('shopping-category-month-graph', 'figure'),
-        [Input('loading-shopping-category-month-graph-id', 'loading_state')]
+        Output('shopping-items-category-graph', 'figure'),
+        [Input('loading-shopping-items-category-graph-id', 'loading_state')]
     )
-    def get_shopping_expenses_type_overview(state):
+    def get_shopping_items_category(state):
         fig = go.Figure()
 
         fig.update_layout({
@@ -265,28 +269,18 @@ def init_callbacks(app):                    # noqa: C901
                 'color': COLORS['font-foreground'],
             },
             'legend': {
-                'orientation': 'h',
+                'orientation': 'v',
+                # 'xanchor': 'left',
+                # 'x': -2,
             },
             'margin': {
                 'l': 10, 'r': 10, 'b': 40, 't': 40, 'pad': 0,
             },
-            'paper_bgcolor': COLORS['background'],
-            'plot_bgcolor': COLORS['background'],
+            'paper_bgcolor': COLORS['transparent'],
+            # 'plot_bgcolor': COLORS['background'],
             'title': {
                 'text': "Shopping categories",
                 'x': 0.5,
-            },
-            'xaxis': {
-                'fixedrange': True,
-                'showline': False,
-                'showgrid': False,
-                'zeroline': False,
-            },
-            'yaxis': {
-                'fixedrange': True,
-                'showline': False,
-                'showgrid': False,
-                'zeroline': False,
             },
         })
 
@@ -294,40 +288,16 @@ def init_callbacks(app):                    # noqa: C901
             current_app.logger.warning("Neccessary Shopping tables do not exist in database!")
             return fig
 
-        expenses = sql.get_all_lists()
+        categories = sql.get_total_item_categories()
 
-        if not expenses.count():
+        if categories.empty:
             return fig
 
-        expenses = pd.DataFrame(
-            [(
-                liste.date,
-                liste.price,
-                liste.shop.category.name if liste.shop.category else None,
-            ) for liste in expenses],
-            columns=['date', 'price', 'category']
-        )
-
-        labels = expenses.category
         fig.add_trace(
             go.Pie(
-                labels=labels,
-                values=expenses.price,
-                name='This months categories',
+                values=categories.price,
+                labels=categories.category,
             ),
-            # 1, 2,
-        )
-
-        this_month = datetime(datetime.now().year, datetime.now().month, 1).date()
-        expenses.loc[expenses.date < this_month, "price"] = 0
-        fig.add_trace(
-            go.Pie(
-                labels=labels,
-                values=expenses.price,
-                name='This months categories',
-                textposition='inside'
-            ),
-            # 1, 1,
         )
 
         fig.update_traces(
@@ -360,7 +330,7 @@ def init_callbacks(app):                    # noqa: C901
                 'color': COLORS['font-foreground'],
             },
             'legend': {
-                'orientation': 'h',
+                'orientation': 'v',
             },
             'margin': {
                 # 'l': 10, 'r': 10, 't': 10, 'b': 10, 'pad': 0,
@@ -370,8 +340,8 @@ def init_callbacks(app):                    # noqa: C901
                 'text': "Total expenses overview",
                 'x': 0.5,
             },
-            'paper_bgcolor': COLORS['background'],
-            'plot_bgcolor': COLORS['background'],
+            'paper_bgcolor': COLORS['transparent'],
+            'plot_bgcolor': COLORS['transparent'],
             'xaxis': {
                 'type': 'date',
                 'range': [datetime(datetime.now().year - 1, datetime.now().month, datetime.now().day), datetime.now()],

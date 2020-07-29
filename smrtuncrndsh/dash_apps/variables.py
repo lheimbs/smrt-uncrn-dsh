@@ -3,6 +3,7 @@ from smrtuncrndsh import CSS_VARIABLES
 
 GRAPH_INTERVAL = os.environ.get("GRAPH_INTERVAL", 60000)
 COLORS = {**{
+    'transparent': 'rgba(0,0,0,0)',
     'foreground': '#7FDBFF',  # 4491ed',
     'foreground-dark': '#123456',
     'background': '#111111',

@@ -214,8 +214,8 @@ def init_callbacks(app):                    # noqa: C901
             'margin': {
                 'l': 10, 'r': 10, 't': 20, 'b': 10, 'pad': 0,
             },
-            'paper_bgcolor': COLORS['background'],
-            'plot_bgcolor': COLORS['background'],
+            'paper_bgcolor': COLORS['transparent'],
+            'plot_bgcolor': COLORS['transparent'],
             'xaxis': {
                 'gridcolor': COLORS['dark-2'],
                 'fixedrange': True,

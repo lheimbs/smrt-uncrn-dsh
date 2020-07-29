@@ -18,7 +18,7 @@ layout = html.Div(
             className='shopping-dashboard-content',
             children=[
                 html.Div(
-                    className='shopping-month-graph-container',
+                    className='card shopping-month-graph-container',
                     children=[
                         dcc.Loading(
                             id="loading-shopping-month-graph-id",
@@ -40,15 +40,15 @@ layout = html.Div(
                     ]
                 ),
                 html.Div(
-                    className='shopping-category-month-graph-container',
+                    className='card shopping-items-category-graph-container',
                     children=[
                         dcc.Loading(
-                            id="loading-shopping-category-month-graph-id",
-                            className="loading-shopping-category-month-graph",
+                            id="loading-shopping-items-category-graph-id",
+                            className="loading-shopping-items-category-graph",
                             color=COLORS['foreground'],
                             children=[
                                 dcc.Graph(
-                                    id="shopping-category-month-graph",
+                                    id="shopping-items-category-graph",
                                     className="dash-graph",
                                     clear_on_unhover=True,
                                     config={
@@ -64,7 +64,7 @@ layout = html.Div(
                     ]
                 ),
                 html.Div(
-                    className='shopping-category-total-graph-container',
+                    className='card shopping-category-total-graph-container',
                     children=[
                         dcc.Loading(
                             id="loading-shopping-category-total-graph-id",
@@ -88,7 +88,7 @@ layout = html.Div(
                     ]
                 ),
                 html.Div(
-                    className='shopping-overview-graph-container',
+                    className='card shopping-overview-graph-container',
                     children=[
                         dcc.Loading(
                             id="loading-shopping-overview-graph-id",
