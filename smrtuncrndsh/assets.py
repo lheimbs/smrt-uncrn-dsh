@@ -41,7 +41,6 @@ def compile_assets(app):
         'js/datatables/jquery.dataTables.js',
         filters='jsmin', output='gen/datatables.js'
     )
-
     daterangepicker_css = Bundle(
         'css/daterangepicker/daterangepicker.css',
         filters='cssmin', output='gen/daterangepicker.css'
@@ -49,6 +48,14 @@ def compile_assets(app):
     daterangepicker_js = Bundle(
         'js/daterangepicker/moment.min.js', 'js/daterangepicker/daterangepicker.js',
         filters='jsmin', output='gen/daterangepicker.js'
+    )
+    flexdatalist_css = Bundle(
+        'css/flexdatalist/jquery.flexdatalist.css',
+        filters='cssmin', output='gen/flexdatalist.css'
+    )
+    flexdatalist_js = Bundle(
+        'js/flexdatalist/jquery.flexdatalist.js',
+        filters='jsmin', output='gen/flexdatalist.js'
     )
 
     plotly_js = Bundle(
@@ -68,6 +75,8 @@ def compile_assets(app):
         'datatables_css': datatables_css,
         'daterangepicker_js': daterangepicker_js,
         'daterangepicker_css': daterangepicker_css,
+        'flexdatalist_js': flexdatalist_js,
+        'flexdatalist_css': flexdatalist_css,
         'plotly_js': plotly_js,
     }
 
