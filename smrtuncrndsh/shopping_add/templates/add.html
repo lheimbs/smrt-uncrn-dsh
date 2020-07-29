@@ -1,0 +1,113 @@
+{% from "macros.html" import render_all_flashes %}
+{% extends "base.html" %}
+
+{% block extra_assets %}
+{% assets "flexdatalist_js" %}
+    <script type="text/javascript" src="{{ ASSET_URL }}"></script>
+{% endassets %}
+{% assets "flexdatalist_css" %}
+    <link rel="stylesheet" href="{{ ASSET_URL }}" />
+{% endassets %}
+
+{% endblock %}
+{% block content %}
+
+
+<div class="flashes">
+    {{ render_all_flashes() }}
+</div>
+
+{% if form %}
+{# render form #}
+    <div class="card">
+        <h3>Add Shopping List</h3>
+        <form id="mqtt-form" method="POST">
+            {{ form.csrf_token }}
+
+            <table class="add-table" cellspacing="0" cellpadding="0">
+                {% for field in form if field.widget.input_type != 'hidden' %}
+                <tr>
+                    <td>{{ field.label }}</td>
+                    <td>
+                        <fieldset class="{{ field.type }}">
+                            {{ field }}
+                            {% if field.errors %}
+                            <ul class="errors">
+                                {% for error in field.errors %}
+                                    <li>{{ error }}</li>
+                                {% endfor %}
+                            </ul>
+                            {% endif %}
+                        </fieldset>
+                    </td>
+                </tr>
+                {% endfor %}
+            </table>
+            <div class="shopping submit-button">
+                <input class="material-icons" type="submit" value="send"/>
+            </div>
+        </form>
+    </div>
+{% endif %}
+{% endblock %}
+
+{% block extra_scripts %}
+<script nonce="{{ csp_nonce() }}">
+
+var csrf_token = "{{ csrf_token() }}";
+
+$.ajaxSetup({
+    beforeSend: function(xhr, settings) {
+        if (!/^(GET|HEAD|OPTIONS|TRACE)$/i.test(settings.type) && !this.crossDomain) {
+            xhr.setRequestHeader("X-CSRFToken", csrf_token);
+        }
+    }
+});
+
+$("#shop").flexdatalist({
+    url: "{{ url_for('shopping_add_bp.query_shops') }}",
+    minLength: 0,
+    // maxShownResults: 100,
+    valueProperty: 'id',
+    selectionRequired: false,
+    visibleProperties: ["name"],
+    searchIn: 'name',
+    searchContain: true,
+    requestType: 'POST',
+    requestContentType: 'json',
+    cache: false,
+});
+
+$("#category").flexdatalist({
+    url: "{{ url_for('shopping_add_bp.query_categories') }}",
+    minLength: 0,
+    // maxShownResults: 100,
+    valueProperty: 'id',
+    selectionRequired: false,
+    visibleProperties: ["name"],
+    searchIn: 'name',
+    searchContain: true,
+    requestType: 'POST',
+    requestContentType: 'json',
+    cache: false,
+});
+
+$("#items").flexdatalist({
+    url: "{{ url_for('shopping_add_bp.query_items') }}",
+    minLength: 0,
+    multiple: true,
+    maxShownResults: 100,
+    valueProperty: 'id',
+    selectionRequired: true,
+    visibleProperties: ["name", "price", "volume", "price_per_volume", "sale"],//
+    searchIn: 'name',
+    searchContain: true,
+    requestType: 'POST',
+    requestContentType: 'json',
+    cache: false,
+    allowDuplicateValues: true,
+});
+
+</script>
+{% endblock %}
+
