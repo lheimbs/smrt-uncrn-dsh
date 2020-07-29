@@ -16,22 +16,23 @@
 
 
 {% macro render_flashes(class) %}
-    {% block extra_scripts %}
-    <script nonce="{{ csp_nonce() }}">
-        function delete_flash(flash){
-            $(flash).parent().remove()
-        }
-    </script>
-    {% endblock %}
-
     {% with msgs = get_flashed_messages(category_filter=[class]) %}
         {% for msg in msgs %}
             <div class="flash {{ class }} message">
                 <span>{{ msg }}</span>
-                <i class="close material-icons" onclick="delete_flash(this);">close</i>
+                <i class="close-flash material-icons">close</i>
             </div>
         {% endfor %}
     {% endwith %}
+{% endmacro %}
+
+{% macro render_all_flashes() %}
+<div class="flashes">
+    {{ render_flashes('error') }}
+    {{ render_flashes('warning') }}
+    {{ render_flashes('info') }}
+    {{ render_flashes('success') }}
+</div>
 {% endmacro %}
 
 

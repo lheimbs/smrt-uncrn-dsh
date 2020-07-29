@@ -4,17 +4,14 @@
 <div class="header-items-center">
 </div>
 <div class="header-items-right">
-    {% if current_user.is_authenticated %}
-        <a class="user-page no-icon-header-item" href="{{ url_for('user_bp.user') }}">{{ current_user.name }}</a>
-    {% else %}
-        <a class="material-icons register-page" href="{{ url_for('auth_bp.register') }}">person_add</a>
-    {% endif %}
-    {% if current_user.is_authenticated %}
-        <a class="material-icons" href="{{ url_for('home_bp.logout') }}">exit_to_app</a>
-    {% else %}
-        <a class="login-page material-icons" href="{{ url_for('auth_bp.login') }}">login</a>
-    {% endif %}
+{% if current_user.is_authenticated %}
+    <a class="user-page no-icon-header-item" href="{{ url_for('user_bp.user') }}">{{ current_user.name }}</a>
+{% else %}
+    <a class="material-icons register-page" href="{{ url_for('auth_bp.register') }}">person_add</a>
+{% endif %}
+{% if current_user.is_authenticated %}
+    <a class="material-icons" href="{{ url_for('home_bp.logout') }}">exit_to_app</a>
+{% else %}
+    <a class="login-page material-icons" href="{{ url_for('auth_bp.login') }}">login</a>
+{% endif %}
 </div>
-
-<!-- <a class="material-icons" id="open_sidebar" onclick="sidebar_toggle()">menu</a> -->
-

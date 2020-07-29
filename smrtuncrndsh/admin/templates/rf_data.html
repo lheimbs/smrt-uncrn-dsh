@@ -1,4 +1,4 @@
-{% from "macros.html" import render_flashes %}
+{% from "macros.html" import render_all_flashes %}
 
 {% extends "base.html" %}
 
@@ -19,10 +19,7 @@
 {% include "adminbar.html" %}
 
 <div class="flashes">
-    {{ render_flashes('error') }}
-    {{ render_flashes('warning') }}
-    {{ render_flashes('info') }}
-    {{ render_flashes('success') }}
+    {{ render_all_flashes() }}
 </div>
 
 {% if form %}

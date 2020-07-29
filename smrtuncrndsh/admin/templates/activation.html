@@ -1,15 +1,10 @@
-{% from "macros.html" import render_flashes %}
+{% from "macros.html" import render_all_flashes %}
 {% extends "base.html" %}
 
 {% block content %}
 {% include "adminbar.html" %}
 <div class="card">
-    <div class="flashes">
-        {{ render_flashes('error') }}
-        {{ render_flashes('warning') }}
-        {{ render_flashes('info') }}
-        {{ render_flashes('success') }}
-    </div>  
+    {{ render_all_flashes() }}
     {% if users %}
         <p>These users are not yet approved to use your page:</p>
         <form id="user-activate-form" method="POST" action="{{ url_for('admin_bp.activation') }}">

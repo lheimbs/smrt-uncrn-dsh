@@ -1,15 +1,10 @@
-{% from "macros.html" import render_flashes %}
+{% from "macros.html" import render_all_flashes %}
 {% extends "base.html" %}
 
 {% block content %}
 {% include "adminbar.html" %}
 <div class="card">
-    <div class="flashes">
-        {{ render_flashes('error') }}
-        {{ render_flashes('warning') }}
-        {{ render_flashes('info') }}
-        {{ render_flashes('success') }}
-    </div>
+    {{ render_all_flashes() }}
     <table class="users-table">
         <thead>
             <tr>

@@ -20,7 +20,6 @@
     {% endassets %}
 
     {% block extra_assets %}{% endblock %}
-    {% block extra_scripts %}{% endblock %}
 </head>
 
 <body class="container {{ template }}">
@@ -38,6 +37,7 @@
 
     <footer>
         {% include 'footer.html' %}
+        {% block extra_scripts %}{% endblock %}
         {% block dash_footer %}{% endblock %}
     </footer>
 </body>
