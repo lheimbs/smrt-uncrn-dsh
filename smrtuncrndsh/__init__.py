@@ -37,6 +37,9 @@ def register_blueprints(app):
     from .auth import auth_bp, login, register  # noqa: F401
     app.register_blueprint(auth_bp)
 
+    from .shopping_add import shopping_add_bp, add, query_shops  # noqa: F401
+    app.register_blueprint(shopping_add_bp)
+
 
 def register_dash(app):
     # Import and register Dash applications
