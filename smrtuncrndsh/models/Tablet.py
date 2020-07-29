@@ -13,7 +13,7 @@ class TabletBattery(db.Model, BaseMixin):
     def to_dict(self):
         return {
             'date': self.date,
-            'level': self.battery,
+            'level': self.level,
         }
 
     def to_ajax(self):
@@ -30,5 +30,5 @@ class TabletBattery(db.Model, BaseMixin):
             "<TabletBattery("
             f"id={self.id}, "
             f"date={self.date}, "
-            f"level={self.battery})>"
+            f"level={self.level})>"
         )

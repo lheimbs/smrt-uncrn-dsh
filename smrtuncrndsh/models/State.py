@@ -30,7 +30,7 @@ class State(db.Model, BaseMixin):
 
     def __repr__(self):
         return (
-            "<State(id={self.id}, "
+            f"<State(id={self.id}, "
             f"date={self.date}, "
             f"device={self.device}, "
             f"state={self.state})>"

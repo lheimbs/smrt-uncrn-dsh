@@ -2,10 +2,17 @@
 
 from ...models import db
 from ...models.RoomData import RoomData
+from ...models.State import State
 
 
 def is_data_in_roomdata_table():
-    if RoomData.query.count():
+    if RoomData.query.first():
+        return True
+    return False
+
+
+def is_data_in_state_table():
+    if State.query.first():
         return True
     return False
 
@@ -49,3 +56,7 @@ def get_last_24_hrs(start, end):
         RoomData.id % 2 == 0
     ).order_by(RoomData.date)
     return data_query
+
+
+def get_latest_state(device):
+    return State.query.filter_by(device=device).order_by(State.id.desc()).first()

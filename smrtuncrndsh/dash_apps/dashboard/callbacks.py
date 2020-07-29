@@ -266,6 +266,90 @@ def init_callbacks(app):                    # noqa: C901
                 mode='lines',
                 name='temperature',
                 line={'color': COLORS['foreground']},
-                hovertemplate="%{x|%d.%m.%Y} : %{y:.2f}°C",
+                hovertemplate="%{x|%d.%m.%Y %X} : %{y:.2f}°C<extra></extra>",
             ))
         return fig
+
+    @app.callback(
+        [
+            Output('computer-status', 'children'),
+            Output('computer-status-container', 'className'),
+        ],
+        [Input('data-overview-update', 'n_intervals')],
+        [State('computer-status-container', 'className'),]
+    )
+    def computer_status(n, className):
+        state = sql.get_latest_state("computer")
+
+        if not sql.is_data_in_state_table() or not state:
+            className += " gone"
+
+        if state and state.state in ['online', 'on']:
+            className += " on"
+        else:
+            className += " off"
+
+        return state.state if state else "", className
+
+    @app.callback(
+        [
+            Output('voiceassistant-status', 'children'),
+            Output('voiceassistant-status-container', 'className'),
+        ],
+        [Input('data-overview-update', 'n_intervals')],
+        [State('voiceassistant-status-container', 'className'),]
+    )
+    def voiceassistant_status(n, className):
+        state = sql.get_latest_state("voice_assistant")
+
+        if not sql.is_data_in_state_table() or not state:
+            className += " gone"
+
+        if state and state.state in ['online', 'on']:
+            className += " on"
+        else:
+            className += " off"
+
+        return state.state if state else "", className
+
+    @app.callback(
+        [
+            Output('bme-status', 'children'),
+            Output('bme-status-container', 'className'),
+        ],
+        [Input('data-overview-update', 'n_intervals')],
+        [State('bme-status-container', 'className'),]
+    )
+    def bme_status(n, className):
+        state = sql.get_latest_state("esp_bme_rf")
+
+        if not sql.is_data_in_state_table() or not state:
+            className += " gone"
+
+        if state and state.state in ['online', 'on']:
+            className += " on"
+        else:
+            className += " off"
+
+        return state.state if state else "", className
+
+    @app.callback(
+        [
+            Output('rpi-status', 'children'),
+            Output('rpi-status-container', 'className'),
+        ],
+        [Input('data-overview-update', 'n_intervals')],
+        [State('rpi-status-container', 'className'),]
+    )
+    def rpi_status(n, className):
+        state = sql.get_latest_state("raspberry_pi")
+
+        if not sql.is_data_in_state_table() or not state:
+            className += " gone"
+
+        if state and state.state in ['online', 'on']:
+            className += " on"
+        else:
+            className += " off"
+
+        return state.state if state else "?", className

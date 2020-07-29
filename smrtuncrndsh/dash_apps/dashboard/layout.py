@@ -116,6 +116,46 @@ layout = html.Div(
                         ),
                     ]
                 ),
+                html.Div(
+                    className="computer-status-container device-state card",
+                    id="computer-status-container",
+                    children=[
+                        html.H6("computer", className="material-icons"),
+                        html.H6(
+                            id='computer-status',
+                        ),
+                    ]
+                ),
+                html.Div(
+                    className="voiceassistant-status-container device-state card",
+                    id="voiceassistant-status-container",
+                    children=[
+                        html.H6("mic", className="material-icons"),
+                        html.H6(
+                            id='voiceassistant-status',
+                        ),
+                    ]
+                ),
+                html.Div(
+                    className="bme-status-container device-state card",
+                    id="bme-status-container",
+                    children=[
+                        html.H6("fireplace", className="material-icons"),
+                        html.H6(
+                            id='bme-status',
+                        ),
+                    ]
+                ),
+                html.Div(
+                    className="rpi-status-container device-state card",
+                    id="rpi-status-container",
+                    children=[
+                        html.H6("developer_board", className="material-icons"),
+                        html.H6(
+                            id='rpi-status',
+                        ),
+                    ]
+                ),
             ],
         ),
     ]

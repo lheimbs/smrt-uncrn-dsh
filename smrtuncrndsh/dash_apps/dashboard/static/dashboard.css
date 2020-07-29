@@ -1,22 +1,31 @@
 .dashboard-content {
     display: grid;
     grid-template-columns: repeat(6, 1fr);
-    grid-template-areas: "temp temp humid humid press press"
-                         "day_hrs day_hrs day_hrs day_hrs brightness altitude"
-                         "day_hrs day_hrs day_hrs day_hrs . .";
+    grid-template-areas: 
+        "temp temp humid humid press press"
+        "day_hrs day_hrs day_hrs day_hrs brightness altitude"
+        "day_hrs day_hrs day_hrs day_hrs pc_status rpi_status"
+        "day_hrs day_hrs day_hrs day_hrs bme_status voiceassistant_status";
     
     grid-gap: 10px;
 }
 
 @media(max-width:768px) {
     .dashboard-content {
+        /* display: grid; */
         grid-template-columns: 1fr;
-        grid-template-areas: "temp"
-                             "humid"
-                             "press"
-                             "brightness"
-                             "altitude"
-                             "day_hrs";
+        /* grid-template-rows: auto; */
+        grid-template-areas:
+            "temp"
+            "humid"
+            "press"
+            "brightness"
+            "altitude"
+            "day_hrs"
+            "pc_status"
+            "rpi_status"
+            "bme_status"
+            "voiceassistant_status";
     }
 }
 
@@ -93,3 +102,28 @@
 #pressure-display .circle-progress-value {
     stroke: var(--colorway-2);
 }
+
+.computer-status-container {
+    grid-area: pc_status;
+}
+.voiceassistant-status-container {
+    grid-area: voiceassistant_status;
+}
+.bme-status-container {
+    grid-area: bme_status;
+}
+.rpi-status-container {
+    grid-area: rpi_status;
+}
+
+.device-state {
+    color: var(--foreground-dark);
+
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    flex-wrap: wrap;
+}
+.device-state.gone { background-color: var(--colorway-2); }
+.device-state.on { background-color: var(--colorway-1); }
+.device-state.off { background-color: var(--colorway-0); }
