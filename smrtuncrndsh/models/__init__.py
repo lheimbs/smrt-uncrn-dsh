@@ -24,12 +24,12 @@ class BaseMixin(object):
         db.session.add(new_obj)
         db.session.commit()
 
-    # @classmethod
-    # def get_count(model_class):
-    #     query = model_class.query
-    #     count_query = query.statement.with_only_columns([func.count()]).order_by(None)
-    #     count = query.session.execute(count_query).scalar()
-    #     return count
+    @classmethod
+    def get_count(model_class):
+        query = model_class.query
+        count_query = query.statement.with_only_columns([func.count()]).order_by(None)
+        count = query.session.execute(count_query).scalar()
+        return count
 
 
 def init_db(app):

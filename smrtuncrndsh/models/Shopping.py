@@ -11,9 +11,11 @@ class Liste(db.Model, BaseMixin):
     date = db.Column(db.Date, nullable=False)
     price = db.Column(db.Float, nullable=False)
 
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
     shop_id = db.Column(db.Integer, db.ForeignKey('shop.id'), nullable=False)
     category_id = db.Column(db.Integer, db.ForeignKey('category.id'))
 
+    user = db.relationship('User', backref='lists')
     shop = db.relationship('Shop', backref='lists')
     category = db.relationship('Category', backref='lists')
 
@@ -28,6 +30,7 @@ class Liste(db.Model, BaseMixin):
     def __repr__(self):
         return (
             f"<Liste(id={self.id}, "
+            f"user={self.user}, "
             f"date={self.date}, "
             f"price={self.price}, "
             f"shop='{self.shop}', "
@@ -40,6 +43,7 @@ class Liste(db.Model, BaseMixin):
             'edit': '',
             'delete': '',
             'id': self.id,
+            'user': self.user.name if self.user else '-',
             'date': self.date,
             'price': self.price,
             'shop': self.shop.name if self.shop else '-',
@@ -50,6 +54,7 @@ class Liste(db.Model, BaseMixin):
     def to_dict(self):
         return {
             'id': self.id,
+            'user': self.user,
             'date': self.date,
             'price': self.price,
             'shop': self.shop.to_dict(),

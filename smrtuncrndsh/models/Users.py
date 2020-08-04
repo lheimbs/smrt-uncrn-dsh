@@ -7,8 +7,9 @@ from . import db, BaseMixin
 
 class User(UserMixin, db.Model, BaseMixin):
     """User account model."""
-    __bind_key__ = 'users'
+    # __bind_key__ = 'users'
     __tablename__ = 'users'
+
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(100), nullable=True, unique=False)
     email = db.Column(db.String(40), unique=True, nullable=False)
@@ -18,6 +19,8 @@ class User(UserMixin, db.Model, BaseMixin):
     last_login = db.Column(db.DateTime, index=False, unique=False, nullable=True)
     is_admin = db.Column(db.Boolean, index=False, unique=False, nullable=False)
     is_activated = db.Column(db.Boolean, index=False, unique=False, nullable=False)
+
+    # lists = db.relationship("Liste")
 
     @property
     def is_authenticated(self):
