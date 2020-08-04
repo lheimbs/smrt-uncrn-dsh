@@ -16,6 +16,7 @@ from ..models.Mqtt import Mqtt
 from ..models.ProbeRequest import ProbeRequest
 from ..models.Tablet import TabletBattery
 from ..models.State import State
+from ..models.Users import User
 
 BaseModelForm = model_form_factory(FlaskForm)
 
@@ -132,6 +133,14 @@ class ListForm(FlaskForm):
         allow_blank=True,
         blank_text="Select a category",
         description="Category of purchase",
+    )
+
+    user = QuerySelectField(
+        query_factory=lambda: User.query.order_by(User.name),
+        get_label='username',
+        allow_blank=False,
+        blank_text="Select an Owner",
+        description="User who bought this list.",
     )
 
     items_obj = QuerySelectMultipleField(

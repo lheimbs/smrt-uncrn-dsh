@@ -57,6 +57,10 @@ $(function() {
                 "render": $.fn.dataTable.render.text(),
             },
             {
+                "data": "user",
+                "render": $.fn.dataTable.render.text(),
+            },
+            {
                 "data": "items[</br>]"
             },
             {

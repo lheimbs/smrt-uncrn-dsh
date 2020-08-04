@@ -55,6 +55,7 @@ def edit_shopping_list(id):
         liste.price = list_form.price.data
         liste.shop = list_form.shop.data
         liste.category = list_form.category.data
+        liste.user = list_form.user.data
 
         add_remove_items_from_liste(list_form.items_obj.data, list_form.test.data, liste)
 

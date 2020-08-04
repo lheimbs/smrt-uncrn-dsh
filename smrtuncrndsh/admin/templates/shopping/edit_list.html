@@ -86,6 +86,21 @@
                     </td>
                 </tr>
                 <tr>
+                    <td>User</td>
+                    <td>
+                        <fieldset class="user">
+                            {{ form.user(class="js-example-basic-single") }}
+                            {% if form.user.errors %}
+                              <ul class="errors">
+                                {% for error in form.user.errors %}
+                                    <li>{{ error }}</li>
+                                {% endfor %}
+                              </ul>
+                            {% endif %}
+                        </fieldset>
+                    </td>
+                </tr>
+                <tr>
                     <td>Items</td>
                     <td>
                         <fieldset class="items">

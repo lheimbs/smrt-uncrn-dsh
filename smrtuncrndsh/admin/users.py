@@ -5,6 +5,7 @@ from wtforms import RadioField
 from wtforms.ext.sqlalchemy.orm import model_form
 
 from . import admin_bp
+from ..models import db
 from ..models.Users import User
 from ..auth.forms import SignupForm
 
@@ -24,7 +25,10 @@ def users():
 def edit_user(username):
     current_app.logger.debug(f"Edit User View, user: {username}")
     user = User.query.filter_by(username=username).scalar()
-    UserForm = model_form(User, base_class=FlaskForm, exclude=['password', 'created_on', 'last_login'])
+    UserForm = model_form(
+        User, db_session=db.session, base_class=FlaskForm,
+        exclude=['password', 'created_on', 'last_login']
+    )
     UserForm.is_admin.kwargs['validators'] = []
     UserForm.is_activated.kwargs['validators'] = []
     user_form = UserForm(obj=user)
