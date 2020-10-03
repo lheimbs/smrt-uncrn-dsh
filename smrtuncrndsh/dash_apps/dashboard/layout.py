@@ -117,42 +117,58 @@ layout = html.Div(
                     ]
                 ),
                 html.Div(
-                    className="computer-status-container device-state card",
+                    className="computer-status-container device-state card tooltip",
                     id="computer-status-container",
                     children=[
                         html.H6("computer", className="material-icons"),
                         html.H6(
                             id='computer-status',
                         ),
+                        html.Span(
+                            "Computer",
+                            className="tooltiptext",
+                        ),
                     ]
                 ),
                 html.Div(
-                    className="voiceassistant-status-container device-state card",
+                    className="voiceassistant-status-container device-state card tooltip",
                     id="voiceassistant-status-container",
                     children=[
                         html.H6("mic", className="material-icons"),
                         html.H6(
                             id='voiceassistant-status',
                         ),
+                        html.Span(
+                            "Terminator",
+                            className="tooltiptext",
+                        ),
                     ]
                 ),
                 html.Div(
-                    className="bme-status-container device-state card",
+                    className="bme-status-container device-state card tooltip",
                     id="bme-status-container",
                     children=[
                         html.H6("fireplace", className="material-icons"),
                         html.H6(
                             id='bme-status',
                         ),
+                        html.Span(
+                            "Room Sensors",
+                            className="tooltiptext",
+                        ),
                     ]
                 ),
                 html.Div(
-                    className="rpi-status-container device-state card",
+                    className="rpi-status-container device-state card tooltip",
                     id="rpi-status-container",
                     children=[
                         html.H6("developer_board", className="material-icons"),
                         html.H6(
                             id='rpi-status',
+                        ),
+                        html.Span(
+                            "Raspberry Pi",
+                            className="tooltiptext",
                         ),
                     ]
                 ),
