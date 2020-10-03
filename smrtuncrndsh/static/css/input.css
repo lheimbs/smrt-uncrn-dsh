@@ -9,3 +9,23 @@ input[type=number] {
     padding: 0;
     width: 100%;
 }
+
+input[type="date"] {
+    border-radius: 1px;
+    appearance: none;
+    -webkit-appearance: none;
+    font-family: inherit;
+    /* font-size: 18px; */
+    /* border:1px solid #ecf0f1; */
+    /* background:#ecf0f1; */
+    padding:5px;
+    display: inline-block !important;
+    visibility: visible !important;
+}
+
+input[type="date"], focus {
+    /* color: #95a5a6; */
+    box-shadow: none;
+    -webkit-box-shadow: none;
+    -moz-box-shadow: none;
+}
