@@ -1,0 +1,24 @@
+#new_items {
+    list-style: none;
+    padding-left: 0;
+}
+
+/* #new_items  label {
+    display: none;
+} */
+
+.add-table input, li.input-container {
+    width: 100%;
+}
+
+.new-items-add-rm {
+    height: 100%;
+    display: flex;
+    justify-content: space-evenly;
+}
+
+.sticky {
+    background-color: var(--background-card);
+    position: sticky;
+    bottom: 0;
+}

@@ -1,4 +1,5 @@
 {% from "macros.html" import render_all_flashes %}
+{% from "item_form.html" import make_new_item_form %}
 {% extends "base.html" %}
 
 {% block extra_assets %}
@@ -9,6 +10,8 @@
     <link rel="stylesheet" href="{{ ASSET_URL }}" />
 {% endassets %}
 
+<script type="text/javascript" src="{{ url_for('shopping_add_bp.adding_js') }}"></script>
+
 {% endblock %}
 {% block content %}
 
@@ -17,96 +20,80 @@
     {{ render_all_flashes() }}
 </div>
 
-{% if form %}
 {# render form #}
-    <div class="card">
-        <h3>Add Shopping List</h3>
-        <form id="mqtt-form" method="POST">
-            {{ form.csrf_token }}
+<div class="card">
+    <h3>Add Shopping List</h3>
+    <form id="add-form" method="POST">
+        {{ form.csrf_token }}
 
-            <table class="add-table" cellspacing="0" cellpadding="0">
-                {% for field in form if field.widget.input_type != 'hidden' %}
-                <tr>
-                    <td>{{ field.label }}</td>
-                    <td>
-                        <fieldset class="{{ field.type }}">
-                            {{ field }}
-                            {% if field.errors %}
-                            <ul class="errors">
-                                {% for error in field.errors %}
-                                    <li>{{ error }}</li>
-                                {% endfor %}
-                            </ul>
-                            {% endif %}
-                        </fieldset>
-                    </td>
-                </tr>
-                {% endfor %}
-            </table>
-            <div class="shopping submit-button">
-                <input class="material-icons" type="submit" value="send"/>
-            </div>
-        </form>
-    </div>
-{% endif %}
+        <table class="add-table" cellspacing="0" cellpadding="0">
+            {#% for field in form if field.widget.input_type != 'hidden' %#}
+            <tr>
+                <td>{{ form.date.label }}</td>
+                <td><fieldset class="{{ form.date.type }}">
+                    {{ form.date }}
+                    {% if form.date.errors %}<ul class="errors">{% for error in form.date.errors %}<li>{{ error }}</li>{% endfor %}</ul>{% endif %}
+                </fieldset></td>
+            </tr>
+            <tr>
+                <td>{{ form.price.label }}</td>
+                <td><fieldset class="{{ form.price.type }}">
+                    {{ form.price }}
+                    {% if form.price.errors %}<ul class="errors">{% for error in form.price.errors %}<li>{{ error }}</li>{% endfor %}</ul>{% endif %}
+                </fieldset></td>
+            </tr>
+            <tr>
+                <td>{{ form.shop.label }}</td>
+                
+                <td><fieldset class="{{ form.shop.type }}">
+                    {{ form.shop.form.name }}
+                    {{ form.shop.form.category(class='is-hidden', placeholder="Category name") }}
+                    {% if form.shop.errors %}<ul class="errors">{% for error in form.shop.errors %}<li>{{ error }}</li>{% endfor %}</ul>{% endif %}
+                </fieldset></td>
+            </tr>
+            <tr>
+                <td>{{ form.category.label }}</td>
+                <td><fieldset class="{{ form.category.type }}">
+                    {{ form.category }}
+                    {% if form.category.errors %}<ul class="errors">{% for error in form.category.errors %}<li>{{ error }}</li>{% endfor %}</ul>{% endif %}
+                </fieldset></td>
+            </tr>
+            <tr>
+                <td>{{ form.items.label }}</td>
+                <td><fieldset class="{{ form.items.type }}">
+                    {{ form.items }}
+                    {% if form.items.errors %}<ul class="errors">{% for error in form.items.errors %}<li>{{ error }}</li>{% endfor %}</ul>{% endif %}
+                </fieldset></td>
+            </tr>
+            <tr>
+                <td>
+                    {{ form.new_items.label }}
+                    <br />
+                    <div class="">
+                        <button type="button" id="add-new-shopping-item" class="material-icons">add</button>
+                        <button type="button" id="remove-new-shopping-item" class="material-icons">remove</button>
+                    </div>
+                </td>
+                <td><fieldset class="{{ form.new_items.type }}">
+                    {{ form.new_items }}
+                    {% if form.new_items.errors %}<ul class="errors">{% for error in form.new_items.errors %}<li>{{ error }}</li>{% endfor %}</ul>{% endif %}
+                </fieldset></td>
+            </tr>
+            {#% endfor %#}
+        </table>
+        <div class="shopping submit-button sticky">
+            <input class="material-icons" type="submit" value="send"/>
+            <button type="button" class="clear-form material-icons">clear</button>
+        </div>
+    </form>
+</div>
 {% endblock %}
 
 {% block extra_scripts %}
 <script nonce="{{ csp_nonce() }}">
-
-var csrf_token = "{{ csrf_token() }}";
-
-$.ajaxSetup({
-    beforeSend: function(xhr, settings) {
-        if (!/^(GET|HEAD|OPTIONS|TRACE)$/i.test(settings.type) && !this.crossDomain) {
-            xhr.setRequestHeader("X-CSRFToken", csrf_token);
-        }
+    function make_new_item_form() {
+        return `{{ make_new_item_form() }}`
     }
-});
-
-$("#shop").flexdatalist({
-    url: "{{ url_for('shopping_add_bp.query_shops') }}",
-    minLength: 0,
-    // maxShownResults: 100,
-    valueProperty: 'id',
-    selectionRequired: false,
-    visibleProperties: ["name"],
-    searchIn: 'name',
-    searchContain: true,
-    requestType: 'POST',
-    requestContentType: 'json',
-    cache: false,
-});
-
-$("#category").flexdatalist({
-    url: "{{ url_for('shopping_add_bp.query_categories') }}",
-    minLength: 0,
-    // maxShownResults: 100,
-    valueProperty: 'id',
-    selectionRequired: false,
-    visibleProperties: ["name"],
-    searchIn: 'name',
-    searchContain: true,
-    requestType: 'POST',
-    requestContentType: 'json',
-    cache: false,
-});
-
-$("#items").flexdatalist({
-    url: "{{ url_for('shopping_add_bp.query_items') }}",
-    minLength: 0,
-    multiple: true,
-    maxShownResults: 100,
-    valueProperty: 'id',
-    selectionRequired: true,
-    visibleProperties: ["name", "price", "volume", "price_per_volume", "sale"],//
-    searchIn: 'name',
-    searchContain: true,
-    requestType: 'POST',
-    requestContentType: 'json',
-    cache: false,
-    allowDuplicateValues: true,
-});
 
 </script>
 {% endblock %}

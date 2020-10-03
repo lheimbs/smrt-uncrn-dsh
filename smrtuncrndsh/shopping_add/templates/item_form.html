@@ -1,0 +1,37 @@
+{% macro make_new_item_form() %}
+<li class="card">
+    <label>Item #_</label>
+    <table id="new_items-_">
+        <tbody>
+            <tr>
+                <th><label for="new_items-_-name">Name</label></th>
+                <td><input id="new_items-_-name" name="new_items-_-name" type="text" value=""></td>
+            </tr>
+            <tr>
+                <th><label for="new_items-_-price">Price</label></th>
+                <td><input id="new_items-_-price" name="new_items-_-price" type="text" value=""></td>
+            </tr>
+            <tr>
+                <th><label for="new_items-_-volume">Volume</label></th>
+                <td><input id="new_items-_-volume" name="new_items-_-volume" type="text" value=""></td>
+            </tr>
+            <tr>
+                <th><label for="new_items-_-price_per_volume">Price</label></th>
+                <td><input id="new_items-_-price_per_volume" name="new_items-_-price_per_volume" type="text" value=""></td>
+            </tr>
+            <tr>
+                <th><label for="new_items-_-sale">Sale</label></th>
+                <td><input id="new_items-_-sale" name="new_items-_-sale" type="checkbox" value="y"></td>
+            </tr>
+            <tr>
+                <th><label for="new_items-_-note">Note</label></th>
+                <td><input id="new_items-_-note" name="new_items-_-note" type="text" value=""></td>
+            </tr>
+            <tr>
+                <th><label for="new_items-_-category">Category</label></th>
+                <td><input id="new_items-_-category" name="new_items-_-category" type="text" value=""></td>
+            </tr>
+        </tbody>
+    </table>
+</li>
+{% endmacro %}
