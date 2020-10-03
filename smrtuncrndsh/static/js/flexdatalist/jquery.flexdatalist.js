@@ -410,13 +410,13 @@ jQuery.fn.flexdatalist = function (_option, _value) {
             multipleInput: function ($alias) {
                 $multiple = $('<ul tabindex="1">')
                     .addClass('flexdatalist-multiple ' + fid)
-                    .css({
-                        'border-color': $this.css('border-left-color'),
-                        'border-width': $this.css('border-left-width'),
-                        'border-style': $this.css('border-left-style'),
-                        'border-radius': $this.css('border-top-left-radius'),
-                        'background-color': $this.css('background-color')
-                    })
+                    // .css({
+                    //     'border-color': $this.css('border-left-color'),
+                    //     'border-width': $this.css('border-left-width'),
+                    //     'border-style': $this.css('border-left-style'),
+                    //     'border-radius': $this.css('border-top-left-radius'),
+                    //     'background-color': $this.css('background-color')
+                    // })
                     .insertAfter($this).click(function () {
                         $(this).find('input').focus();
                     });
@@ -1465,10 +1465,10 @@ jQuery.fn.flexdatalist = function (_option, _value) {
                         .appendTo('body')
                         .attr('id', $alias.attr('id') + '-results')
                         .css({
-                            'border-color': $target.css("border-left-color"),
-                            'border-width': '1px',
-                            'border-bottom-left-radius': $target.css("border-bottom-left-radius"),
-                            'border-bottom-right-radius': $target.css("border-bottom-right-radius")
+                            // 'border-color': $target.css("border-left-color"),
+                            // 'border-width': '1px',
+                            // 'border-bottom-left-radius': $target.css("border-bottom-left-radius"),
+                            // 'border-bottom-right-radius': $target.css("border-bottom-right-radius")
                         }).data({
                             target: ($multiple ? $multiple : $alias),
                             input: $this
@@ -1722,7 +1722,7 @@ jQuery.fn.flexdatalist = function (_option, _value) {
                 $this.prop('disabled', disabled);
                 $alias.prop('disabled', disabled);
                 if ($multiple) {
-                    $multiple.css('background-color', $this.css('background-color'));
+                    // $multiple.css('background-color', $this.css('background-color'));
                     var $btns = $multiple.find('li .fdl-remove'),
                         $input = $multiple.find('li.input-container');
                     if (disabled) {
