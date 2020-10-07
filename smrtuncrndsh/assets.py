@@ -58,6 +58,14 @@ def compile_assets(app):
         'js/flexdatalist/jquery.flexdatalist.js',
         filters='jsmin', output='gen/flexdatalist.js'
     )
+    jquerymodal_css = Bundle(
+        'css/jquerymodal/jquery.modal.min.css',
+        filters='cssmin', output='gen/jquerymodal.css'
+    )
+    jquerymodal_js = Bundle(
+        'js/jquerymodal/jquery.modal.min.js',
+        filters='jsmin', output='gen/jquerymodal.js'
+    )
 
     plotly_js = Bundle(
         'js/plotly/plotly.basic.js',
@@ -78,6 +86,8 @@ def compile_assets(app):
         'daterangepicker_css': daterangepicker_css,
         'flexdatalist_js': flexdatalist_js,
         'flexdatalist_css': flexdatalist_css,
+        'jquerymodal_js': jquerymodal_js,
+        'jquerymodal_css': jquerymodal_css,
         'plotly_js': plotly_js,
     }
 
