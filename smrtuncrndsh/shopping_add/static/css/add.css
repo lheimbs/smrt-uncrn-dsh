@@ -3,12 +3,12 @@
     padding-left: 0;
 }
 
-/* #new_items  label {
-    display: none;
-} */
-
-.add-table input, li.input-container {
+.add-table input, li.input-container, #add-new-item-form input {
     width: 100%;
+}
+
+#items-flexdatalist {
+    width: 100% !important;
 }
 
 .new-items-add-rm {
@@ -17,8 +17,36 @@
     justify-content: space-evenly;
 }
 
+#add-new-item-form th {
+    background-color: initial;
+}
+
 .sticky {
     background-color: var(--background-card);
     position: sticky;
     bottom: 0;
+}
+
+#items-table-data {
+    position: relative;
+}
+
+/* hide button at the beginning */
+#btn-add-new-item {
+    position: absolute;
+    bottom: 24px;
+    right: 30px;
+    z-index: 1;
+    padding: 0 2px;
+}
+
+#btn-add-new-item:hover {
+    color: var(--background);
+    background-color: var(--border-light);
+    border-radius: 3px;
+}
+
+/* MODAL CONFIG */
+#modal-add-new-item.modal {
+    background: var(--background-card);
 }

@@ -28,6 +28,20 @@ $(function() {
         cache: false,
     });
 
+    var new_items_category = $("#new_items-_-category").flexdatalist({
+        url: "{{ url_for('shopping_add_bp.query_categories') }}",
+        minLength: 0,
+        // maxShownResults: 100,
+        valueProperty: ['id', 'name'],
+        selectionRequired: false,
+        visibleProperties: ["name"],
+        searchIn: 'name',
+        searchContain: true,
+        requestType: 'POST',
+        requestContentType: 'json',
+        cache: false,
+    })
+
     var items = $("#items").flexdatalist({
         url: "{{ url_for('shopping_add_bp.query_items') }}",
         minLength: 0,
@@ -60,9 +74,9 @@ $(function() {
 
     $(".clear-form").click(clear_form);
 
-    $(document).on('click', 'form button[type=submit]', function(e) {
+    $(document).on('click', '#add-form button[type=submit]', function(e) {
         e.preventDefault(); //prevent the default action
-        var isValid = $(e.target).parents('form').isValid();
+        var isValid = $(e.target).parents('#add-form').isValid();
         if(isValid) {
             this.submit(); // use the native submit method of the form element
 
@@ -70,72 +84,78 @@ $(function() {
         }
     });
 
-    $("#add-new-shopping-item").click(function() {
-        var $ul = $("ul[id='new_items']");
-        if ($ul.find("input:last").length <= 0 ) {
-            var num = 0;
+    // $("#add-new-shopping-item").click(function() {
+    //     var $ul = $("ul[id='new_items']");
+    //     if ($ul.find("input:last").length <= 0 ) {
+    //         var num = 0;
+    //     }
+    //     else {
+    //         var num = parseInt($ul.find("input:last").prop("id").match(/\d+/g), 10) + 1;
+    //     }
+
+    //     var $new_li = make_new_item_form().replaceAll("new_items-_", "new_items-"+num).replace('#_', '#'+(num+1));
+    //     $ul.append($new_li);
+
+    //     $ul.find("input[id='new_items-"+num+"-category']").flexdatalist({
+    //         url: "{{ url_for('shopping_add_bp.query_categories') }}",
+    //         minLength: 0,
+    //         // maxShownResults: 100,
+    //         valueProperty: 'id',
+    //         selectionRequired: false,
+    //         visibleProperties: ["name"],
+    //         searchIn: 'name',
+    //         searchContain: true,
+    //         requestType: 'POST',
+    //         requestContentType: 'json',
+    //         cache: false,
+    //     });
+
+    // });
+    // $("#remove-new-shopping-item").click(function() {
+    //     $("ul[id='new_items']").find("li:last").remove();
+    // });
+
+    // when search for a shop returns nothing, the new shops category field will appear
+    $('#shop-name.flexdatalist').on('after:flexdatalist.search', function(event, keyword, data, items) {
+        if (!items.length) {
+            // console.log("no results");
+            $('#shop-category').removeClass("is-hidden").addClass("is-visible");
         }
         else {
-            var num = parseInt($ul.find("input:last").prop("id").match(/\d+/g), 10) + 1;
+            // console.log("results");
+            $('#shop-category').removeClass("is-visible").addClass("is-hidden");
         }
+    });
 
-        var $new_li = make_new_item_form().replaceAll("new_items-_", "new_items-"+num).replace('#_', '#'+(num+1));
-        $ul.append($new_li);
+    // When search for items returns an empty list, add an 'add-new-items' button
+    $('#items.flexdatalist').on('after:flexdatalist.search', function(event, keyword, data, items) {
+        if (!items.length) {
+            $('#new_items-_-name').val(keyword);
+            $('#btn-add-new-item').removeClass("is-hidden").addClass("is-visible");
+        }
+        else {
+            $('#btn-add-new-item').removeClass("is-visible").addClass("is-hidden");
+        }
+    });
 
-        $ul.find("input[id='new_items-"+num+"-category']").flexdatalist({
-            url: "{{ url_for('shopping_add_bp.query_categories') }}",
-            minLength: 0,
-            // maxShownResults: 100,
-            valueProperty: 'id',
-            selectionRequired: false,
-            visibleProperties: ["name"],
-            searchIn: 'name',
-            searchContain: true,
-            requestType: 'POST',
-            requestContentType: 'json',
-            cache: false,
+
+    // dialog to add a new item
+    $('#add-new-item-form').submit(function(event) {
+        event.preventDefault(); //prevent the default action
+        $.ajax({
+            url: "{{ url_for('shopping_add_bp.shopping_add_new_item') }}",
+            type: "POST",
+            dataType: 'json',
+            contentType: 'application/json',
+            data: JSON.stringify( $(this).serializeArray() ),
+            success: function(response) {
+                console.info(response);
+                $.modal.close();
+            },
+            error: function(xhr) {
+                console.error(xhr)
+            },
         });
-
-    });
-    $("#remove-new-shopping-item").click(function() {
-        $("ul[id='new_items']").find("li:last").remove();
-    });
-
-    $("#shop-name-flexdatalist").focusout(function() {
-        console.log("focus lost");
-        var $shop_cat = $("#shop-category");
-        if (shop.val().startsWith('{') && shop.val().endsWith('}')) {
-            // value is numeric, so an entry was chosen from datalist -> hide new category
-            if (!$shop_cat.hasClass("is-hidden")) {
-                $shop_cat.addClass(['is-hidden']);
-            }
-        }
-        else {
-            if ($shop_cat.hasClass("is-hidden")) {
-                $shop_cat.removeClass(['is-hidden']);
-            }
-        }
-    });
-    shop.on('select:flexdatalist', function(event, set, options) {
-        var $shop_cat = $("#shop-category");
-        if (!$shop_cat.hasClass("is-hidden")) {
-            $shop_cat.addClass(['is-hidden']);
-        }
-    });
-
-
-    $('#items.flexdatalist').on('shown:flexdatalist.results', function(event, results) {
-        console.log("show results")
-        console.log(results);
-
-        if (!results.length) {
-            console.log("No items found");
-            $('ul#items-flexdatalist-results').append(
-                $('<li>').append(
-                    '<button>Add new Item</button>'
-                )
-            );
-        }
     });
 });
 
