@@ -44,6 +44,43 @@ def add():
     )
 
 
+@shopping_add_bp.route('/shopping/add/new/item', methods=['GET', 'POST'])
+def shopping_add_new_item():
+    result = {'result': 'success'}
+    raw_data = request.get_json(silent=True)
+    if not raw_data:
+        result['result'] = 'error'
+        result['message'] = "Error occured while parsing response data!"
+    else:
+        data = {entry['name'].replace("new_items-_-", ""): entry['value'] for entry in raw_data}
+        item, result = data_to_new_item(data)
+        
+
+    
+    print(data)
+
+    return jsonify(result)
+    # make_response('test', 200)
+
+
+def data_to_new_item(data):
+    result = {'result': 'success', 'msg': []}
+    try:
+        price = float(data['price'].replace(",", "."))
+    except ValueError:
+        result['result'] = 'error'
+        result['msg'].append('Price is not a valid number!')
+    
+    try:
+        category_dict = json.loads(data['category'])
+        category = Category.query(id==category_dict['id'])
+    except json.JSONDecodeError:
+        category = Category()
+    
+    new_item = Item(name=data['name'])
+    return item, result
+
+
 @shopping_add_bp.route('/shopping/query/shops', methods=['GET', 'POST'])
 def query_shops():
     return get_ajax_search_objects(Shop, request.args)
