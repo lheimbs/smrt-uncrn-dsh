@@ -87,3 +87,4 @@ footer {
 }
 
 .is-hidden { display: none; }
+.is-visible { display: initial; }
