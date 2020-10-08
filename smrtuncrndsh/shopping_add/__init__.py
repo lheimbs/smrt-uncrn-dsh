@@ -5,7 +5,7 @@ from flask import render_template, Blueprint, redirect, abort, request, \
     make_response, jsonify, Response, current_app
 from flask_login import login_required, current_user
 
-from .forms import AddList
+from .forms import AddList, AddItem
 from ..models import db
 from ..models.Shopping import Shop, Category, Item
 
@@ -46,21 +46,29 @@ def add():
 
 @shopping_add_bp.route('/shopping/add/new/item', methods=['GET', 'POST'])
 def shopping_add_new_item():
-    result = {'result': 'success'}
-    raw_data = request.get_json(silent=True)
-    if not raw_data:
-        result['result'] = 'error'
-        result['message'] = "Error occured while parsing response data!"
-    else:
-        data = {entry['name'].replace("new_items-_-", ""): entry['value'] for entry in raw_data}
-        item, result = data_to_new_item(data)
-        
+    form = AddItem()
 
-    
-    print(data)
+    if request.method == 'POST':
+        if form.validate():
+            raw_data = request.get_json(silent=True)
+            if not raw_data:
+                result = {'result': 'error', 'message': ["Error occured while parsing response data!"]}
+            else:
+                data = {entry['name'].replace("new_items-_-", ""): entry['value'] for entry in raw_data}
+                item, result = data_to_new_item(data)
 
-    return jsonify(result)
-    # make_response('test', 200)
+                if result['result'] == 'success':
+                    if item.exists():
+                        result['result'] = 'duplicate'
+                        result['message'].append("Item already exists.")
+                    else:
+                        current_app.logger.info(f"Save new item '{new_item.name}' to db.")
+                        # item.save_to_db()
+
+            print(result)
+
+            return jsonify(result)
+        # make_response('test', 200)
 
 
 def data_to_new_item(data):
@@ -68,17 +76,29 @@ def data_to_new_item(data):
     try:
         price = float(data['price'].replace(",", "."))
     except ValueError:
+        current_app.logger.exception("Supplied price is not a valid floating point number!")
         result['result'] = 'error'
         result['msg'].append('Price is not a valid number!')
-    
+
     try:
         category_dict = json.loads(data['category'])
-        category = Category.query(id==category_dict['id'])
+        category = Category.query.filter_by(id=category_dict['id']).first_or_404()
     except json.JSONDecodeError:
-        category = Category()
-    
-    new_item = Item(name=data['name'])
-    return item, result
+        current_app.logger.info("Creating new category for ")
+        category = Category(name=data['category'])
+
+    if data['sale'] == 'y':
+        sale = True
+    elif data['sale'] == 'n':
+        sale = False
+    else:
+        sale = False
+        result['result'] = 'error'
+        result['msg'].append('Sale variable is badly formed!')
+
+    new_item = Item(name=data['name'], price=price, volume=data['volume'], price_per_volume=['price_per_volume'], sale=sale, note=data['note'], category=category)
+    return new_item, result
+# {'name': 'sadf', 'price': '1', 'volume': 'asd', 'price_per_volume': 'as', 'note': 'ss', 'category': '{"id":1,"name":"Fahrrad"}', 'flexdatalist-category': 'Fahrrad'}
 
 
 @shopping_add_bp.route('/shopping/query/shops', methods=['GET', 'POST'])
