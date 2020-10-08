@@ -56,6 +56,7 @@ body.user-page a.user-page,
 body.login-page a.login-page,
 body.home-page a.home-page,
 body.graph-page a.graph-page,
-body.register-page a.register-page {
+body.register-page a.register-page,
+body.shopping-add a.shopping-add-page {
     background-color: var(--background-medium);
 }
