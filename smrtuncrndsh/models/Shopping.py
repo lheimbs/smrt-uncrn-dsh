@@ -170,7 +170,8 @@ class Item(db.Model, BaseMixin):
             volume=self.volume,
             price_per_volume=self.price_per_volume,
             sale=self.sale,
-            note=self.note
+            note=self.note,
+            category_id=self.category_id,
         ).exists()).scalar()
 
 
@@ -237,9 +238,4 @@ class Category(db.Model, BaseMixin):
     def exists(self):
         return db.session.query(Category.query.filter_by(
             name=self.name,
-            price=self.price,
-            volume=self.volume,
-            price_per_volume=self.price_per_volume,
-            sale=self.sale,
-            note=self.note
         ).exists()).scalar()
