@@ -24,8 +24,8 @@ def add():
 
     if form.validate_on_submit():
         try:
-            shop = json.loads(form.shop.data['name'])
-            shop = Shop.query.get(shop['id'])
+            shop_dict = json.loads(form.shop.data['name'])
+            shop = Shop.query.get(shop_dict['id'])
         except json.decoder.JSONDecodeError:
             current_app.logger.info("JSONDecodeError decoding shopping.add input.")
             shop = get_shop_from_fields()
@@ -46,59 +46,60 @@ def add():
 
 @shopping_add_bp.route('/shopping/add/new/item', methods=['GET', 'POST'])
 def shopping_add_new_item():
+    result = {'status': 'success', 'text': []}
     form = AddItem()
 
     if request.method == 'POST':
+        formdata = {entry['name']: entry['value'] for entry in request.get_json()}
+        if 'flexdatalist-category' in formdata.keys() and formdata['flexdatalist-category']:
+            formdata['category'] = formdata['flexdatalist-category']
+        form = AddItem.from_json(formdata)
         if form.validate():
-            raw_data = request.get_json(silent=True)
-            if not raw_data:
-                result = {'result': 'error', 'message': ["Error occured while parsing response data!"]}
+            category = get_category_for_new_item(form.category.data)
+
+            new_item = Item(
+                name=form.name.data,
+                price=form.price.data,
+                volume=form.volume.data,
+                price_per_volume=form.price_per_volume.data,
+                sale=form.sale.data,
+                note=form.note.data,
+                category=category,
+            )
+            if new_item.exists():
+                result['status'] = 'error'
+                result['text'] = "Item already exists."
             else:
-                data = {entry['name'].replace("new_items-_-", ""): entry['value'] for entry in raw_data}
-                item, result = data_to_new_item(data)
-
-                if result['result'] == 'success':
-                    if item.exists():
-                        result['result'] = 'duplicate'
-                        result['message'].append("Item already exists.")
-                    else:
-                        current_app.logger.info(f"Save new item '{new_item.name}' to db.")
-                        # item.save_to_db()
-
-            print(result)
+                current_app.logger.info(f"Save new item '{new_item.name}' to db.")
+                new_item.save_to_db()
+                result.update({'item': {"id": new_item.id, "name": new_item.name}})
 
             return jsonify(result)
-        # make_response('test', 200)
+        else:
+            result['status'] = 'error'
+            result['text'] = 'form validation failed'
+            result.update({'fields': form.errors})
+
+            return jsonify(result)
+    return render_template("item_form.html", form=form)
 
 
-def data_to_new_item(data):
-    result = {'result': 'success', 'msg': []}
-    try:
-        price = float(data['price'].replace(",", "."))
-    except ValueError:
-        current_app.logger.exception("Supplied price is not a valid floating point number!")
-        result['result'] = 'error'
-        result['msg'].append('Price is not a valid number!')
-
-    try:
-        category_dict = json.loads(data['category'])
-        category = Category.query.filter_by(id=category_dict['id']).first_or_404()
-    except json.JSONDecodeError:
-        current_app.logger.info("Creating new category for ")
-        category = Category(name=data['category'])
-
-    if data['sale'] == 'y':
-        sale = True
-    elif data['sale'] == 'n':
-        sale = False
-    else:
-        sale = False
-        result['result'] = 'error'
-        result['msg'].append('Sale variable is badly formed!')
-
-    new_item = Item(name=data['name'], price=price, volume=data['volume'], price_per_volume=['price_per_volume'], sale=sale, note=data['note'], category=category)
-    return new_item, result
-# {'name': 'sadf', 'price': '1', 'volume': 'asd', 'price_per_volume': 'as', 'note': 'ss', 'category': '{"id":1,"name":"Fahrrad"}', 'flexdatalist-category': 'Fahrrad'}
+def get_category_for_new_item(form_category):
+    if form_category:
+        try:
+            category_dict = json.loads(form_category)
+            category = Category.query.filter_by(id=category_dict['id']).first_or_404()
+        except json.JSONDecodeError:
+            current_app.logger.info("Category not json decodable. Assuming new category name.")
+            category = Category(name=form_category)
+            if category.exists():
+                current_app.logger.info(f"Category with name '{form_category}' already exists. Using this one.")
+                category = Category.query.filter_by(name=form_category).first_or_404()
+            else:
+                current_app.logger.debug(f"Add new category '{form_category}' to db.")
+                # category.save_to_db()
+        return category
+    return None
 
 
 @shopping_add_bp.route('/shopping/query/shops', methods=['GET', 'POST'])
