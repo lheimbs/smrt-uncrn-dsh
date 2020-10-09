@@ -1,5 +1,7 @@
 """Initialize Flask app."""
 import os
+import wtforms_json
+
 from flask import Flask
 from flask_migrate import Migrate
 from flask_wtf.csrf import CSRFProtect
@@ -7,6 +9,7 @@ from flask_talisman import Talisman
 
 csrf = CSRFProtect()
 talisman = Talisman()
+wtforms_json.init()
 
 
 def get_base_dir():
