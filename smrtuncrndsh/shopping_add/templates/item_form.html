@@ -1,38 +1,60 @@
-<form id="add-new-item-form" action="/add" method="post">
+<form id="add-new-item-form" action="{{ url_for('shopping_add_bp.shopping_add_new_item') }}" method="post">
     {{ form.csrf_token }}
     <table id="new_items-_">
         <tbody>
             <tr>
                 <th>{{ form.name.label }}</th>
-                <td>{{ form.name }}</td>
+                <td>
+                    {{ form.name }}
+                    <div id="{{ form.name.name }}-error" class="invalid-feedback"></div>
+                </td>
             </tr>
             <tr>
                 <th>{{ form.price.label }}</th>
-                <td>{{ form.price }}</td>
+                <td>
+                    {{ form.price }}
+                    <div id="{{ form.price.name }}-error" class="invalid-feedback"></div>
+                </td>
             </tr>
             <tr>
                 <th>{{ form.volume.label }}</th>
-                <td>{{ form.volume }}</td>
+                <td>
+                    {{ form.volume }}
+                    <div id="{{ form.volume.name }}-error" class="invalid-feedback"></div>
+                </td>
             </tr>
             <tr>
                 <th>{{ form.price_per_volume.label }}</th>
-                <td>{{ form.price_per_volume }}</td>
+                <td>
+                    {{ form.price_per_volume }}
+                    <div id="{{ form.price_per_volume.name }}-error" class="invalid-feedback"></div>
+                </td>
             </tr>
             <tr>
                 <th>{{ form.sale.label }}</th>
-                <td>{{ form.sale }}</td>
+                <td>
+                    {{ form.sale }}
+                    <div id="{{ form.sale.name }}-error" class="invalid-feedback"></div>
+                </td>
             </tr>
             <tr>
                 <th>{{ form.note.label }}</th>
-                <td>{{ form.note }}</td>
+                <td>
+                    {{ form.note }}
+                    <div id="{{ form.note.name }}-error" class="invalid-feedback"></div>
+                </td>
             </tr>
             <tr>
                 <th>{{ form.category.label }}</th>
-                <td>{{ form.category }}</td>
+                <td>
+                    {{ form.category(id="new-item-category") }}
+                    <div id="{{ form.category.name }}-error" class="invalid-feedback"></div>
+                </td>
             </tr>
         </tbody>
     </table>
     <div class="submit-button">
         <input class="material-icons" type="submit" value="send"/>
     </div>
+    <div id="add-new-item-status" class="is-hidden"></div>
 </form>
