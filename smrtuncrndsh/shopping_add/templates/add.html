@@ -1,5 +1,4 @@
 {% from "macros.html" import render_all_flashes %}
-{% from "item_form.html" import make_new_item_form %}
 {% extends "base.html" %}
 
 {% block extra_assets %}
@@ -19,8 +18,9 @@
 <script type="text/javascript" src="{{ url_for('shopping_add_bp.adding_js') }}"></script>
 
 {% endblock %}
-{% block content %}
 
+
+{% block content %}
 
 <div class="flashes">
     {{ render_all_flashes() }}
@@ -51,11 +51,14 @@
             <tr>
                 <td>{{ form.shop.label }}</td>
                 
-                <td><fieldset class="{{ form.shop.type }}">
-                    {{ form.shop.form.name }}
-                    {{ form.shop.form.category(class='is-hidden', placeholder="Category name") }}
-                    {% if form.shop.errors %}<ul class="errors">{% for error in form.shop.errors %}<li>{{ error }}</li>{% endfor %}</ul>{% endif %}
-                </fieldset></td>
+                <td class="table-data-relative">
+                    <fieldset class="{{ form.shop.type }}">
+                        {{ form.shop.form.name }}
+                        {{ form.shop.form.category(class='is-hidden', placeholder="Category name") }}
+                        {% if form.shop.errors %}<ul class="errors">{% for error in form.shop.errors %}<li>{{ error }}</li>{% endfor %}</ul>{% endif %}
+                    </fieldset>
+                    <a id="btn-add-shopping-category" class="is-hidden">Add Category <span class="material-icons">add</span></a>
+                </td>
             </tr>
             <tr>
                 <td>{{ form.category.label }}</td>
@@ -66,12 +69,12 @@
             </tr>
             <tr>
                 <td>{{ form.items.label }}</td>
-                <td id="items-table-data">
+                <td class="table-data-relative">
                     <fieldset class="{{ form.items.type }}">
                         {{ form.items }}
                         {% if form.items.errors %}<ul class="errors">{% for error in form.items.errors %}<li>{{ error }}</li>{% endfor %}</ul>{% endif %}
                     </fieldset>
-                    <a href="#modal-add-new-item" id="btn-add-new-item" class="is-hidden" rel="modal:open">Add new item <span class="material-icons">add</span></a>
+                    <a href="{{ url_for('shopping_add_bp.shopping_add_new_item') }}" id="btn-add-new-item" class="is-hidden" rel="ajax:modal">Add new item <span class="material-icons">add</span></a>
                     {#  type="submit" value="send" #}
                 </td>
             </tr>
@@ -85,7 +88,7 @@
 </div>
 
 {# MODAL FOR ADDING NEW ITEMS #}
-<div id="modal-add-new-item" aria-hidden="true" class="modal">
+{# <div id="modal-add-new-item" aria-hidden="true" class="modal">
     <header>
         <h2>Add a new item</h2>
     </header>
@@ -130,16 +133,16 @@
             </div>
         </form>
     </div>
-</div>
+</div> #}
 
 {% endblock %}
 
-{% block extra_scripts %}
+{# {% block extra_scripts %}
 <script nonce="{{ csp_nonce() }}">
     function make_new_item_form() {
         return `{{ make_new_item_form() }}`
     }
 
 </script>
-{% endblock %}
+{% endblock %} #}
 
