@@ -2,12 +2,12 @@ import json
 from collections import Counter
 
 from flask import render_template, Blueprint, redirect, abort, request, \
-    make_response, jsonify, Response, current_app
+    make_response, jsonify, Response, current_app, flash
 from flask_login import login_required, current_user
 
 from .forms import AddList, AddItem
 from ..models import db
-from ..models.Shopping import Shop, Category, Item
+from ..models.Shopping import Shop, Category, Item, Liste
 
 # Blueprint Configuration
 shopping_add_bp = Blueprint(
@@ -23,18 +23,23 @@ def add():
     form = AddList()
 
     if form.validate_on_submit():
-        try:
-            shop_dict = json.loads(form.shop.data['name'])
-            shop = Shop.query.get(shop_dict['id'])
-        except json.decoder.JSONDecodeError:
-            current_app.logger.info("JSONDecodeError decoding shopping.add input.")
-            shop = get_shop_from_fields()
-        
-        
-        print(shop)
-        print(form.category.data)
-        print(form.items.data)
-        print(form.new_items.data)
+        # try:
+        #     shop_dict = json.loads(form.shop.data['name'])
+        #     shop = Shop.query.filter_by(id=shop_dict['id']).first_or_404()
+        # except json.decoder.JSONDecodeError:
+        #     current_app.logger.info("JSONDecodeError decoding shopping.add input.")
+        #     shop = get_shop_from_fields()
+        # new_list = Liste(date=form.date.data, price=float(form.price.data))
+        shop = get_shop(form.shop.data)
+        category = get_category(form.category.data)
+
+        new_list = Liste(form.date.data, float(form.price.data), shop, category)
+        item_list = get_list(form.items.data)
+
+        new_list.items = item_list
+
+        print(new_list)
+        print(current_user)
 
     return render_template(
         'add.html',
@@ -44,15 +49,109 @@ def add():
     )
 
 
+def get_shop(shop_data):
+    try:
+        shop_dict = json.loads(shop_data['name'])
+        if isinstance(shop_dict, dict) and 'id' in shop_dict.keys():
+            current_app.logger.debug(f"Using shop with id '{shop_dict['id']}' and name '{shop_dict['name']}'.")
+            return Shop.query.filter_by(id=shop_dict['id']).first_or_404()
+        else:
+            current_app.logger.error(f"The given shop has not a vlid name ('{shop_data['name']}')!")
+            flash("The shops name in not valid! Please choose another one.", "error")
+            return None
+    except json.decoder.JSONDecodeError:
+        current_app.logger.debug(f"JSONDecodeError: shop '{shop_data['name']}' is not a flexdatalist item.")
+
+    shop = Shop(name=shop_data['name'])
+    if shop.exists():
+        current_app.logger.debug("Shop with name '{}' exists.")
+        shop = Shop.query.filter_by(name=shop_data['name']).first_or_404()
+        current_app.logger.debug(f"Using shop with id '{shop.id}'.")
+    else:
+        category = get_category(shop_data['category'])
+        if category:
+            shop.category = category
+        shop.save_to_db()
+        current_app.logger.info(f"Added new shop {shop} to database.")
+    return shop
+
+
+def get_category(category_data):
+    if not category_data:
+        return None
+
+    try:
+        category_dict = json.loads(category_data)
+        if isinstance(category_dict, dict) and 'id' in category_dict.keys():
+            current_app.logger.debug(
+                f"Using category with id '{category_dict['id']}' and name '{category_dict['name']}'."
+            )
+            return Category.query.filter_by(id=category_dict['id']).first_or_404()
+        elif isinstance(category_dict, str):
+            category_data = category_dict
+        else:
+            current_app.logger.error(f"The given category has not a vlid name ('{category_data}')!")
+            flash("The Categories name in not valid! Please choose another one.", "error")
+            return None
+    except json.decoder.JSONDecodeError:
+        current_app.logger.debug(f"JSONDecodeError: category '{category_data}' is not a flexdatalist item.")
+
+    category = Category(name=category_data)
+    if category.exists():
+        current_app.logger.debug("category with name '{}' exists.")
+        category = Category.query.filter_by(name=category_data).first_or_404()
+        current_app.logger.debug(f"Using category with id '{category.id}'.")
+    else:
+        category.save_to_db()
+        current_app.logger.info(f"Added new category {category} to database.")
+    return category
+
+
+def get_list(list_data):
+    def check_item_dict(item_dict):
+        if isinstance(item_dict, dict) and "id" in item_dict.keys() and "name" in item_dict.keys():
+            return True
+        return False
+
+    def get_list_items_from_dict(list_dict):
+        items = []
+        for item in list_dict:
+            if check_item_dict(item):
+                item_obj = Item.query.filter_by(id=item['id']).first()
+                if item_obj:
+                    items.append(item_obj)
+                else:
+                    current_app.logger.warning(f"Item '{item['name']}' is not a valid item in the database! Skipping.")
+            else:
+                current_app.logger.warning(f"Item '{item}' is not valid! Skipping.")
+        return items
+
+    if isinstance(list_data, list) and all([check_item_dict(item) for item in list_data]):
+        return get_list_items_from_dict(list_data)
+    elif not isinstance(list_data, str):
+        current_app.logger.error("List data is neither string nor dictionary. Can't parse it.")
+        return []
+
+    try:
+        list_dict = json.loads(list_data)
+    except json.decoder.JSONDecodeError:
+        current_app.logger.error("List data is not json decodable. Aborting.")
+        return []
+
+    if isinstance(list_dict, list) and all([check_item_dict(item) for item in list_dict]):
+        return get_list_items_from_dict(list_dict)
+    else:
+        current_app.logger.warning("Could not read items list.")
+        return []
+
 @shopping_add_bp.route('/shopping/add/new/item', methods=['GET', 'POST'])
 def shopping_add_new_item():
-    result = {'status': 'success', 'text': []}
+    result = {'status': 'success', 'text': ""}
     form = AddItem()
 
     if request.method == 'POST':
         formdata = {entry['name']: entry['value'] for entry in request.get_json()}
-        if 'flexdatalist-category' in formdata.keys() and formdata['flexdatalist-category']:
-            formdata['category'] = formdata['flexdatalist-category']
+        formdata['category'] = formdata['flexdatalist-category']
         form = AddItem.from_json(formdata)
         if form.validate():
             category = get_category_for_new_item(form.category.data)
@@ -72,6 +171,7 @@ def shopping_add_new_item():
             else:
                 current_app.logger.info(f"Save new item '{new_item.name}' to db.")
                 new_item.save_to_db()
+                result['text'] = f"Item {new_item.name} added successfully to database."
                 result.update({'item': {"id": new_item.id, "name": new_item.name}})
 
             return jsonify(result)
@@ -85,19 +185,18 @@ def shopping_add_new_item():
 
 
 def get_category_for_new_item(form_category):
+    category = None
     if form_category:
-        try:
-            category_dict = json.loads(form_category)
-            category = Category.query.filter_by(id=category_dict['id']).first_or_404()
-        except json.JSONDecodeError:
-            current_app.logger.info("Category not json decodable. Assuming new category name.")
-            category = Category(name=form_category)
-            if category.exists():
-                current_app.logger.info(f"Category with name '{form_category}' already exists. Using this one.")
-                category = Category.query.filter_by(name=form_category).first_or_404()
-            else:
-                current_app.logger.debug(f"Add new category '{form_category}' to db.")
-                # category.save_to_db()
+        category = Category(name=form_category)
+
+        if category.exists():
+            current_app.logger.debug(f"Category with name '{form_category}' already exists.")
+            category = Category.query.filter_by(name=form_category).first_or_404()
+            current_app.logger.debug(f"Using category f{category}.")
+        else:
+            current_app.logger.debug(f"Add new category '{form_category}' to db.")
+            category.save_to_db()
+
         return category
     return None
 
