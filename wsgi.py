@@ -7,7 +7,8 @@ from smrtuncrndsh import create_app
 dictConfig({
     'version': 1,
     'formatters': {'default': {
-        'format': '%(module)15s - %(levelname)-8s : %(message)s',
+        'format': 'File "%(pathname)-75s", line %(lineno)-3d, in %(funcName)-20s: %(levelname)-8s : %(message)s',
+        #'funcName: %(funcName)s line: %(lineno)d path: %(pathname)s filename: %(filename)s module: %(module)15s - %(levelname)-8s : %(message)s',
     }},
     'handlers': {'wsgi': {
         'class': 'logging.StreamHandler',
