@@ -17,13 +17,14 @@ def register_dash_app(app, dash_app, *args):
     if dash_app.logger.hasHandlers():
         dash_app.logger.handlers.clear()
 
+    if current_app.config['DEBUG']:
+        app.logger.warning("Debugging enabled. Skipping activation and login requirements for dash apps!")
+
     for view_name, view_method in dash_app.server.view_functions.items():
         if view_name.startswith(dash_app.config['routes_pathname_prefix']):
             csrf.exempt(view_method)
 
-            if current_app.config['DEBUG']:
-                app.logger.warning("Debugging enabled. Skipping activation and login requirements for dash apps!")
-            else:
+            if not current_app.config['DEBUG']:
                 if 'activation_required' in args:
                     app.logger.debug(f"Enabling 'activation required' for view '{view_name}'.")
                     dash_app.server.view_functions[view_name] = activation_required(view_method)
