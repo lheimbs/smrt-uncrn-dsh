@@ -13,6 +13,8 @@ $(function() {
         requestContentType: 'json',
         cache: false,
     });
+    $("#shop-name").attr("required", false);
+    $("#shop-name-flexdatalist").attr("required", true);
 
     var category = $("#category").flexdatalist({
         url: "{{ url_for('shopping_add_bp.query_categories') }}",
@@ -62,11 +64,9 @@ $(function() {
     });
     // items.flexdatalist('add', )
 
-
     function clear_form() {
         console.log("Cear form");
         $("#add-form")[0].reset();
-        $("ul[id='new_items']").empty();
         $("#date").val("");
         $("#price").val("");
         $("#shop-category").val("");
@@ -74,7 +74,7 @@ $(function() {
         category.val("");
         items.val("");
     }
-
+    // custom form clearing on reset button press
     $(".clear-form").click(clear_form);
 
     // when search for a shop returns nothing, the new shops category field will appear
@@ -87,12 +87,13 @@ $(function() {
         }
     });
 
+    // hide new category & add-category-btn when a shop from the datalist is selected
     $('#shop-name.flexdatalist').on('select:flexdatalist', function(event, selected, options) {
         $('#btn-add-shopping-category').removeClass("is-visible").addClass("is-hidden");
         $('#shop-category').removeClass("is-visible").addClass("is-hidden");
     });
 
-    // show shop category input and make it flexbox
+    // show shop category input and make it flexdatalist
     $(document).on('click', '#btn-add-shopping-category', function() {
         $('#shop-category').toggleClass("is-visible is-hidden");
         var add_text = 'Add Category <span class="material-icons">add</span>';
@@ -117,7 +118,7 @@ $(function() {
     // When search for items returns an empty list, add an 'add-new-items' button
     $('#items.flexdatalist').on('after:flexdatalist.search', function(event, keyword, data, items) {
         if (!items.length) {
-            $('#new_items-_-name').val(keyword);
+            $('#add-new-item-form #name').val(keyword);
             $('#btn-add-new-item').removeClass("is-hidden").addClass("is-visible");
         }
         else {
@@ -127,96 +128,89 @@ $(function() {
 
 
     // get new item form from ajax
-    $('a[rel="ajax:modal"]').click(function(event) {
+    $('a#btn-add-new-item[rel="ajax:modal"]').click(function(event) {
         $.ajax({
             url: $(this).attr('href'),
             success: function(newHTML, textStatus, jqXHR) {
                 $(newHTML).appendTo('body').modal();
-                after_new_items_form_created();
+
+                // make category field flexdatalist
+                $("#new-item-category").flexdatalist({
+                    url: "{{ url_for('shopping_add_bp.query_categories') }}",
+                    minLength: 0,
+                    // maxShownResults: 100,
+                    valueProperty: ['id', 'name'],
+                    selectionRequired: false,
+                    visibleProperties: ["name"],
+                    searchIn: 'name',
+                    searchContain: true,
+                    requestType: 'POST',
+                    requestContentType: 'json',
+                    cache: false,
+                });
+
+                // set search value as new items name
+                $("#name").val($("#items-flexdatalist").val());
             },
-            error: function(jqXHR, textStatus, errorThrown) {
-                // Handle AJAX errors
+            error: function(response, textStatus, errorThrown) {
+                $.modal.close();
+                $('#add-new-item-form').remove();
+                handleAjaxError(response, textStatus, errorThrown);
             }
-            // More AJAX customization goes here.
         });
-      
         return false;
     });
 
-    
+    $(document).on('submit', '#add-new-item-form', function(event) {
+        event.preventDefault();
 
-    // dialog to add a new item
-    function after_new_items_form_created() {
-        $(document).on('submit', '#add-new-item-form', function(event) {
-            event.preventDefault();
-
-            console.log("submit ajax: "+JSON.stringify( $(this).serializeArray() ));
-            $.ajax({
-                url: "{{ url_for('shopping_add_bp.shopping_add_new_item') }}",
-                type: "POST",
-                dataType: 'json',
-                contentType: 'application/json',
-                data: JSON.stringify( $(this).serializeArray() ),
-                success: function(response) {
-                    console.info("Success");
-                    console.log(response);
-
+        $.ajax({
+            url: "{{ url_for('shopping_add_bp.shopping_add_new_item') }}",
+            type: "POST",
+            dataType: 'json',
+            contentType: 'application/json',
+            data: JSON.stringify( $(this).serializeArray() ),
+            success: function(response) {
+                if (response.status=="success") {
                     const newLocal = $("#items").flexdatalist('value');
                     var current_selected = newLocal;
-                    console.log("current_selected: "+JSON.stringify(current_selected));
+
                     current_selected.push(response.item);
-                    console.log("new current selected: "+JSON.stringify(current_selected));
 
                     $("#items").flexdatalist('reset');
                     var items = load_items_list();
                     $("#items").flexdatalist('value', JSON.stringify(current_selected));
 
                     $.modal.close();
-                },
-                error: function(response, textStatus, errorThrown) {
-                    console.error("Error");
-                    console.log(response);
-                    // if (response.status==0) {
-                    //     alert('You are offline!!\n Please Check Your Network.');
-                    // } else if(response.status==404) {
-                    //     alert('Requested URL not found.');
-                    // } else if(response.status==500) {
-                    //     alert('Internel Server Error.');
-                    // } else if(e=='parsererror') {
-                    //     alert('Error.\nParsing JSON Request failed.');
-                    // } else if(e=='timeout'){
-                    //     alert('Request Time out.');
-                    // } else {
-                    //     alert('Unknow Error.\n'+response.responseText);
-                    // }
-                },
-            });
+                    $('#add-new-item-form').remove();
+
+                    makeFlashMessage("success", response.text);
+                }
+                else {
+                    if ("fields" in response) {
+                        response.fields.forEach(item => makeAddItemFlashMessage("warning", item+": "+response.fields[item]));
+                    }
+                    else {
+                        makeFlashMessage("error", response.status+": "+response.text);
+                        $.modal.close();
+                        $('#add-new-item-form').remove();
+                    }
+                }
+                console.debug(JSON.stringify(response));
+            },
+            error: function(response, textStatus, errorThrown) {
+                $.modal.close();
+                $('#add-new-item-form').remove();
+                handleAjaxError(response, textStatus, errorThrown);
+            },
         });
-
-        // make category field flexdatalist
-        $("#new-item-category").flexdatalist({
-            url: "{{ url_for('shopping_add_bp.query_categories') }}",
-            minLength: 0,
-            // maxShownResults: 100,
-            valueProperty: ['id', 'name'],
-            selectionRequired: false,
-            visibleProperties: ["name"],
-            searchIn: 'name',
-            searchContain: true,
-            requestType: 'POST',
-            requestContentType: 'json',
-            cache: false,
-        });
-
-        // set search value as new items name
-        $("#name").val($("#items-flexdatalist").val());
-    }
-
-    $(document).on('focus', 'input', function () {
-        $('html, body').animate({
-            scrollTop: $(this).offset().top + 'px'
-        }, 'fast');
     });
+});
+
+$(document).on('focus', 'input', function() {
+    $('html, body').animate({
+        scrollTop: $(this).offset().top + 'px'
+    }, 'fast');
 });
 
 var csrf_token = "{{ csrf_token() }}";
@@ -225,5 +219,27 @@ $.ajaxSetup({
         if (!/^(GET|HEAD|OPTIONS|TRACE)$/i.test(settings.type) && !this.crossDomain) {
             xhr.setRequestHeader("X-CSRFToken", csrf_token);
         }
-    }
+    },
+    error: handleAjaxError,
 });
+
+function handleAjaxError(response, textStatus, errorThrown) {
+    console.debug("ajax setup, error");
+    console.debug(response, textStatus, errorThrown);
+    // Handle AJAX errors
+    if (response.status==0) {
+        makeFlashMessage('error', 'You are offline! Please Check Your Network.');
+    } else if(response.status==404) {
+        makeFlashMessage('error', 'Requested URL not found.');
+    } else if(response.status==500) {
+        makeFlashMessage('error', 'Internal Server Error.');
+    } else if(textStatus=='parsererror') {
+        makeFlashMessage('error', 'Parsing JSON Request failed.');
+    } else if(textStatus=='timeout'){
+        makeFlashMessage('error', 'Request Time out.');
+    } else if(response.responseJSON=="The CSRF token has expired."){
+        makeFlashMessage('error', "The CSRF token has expired. Please refresh the page.");
+    } else {
+        makeFlashMessage('error', 'Unknow Error: '+errorThrown);
+    }
+}
