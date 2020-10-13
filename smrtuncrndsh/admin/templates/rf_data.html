@@ -18,9 +18,7 @@
 {% block content %}
 {% include "adminbar.html" %}
 
-<div class="flashes">
-    {{ render_all_flashes() }}
-</div>
+{{ render_all_flashes() }}
 
 {% if form %}
     <div class="card">
