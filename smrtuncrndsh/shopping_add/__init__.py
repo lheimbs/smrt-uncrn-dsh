@@ -23,23 +23,21 @@ def add():
     form = AddList()
 
     if form.validate_on_submit():
-        # try:
-        #     shop_dict = json.loads(form.shop.data['name'])
-        #     shop = Shop.query.filter_by(id=shop_dict['id']).first_or_404()
-        # except json.decoder.JSONDecodeError:
-        #     current_app.logger.info("JSONDecodeError decoding shopping.add input.")
-        #     shop = get_shop_from_fields()
-        # new_list = Liste(date=form.date.data, price=float(form.price.data))
         shop = get_shop(form.shop.data)
         category = get_category(form.category.data)
 
         new_list = Liste(form.date.data, float(form.price.data), shop, category)
         item_list = get_list(form.items.data)
 
-        new_list.items = item_list
-
-        print(new_list)
-        print(current_user)
+        if not item_list:
+            flash(
+                "An error occured reading the supplied shopping items! Please change your input or try again alter.",
+                "error"
+            )
+        else:
+            new_list.items = item_list
+            new_list.save_to_db()
+            flash("Successfully saved the entered receipt!", "success")
 
     return render_template(
         'add.html',
