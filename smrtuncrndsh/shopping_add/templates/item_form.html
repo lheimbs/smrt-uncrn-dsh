@@ -1,5 +1,8 @@
 <form id="add-new-item-form" action="{{ url_for('shopping_add_bp.shopping_add_new_item') }}" method="post">
     {{ form.csrf_token }}
+
+    <div class="add-new-item-errors"></div>
+
     <table id="new_items-_">
         <tbody>
             <tr>
