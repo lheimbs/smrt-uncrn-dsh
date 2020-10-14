@@ -14,6 +14,14 @@ body {
     background-attachment: fixed;
     background-size: cover;
     /* background by SVGBackgrounds.com */
+
+    min-height: 100vh;
+    /* mobile viewport bug fix */
+    min-height: -webkit-fill-available;
+}
+
+html {
+    height: -webkit-fill-available;
 }
 
 .material-icons,
@@ -57,20 +65,16 @@ footer {
 
 @media (max-width: 768px) {
     .container {
-        display: block;
-        /* grid-gap: 0px;
+        /* display: block; */
+        grid-gap: 0px;
         grid-template-areas:
-            "header"
-            "nav"
-            "content"
-            "footer";
+            "header header"
+            "nav content"
+            "footer footer";
 
-        grid-template-columns: 1fr;
-        grid-template-rows: */
-            /* auto Header */
-            /* minmax(75px, auto) Nav */
-            /* 1fr Content */
-            /* auto; Footer */
+        grid-template-columns: auto 1fr;
+        --container-grid-gap: 5px;
+        grid-gap: var(--container-grid-gap);
     }
 
     main {
