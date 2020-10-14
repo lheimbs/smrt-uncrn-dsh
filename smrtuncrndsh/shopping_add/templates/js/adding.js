@@ -62,7 +62,6 @@ $(function() {
         cache: false,
         allowDuplicateValues: true,
     });
-    // items.flexdatalist('add', )
 
     function clear_form() {
         console.log("Cear form");
@@ -116,15 +115,15 @@ $(function() {
     });
 
     // When search for items returns an empty list, add an 'add-new-items' button
-    $('#items.flexdatalist').on('after:flexdatalist.search', function(event, keyword, data, items) {
-        if (!items.length) {
-            $('#add-new-item-form #name').val(keyword);
-            $('#btn-add-new-item').removeClass("is-hidden").addClass("is-visible");
-        }
-        else {
-            $('#btn-add-new-item').removeClass("is-visible").addClass("is-hidden");
-        }
-    });
+    // $('#items.flexdatalist').on('after:flexdatalist.search', function(event, keyword, data, items) {
+    //     if (!items.length) {
+    //         $('#add-new-item-form #name').val(keyword);
+    //         $('#btn-add-new-item').removeClass("is-hidden").addClass("is-visible");
+    //     }
+    //     else {
+    //         $('#btn-add-new-item').removeClass("is-visible").addClass("is-hidden");
+    //     }
+    // });
 
 
     // get new item form from ajax

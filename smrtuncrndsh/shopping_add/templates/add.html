@@ -72,7 +72,7 @@
                         {{ form.items }}
                         {% if form.items.errors %}<ul class="errors">{% for error in form.items.errors %}<li>{{ error }}</li>{% endfor %}</ul>{% endif %}
                     </fieldset>
-                    <a href="{{ url_for('shopping_add_bp.shopping_add_new_item') }}" id="btn-add-new-item" class="is-hidden" rel="ajax:modal">Add new item <span class="material-icons">add</span></a>
+                    <a href="{{ url_for('shopping_add_bp.shopping_add_new_item') }}" id="btn-add-new-item" class="is-visible" rel="ajax:modal">Add new item <span class="material-icons">add</span></a>
                     {#  type="submit" value="send" #}
                 </td>
             </tr>
@@ -85,62 +85,4 @@
     </form>
 </div>
 
-{# MODAL FOR ADDING NEW ITEMS #}
-{# <div id="modal-add-new-item" aria-hidden="true" class="modal">
-    <header>
-        <h2>Add a new item</h2>
-    </header>
-
-    <div id="modal-add-new-item-content">
-        <form id="add-new-item-form" action="#" method="post">
-            {{ form.csrf_token }}
-            <table id="new_items-_">
-                <tbody>
-                    <tr>
-                        <th><label for="new_items-_-name">Name</label></th>
-                        <td><input id="new_items-_-name" name="new_items-_-name" type="text" value=""></td>
-                    </tr>
-                    <tr>
-                        <th><label for="new_items-_-price">Price</label></th>
-                        <td><input id="new_items-_-price" name="new_items-_-price" type="text" value=""></td>
-                    </tr>
-                    <tr>
-                        <th><label for="new_items-_-volume">Volume</label></th>
-                        <td><input id="new_items-_-volume" name="new_items-_-volume" type="text" value=""></td>
-                    </tr>
-                    <tr>
-                        <th><label for="new_items-_-price_per_volume">Price</label></th>
-                        <td><input id="new_items-_-price_per_volume" name="new_items-_-price_per_volume" type="text" value=""></td>
-                    </tr>
-                    <tr>
-                        <th><label for="new_items-_-sale">Sale</label></th>
-                        <td><input id="new_items-_-sale" name="new_items-_-sale" type="checkbox" value="y"></td>
-                    </tr>
-                    <tr>
-                        <th><label for="new_items-_-note">Note</label></th>
-                        <td><input id="new_items-_-note" name="new_items-_-note" type="text" value=""></td>
-                    </tr>
-                    <tr>
-                        <th><label for="new_items-_-category">Category</label></th>
-                        <td><input id="new_items-_-category" name="new_items-_-category" type="text" value=""></td>
-                    </tr>
-                </tbody>
-            </table>
-            <div class="submit-button">
-                <input class="material-icons" type="submit" value="send"/>
-            </div>
-        </form>
-    </div>
-</div> #}
-
 {% endblock %}
-
-{# {% block extra_scripts %}
-<script nonce="{{ csp_nonce() }}">
-    function make_new_item_form() {
-        return `{{ make_new_item_form() }}`
-    }
-
-</script>
-{% endblock %} #}
-
