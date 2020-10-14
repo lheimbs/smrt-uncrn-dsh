@@ -11,7 +11,10 @@ header .header-items-left {
     justify-content: flex-start;
     /* width: 33.4%; */
     align-items: center;
-    padding-left: 5%;
+
+	padding-left: calc(5% - (-30px));
+	padding-left: calc(5% - -30px);
+
     overflow: hidden;
     text-overflow: ellipsis;
     /* min-width: 0; */
