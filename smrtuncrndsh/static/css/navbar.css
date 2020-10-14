@@ -1,8 +1,9 @@
-nav {
-    /* height: 100%; */
+.navbar {
+    height: 100%;
 
     display: flex;
     flex-direction: column;
+    width: 200px;
 
     /* background-color: var(--background); */
     border-right: 2px solid var(--border-medium);
@@ -10,28 +11,48 @@ nav {
     text-align: center;
 }
 
+/* hide header navbar icon on non-mobile */
+.navbar-toggle {
+    display: none;
+    padding-right: 5px;
+    margin-right: 5px;
+    border-right: 2px solid var(--border-medium);
+}
+
+.navbar-toggle[type="checkbox"] {
+    display: none;
+}
+
+.navbar-toggle {
+    position: fixed;
+    top: 30px;
+    left: 15px;
+}
+
 @media (max-width: 768px) {
-    nav {
-        flex-direction: row;
-        border-right: none;
-        justify-content: space-around;
+    /* show navbar hamburger icon */
+    .navbar-toggle {
+        display: initial;
     }
-    nav a {
-        flex-grow: 1;
-        text-align: center !important;
-    }
-    nav .name {
+
+    .navbar {
+        width: 0;
         display: none;
+        height: 100%;
     }
-}
 
-nav ul {
-    list-style: none;
-    padding-left: 0;
-}
+    .navbar-toggle:not(checked) ~ .navbar {
+        width: 0;
+        display: none;
+        border-right: none;
 
-nav ul li {
-    text-align: left;
+    }
+    .navbar-toggle:checked ~ .navbar {
+        width: 200px;
+        display: flex;
+        border-right: 2px solid var(--border-medium);
+
+    }
 }
 
 nav a {
@@ -53,4 +74,46 @@ nav a span {
 
 nav a:hover {
     color: var(--font-link-hover);
+}
+
+nav .dropdown-container {
+    display: flex;
+    flex-direction: column;
+}
+
+nav .dropdown-button {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    cursor: pointer;
+}
+
+nav .dropdown-items {
+    display: flex;
+    flex-direction: column;
+    /* margin-left: 30px; */
+
+    transition: max-height 0.2s ease-out;
+    max-height: 0;
+    overflow: hidden;
+}
+
+nav .dropdown-button:hover > nav .dropdown-items {
+    max-height: 100%;
+    transition: max-height 0.25s ease-in;
+}
+
+nav .dropdown-item {
+    padding-left: 40px;
+}
+
+nav .collapsed {
+    transition: max-height 0.5s ease-out;
+    max-height: 0;
+    overflow: hidden;
+}
+
+nav .expanded {
+    max-height: 100%;
+    transition: max-height 1s ease-in;
 }

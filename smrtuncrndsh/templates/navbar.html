@@ -1,20 +1,51 @@
-<a class="home-page" href="{{ url_for('home_bp.home') }}">
-    <i class="material-icons">home</i><span class="name">home</span>
-</a>
-<a class="dashboard-page" href="/dashboard/">
-    <i class="material-icons">dashboard</i><span class="name">dashboard</span>
-</a>
-<a class="dashboard-overview-page" href="/dashboard/overview">
-    <i class="material-icons">dashboard</i><span class="name">dashboard overview</span>
-</a>
-<a class="shopping-dashboard-page" href="/shopping/dashboard/">
-    <i class="material-icons">local_grocery_store</i><span class="name">shopping dash</span>
-</a>
-<a class="shopping-add-page" href="{{ url_for('shopping_add_bp.add') }}">
-    <i class="material-icons">local_grocery_store</i><span class="name">add receipt</span>
-</a>
-{% if current_user.is_authenticated and current_user.is_admin %}
-    <a class="admin-page" href="{{ url_for('admin_bp.users') }}">
-        <i class="material-icons">admin_panel_settings</i><span class="name">admin</span>
+
+<input type="checkbox" id="navbar-toggle-cbox" class="navbar-toggle">
+<label for="navbar-toggle-cbox" class="navbar-toggle material-icons" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">menu</label>
+
+<div class="navbar">
+    <a class="home-page" href="{{ url_for('home_bp.home') }}">
+        <i class="material-icons">home</i><span class="name">home</span>
     </a>
-{% endif %}
+
+    <div class="dropdown-container">
+        <a role="button" tabindex="0" class="dropdown-button">
+            <i class="material-icons">dashboard</i>
+            <span class="name">dashboard</span>
+            <i class="material-icons expand-icon">expand_more</i>
+        </a>
+        <div class="dropdown-items expanded">
+            <a class="dashboard-page dropdown-item" href="/dashboard/">
+                <i class="material-icons">meeting_room</i>
+                <span class="name">dashboard</span>
+            </a>
+            <a class="dashboard-overview-page dropdown-item" href="/dashboard/overview/">
+                <i class="material-icons">show_chart</i>
+                <span class="name">data overview</span>
+            </a>
+            <a class="shopping-dashboard-page dropdown-item" href="/shopping/dashboard/">
+                <i class="material-icons">local_grocery_store</i><span class="name">shopping</span>
+            </a>
+        </div>
+    </div>
+
+    <div class="dropdown-container">
+        <a role="button" tabindex="0" class="dropdown-button">
+            <i class="material-icons">local_grocery_store</i>
+            <span class="name">shopping</span>
+            <i class="material-icons expand-icon">expand_more</i>
+        </a>
+        <div class="dropdown-items expanded">
+            <a class="shopping-add-page dropdown-item" href="{{ url_for('shopping_add_bp.add') }}">
+                <i class="material-icons">add_shopping_cart</i><span class="name">add receipt</span>
+            </a>
+            <a class="shopping-add-page dropdown-item" href="">
+                <i class="material-icons">receipt</i><span class="name">view receipts</span>
+            </a>
+        </div>
+    </div>
+    {% if current_user.is_authenticated and current_user.is_admin %}
+        <a class="admin-page" href="{{ url_for('admin_bp.users') }}">
+            <i class="material-icons">admin_panel_settings</i><span class="name">admin panel</span>
+        </a>
+    {% endif %}
+</div>
