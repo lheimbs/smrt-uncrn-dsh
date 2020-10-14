@@ -115,6 +115,7 @@ def init_callbacks(app):                    # noqa: C901
                 'max': 0,
                 'display': 0
             }
+        print(old_data)
         return old_data
 
     @app.callback(
@@ -179,7 +180,7 @@ def init_callbacks(app):                    # noqa: C901
                 old_data['new'] = last
         else:
             old_data = {
-                'new': '?',
+                'new': 0,
                 'old': 0,
                 'min': 0,
                 'max': 0,
