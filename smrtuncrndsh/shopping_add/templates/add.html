@@ -65,6 +65,15 @@
                     {% if form.category.errors %}<ul class="errors">{% for error in form.category.errors %}<li>{{ error }}</li>{% endfor %}</ul>{% endif %}
                 </fieldset></td>
             </tr>
+            {% if form.user %}
+            <tr>
+                <td>{{ form.user.label }}</td>
+                <td><fieldset class="{{ form.user.type }}">
+                    {{ form.user }}
+                    {% if form.user.errors %}<ul class="errors">{% for error in form.user.errors %}<li>{{ error }}</li>{% endfor %}</ul>{% endif %}
+                </fieldset></td>
+            </tr>
+            {% endif %}
             <tr>
                 <td>{{ form.items.label }}</td>
                 <td class="table-data-relative">

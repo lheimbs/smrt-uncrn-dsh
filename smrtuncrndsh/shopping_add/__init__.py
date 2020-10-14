@@ -1,10 +1,14 @@
 from flask import render_template, Blueprint, jsonify, abort, request, \
     Response, current_app, flash  # , make_response, redirect
 from flask_login import login_required, current_user
+from wtforms import TextField
+from wtforms.validators import DataRequired
+from wtforms.ext.sqlalchemy.fields import QuerySelectField
 
 from .misc import get_ajax_search_objects, get_category, get_shop, get_list, get_category_for_new_item
 from .forms import AddList, AddItem
 from ..models.Shopping import Shop, Category, Item, Liste
+from ..models.Users import User
 
 # Blueprint Configuration
 shopping_add_bp = Blueprint(
@@ -17,7 +21,24 @@ shopping_add_bp = Blueprint(
 
 @shopping_add_bp.route('/add', methods=['GET', 'POST'])
 def add():
-    form = AddList()
+    if current_user.is_admin:
+        current_app.logger.info("User is admin! Letting admin decide who is the owner of the added Recepit.")
+
+        class AddListAsAdmin(AddList):
+            pass
+
+        AddListAsAdmin.user = QuerySelectField(
+            query_factory=lambda: User.query,
+            get_label='username',
+            allow_blank=False,
+            blank_text="Select a user",
+            description="User",
+        )
+        # TextField("User", validators=[DataRequired()])
+        form = AddListAsAdmin()
+        # form.user = current_user
+    else:
+        form = AddList()
 
     if form.validate_on_submit():
         shop = get_shop(form.shop.data)
@@ -33,6 +54,12 @@ def add():
             )
         else:
             new_list.items = item_list
+
+            if hasattr(form, "user") and form.user.data and current_user.is_admin:
+                new_list.user = form.user.data
+            else:
+                new_list.user = current_user
+
             new_list.save_to_db()
             flash("Successfully saved the entered receipt!", "success")
 
