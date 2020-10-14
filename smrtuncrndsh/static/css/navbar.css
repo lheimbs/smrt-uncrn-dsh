@@ -1,4 +1,4 @@
-.navbar {
+nav .navbar {
     height: 100%;
 
     display: flex;
@@ -12,18 +12,18 @@
 }
 
 /* hide header navbar icon on non-mobile */
-.navbar-toggle {
+nav .navbar-toggle {
     display: none;
     padding-right: 5px;
     margin-right: 5px;
     border-right: 2px solid var(--border-medium);
 }
 
-.navbar-toggle[type="checkbox"] {
+nav .navbar-toggle[type="checkbox"] {
     display: none;
 }
 
-.navbar-toggle {
+nav .navbar-toggle {
     position: fixed;
     top: 30px;
     left: 15px;
@@ -31,28 +31,29 @@
 
 @media (max-width: 768px) {
     /* show navbar hamburger icon */
-    .navbar-toggle {
+    nav .navbar-toggle {
         display: initial;
     }
 
-    .navbar {
+    nav .navbar {
         width: 0;
         display: none;
         height: 100%;
     }
 
-    .navbar-toggle:not(checked) ~ .navbar {
+    nav .navbar-toggle:not(checked) ~ .navbar {
         width: 0;
         display: none;
         border-right: none;
 
     }
-    .navbar-toggle:checked ~ .navbar {
+    nav .navbar-toggle:checked ~ .navbar {
         width: 200px;
         display: flex;
         border-right: 2px solid var(--border-medium);
 
     }
+
 }
 
 nav a {
