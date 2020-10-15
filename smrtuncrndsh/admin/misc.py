@@ -1,3 +1,4 @@
+import json
 import dateutil.parser as dt
 from datetime import timedelta
 
@@ -7,6 +8,7 @@ from sqlalchemy.sql import sqltypes
 
 from ..models import db
 from ..models.Shopping import Liste, Category, Shop, Item
+from ..models.Users import User
 
 
 def get_multiple_items(liste):
@@ -19,11 +21,19 @@ def get_multiple_items(liste):
     return multiple
 
 
-def add_remove_items_from_liste(new_items, repeated_items, liste=None):
+def add_remove_items_from_liste(new_items, repeated_items_raw, liste=None):
     """ Repeated items dont show up in the form of a QuerySelectMultipleField (new_items).
         To add multiple items to the Liste.items list repeated items are counted using js (repeated_items).
         This handles the adding/removing of all items.
     """
+    print(new_items, type(new_items), repeated_items_raw, type(repeated_items_raw))
+
+    repeated_items = get_repeated_items(repeated_items_raw)
+    if repeated_items_raw and not repeated_items:
+        return False
+
+    print(new_items, type(new_items), repeated_items, type(repeated_items))
+
     add_items = []
     for item in new_items:
         if item.id in repeated_items.keys() and new_items.count(item) < repeated_items[item.id]:
@@ -62,6 +72,26 @@ def add_remove_items_from_liste(new_items, repeated_items, liste=None):
 
     if not liste.items and new_items:
         liste.items = new_items
+    return True
+
+
+def get_repeated_items(repeated_items):
+    if isinstance(repeated_items, dict):
+        return repeated_items
+
+    try:
+        repeated_items = json.loads(repeated_items.replace("'", '"'))
+    except json.decoder.JSONDecodeError:
+        current_app.logger.error(f"Coud not json-decode repeated_items '{repeated_items}'!")
+        repeated_items = {}
+
+    new_repeated_items = {}
+    for key, value in repeated_items.items():
+        try:
+            new_repeated_items[int(key)] = value
+        except ValueError:
+            current_app.logger.debug(f"Key '{key}' is not a valid id. Skipping.")
+    return new_repeated_items
 
 
 def min_price():
@@ -129,6 +159,7 @@ def get_datatables_search_query(obj, req_dict):
             # current_app.logger.debug(f"No search value provided for column '{vals['data']}'.")
             continue
 
+        # if the searching object has relationships, these objects have to be translated here
         attr, query = get_attr_based_on_category(vals['data'], query, obj)
 
         if vals['data'] == 'items':
@@ -168,6 +199,9 @@ def get_attr_based_on_category(category, query, obj):
     elif category == 'shop':
         attr = getattr(Shop, 'name')
         query = query.join(obj.shop)
+    elif category == 'user':
+        attr = getattr(User, 'name')
+        query = query.join(obj.user)
     else:
         attr = getattr(obj, category)
     return attr, query

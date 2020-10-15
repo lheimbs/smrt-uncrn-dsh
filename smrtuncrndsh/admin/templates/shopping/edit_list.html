@@ -163,11 +163,12 @@
             //$(".select-items-multi-chosen").trigger("chosen:updated");
             ids = [];
             $(".choice-id").each(function(){
-                if(($.trim($(this).text()).length>0)){
-                ids.push($(this).text());
+                if (($.trim($(this).text()).length>0)) {
+                    ids.push($(this).text());
                 }
             });
             $("#test").val(ids);
+            console.log($("#test").val());
         });
     });
 

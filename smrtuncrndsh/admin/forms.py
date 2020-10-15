@@ -107,7 +107,7 @@ class HiddenListIntegerField(HiddenField):
             data = {}
             for x in new_valuelist:
                 occurences = new_valuelist.count(x)
-                data.update({x: occurences})
+                data.update({f"{x}": occurences})
             self.data = data
         else:
             self.data = {}

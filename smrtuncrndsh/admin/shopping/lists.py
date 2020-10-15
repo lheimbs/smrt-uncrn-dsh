@@ -57,9 +57,8 @@ def edit_shopping_list(id):
         liste.category = list_form.category.data
         liste.user = list_form.user.data
 
-        add_remove_items_from_liste(list_form.items_obj.data, list_form.test.data, liste)
-
-        liste.db_commit()
+        if add_remove_items_from_liste(list_form.items_obj.data, list_form.test.data, liste):
+            liste.db_commit()
         return redirect(request.url)
     else:
         if list_form.errors:
