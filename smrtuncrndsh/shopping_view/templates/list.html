@@ -1,0 +1,70 @@
+{% from "macros.html" import render_all_flashes %}
+{% extends "base.html" %}
+
+{% block extra_assets %}
+{% assets "jrange_js" %}
+    <script type="text/javascript" src="{{ ASSET_URL }}"></script>
+{% endassets %}
+{% assets "jrange_css" %}
+    <link rel="stylesheet" href="{{ ASSET_URL }}" />
+{% endassets %}
+
+{% assets "datatables_js" %}
+    <script type="text/javascript" src="{{ ASSET_URL }}"></script>
+{% endassets %}
+{% assets "datatables_css" %}
+    <link rel="stylesheet" href="{{ ASSET_URL }}" />
+{% endassets %}
+
+{% assets "daterangepicker_js" %}
+    <script type="text/javascript" src="{{ ASSET_URL }}"></script>
+{% endassets %}
+{% assets "daterangepicker_css" %}
+    <link rel="stylesheet" href="{{ ASSET_URL }}" />
+{% endassets %}
+
+<script src="{{ url_for('shopping_view_bp.shopping_view_list_js') }}"></script>
+<script src="{{ url_for('shopping_view_bp.static', filename='js/search.js') }}"></script>
+
+{% endblock %}
+
+{% block content %}
+
+{{ render_all_flashes() }}
+
+<table class="shopping-table data-table" id="shopping-list-table">
+    <thead>
+        <tr>
+            <th>Date</th>
+            <th>Price</th>
+            <th>Shop</th>
+            <th>Category</th>
+            <th class="col-large">Items</th>
+            <th class="edit_delete_header"></th>
+            <th class="edit_delete_header"></th>
+        </tr>
+    </thead>
+    <tfoot>
+        <tr>
+            <th><input type="text" name="daterange" placeholder="Daterange" value="" /></th>
+            <th><input type="hidden" class="price-slider" placeholder="Price" value="{{ data['min_price'] }},{{ data['max_price'] }}" /></th>
+            <th><input type="text" placeholder="Shop" /></th>
+            <th><input type="text" placeholder="Category" /></th>
+            <th><input type="text" placeholder="Item" /></th>
+            <th class="edit_delete_footer"><button id="search-cancel" class="material-icons">clear</button></th>
+            <th class="edit_delete_footer"><button id="search-go" class="material-icons">search</button></th>
+        </tr>
+    </tfoot>
+</table>
+
+<script nonce="{{ csp_nonce() }}" type="text/javascript">
+    function getMinPrice() {
+        return parseFloat({{ data['min_price']|string|tojson|safe }});
+    }
+    function getMaxPrice() {
+        return parseFloat({{ data['max_price']|string|tojson|safe }});
+    }
+</script>
+    
+
+{% endblock %}

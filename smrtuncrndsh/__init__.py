@@ -43,6 +43,9 @@ def register_blueprints(app):
     from .shopping_add import shopping_add_bp, add, query_shops  # noqa: F401
     app.register_blueprint(shopping_add_bp)
 
+    from .shopping_view import shopping_view_bp, shopping_view_list  # noqa: F401
+    app.register_blueprint(shopping_view_bp)
+
 
 def register_dash(app):
     # Import and register Dash applications
