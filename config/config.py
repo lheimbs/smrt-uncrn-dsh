@@ -27,9 +27,9 @@ class Config:
     MQTT_SERVER = 'lennyspi.local'
     SECRET_KEY = 'key'
     ADMIN = {
-        'username': 'admin',
-        'email': 'admin@admin.de',
-        'password': 'admin'
+        'username': os.environ.get('FLASK_APP_ADMIN', 'admin'),
+        'email': os.environ.get('FLASK_APP_ADMIN_EMAIL', 'admin@admin.de'),
+        'password': os.environ.get('FLASK_APP_ADMIN_PASSWORD', 'admin')
     }
 
     DROP_ALL = os.environ.get('DROP_ALL', '')
@@ -70,8 +70,8 @@ class ProductionConfig(Config):
     SQLALCHEMY_DATABASE_URI = 'postgresql://{}:{}@{}:{}/{}'.format(
         os.environ.get('DATABASE_USER', 'lenny'),
         os.environ.get('DATABASE_PASSWORD', ''),
-        os.environ.get('DATABASE_HOST', 'dashboard.heimbs.me'),
-        os.environ.get('DATABASE_PORT', 65432),
+        os.environ.get('DATABASE_HOST', 'home.heimbs.me'),
+        os.environ.get('DATABASE_PORT', 5432),
         os.environ.get('DATABASE_NAME', 'data_production')
     )
 
@@ -79,15 +79,15 @@ class ProductionConfig(Config):
         'probe_request': 'postgresql://{}:{}@{}:{}/{}'.format(
             os.environ.get('DATABASE_USER', 'lenny'),
             os.environ.get('DATABASE_PASSWORD', ''),
-            os.environ.get('DATABASE_HOST', 'dashboard.heimbs.me'),
-            os.environ.get('DATABASE_PORT', 65432),
+            os.environ.get('DATABASE_HOST', 'home.heimbs.me'),
+            os.environ.get('DATABASE_PORT', 5432),
             os.environ.get('DATABASE_NAME', 'probes_production')
         ),
         'users': 'postgresql://{}:{}@{}:{}/{}'.format(
             os.environ.get('DATABASE_USER', 'lenny'),
             os.environ.get('DATABASE_PASSWORD', ''),
-            os.environ.get('DATABASE_HOST', 'dashboard.heimbs.me'),
-            os.environ.get('DATABASE_PORT', 65432),
+            os.environ.get('DATABASE_HOST', 'home.heimbs.me'),
+            os.environ.get('DATABASE_PORT', 5432),
             os.environ.get('DATABASE_NAME', 'users_production')
         ),
     }
