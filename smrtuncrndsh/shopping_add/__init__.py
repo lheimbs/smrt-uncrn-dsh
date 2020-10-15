@@ -1,8 +1,6 @@
 from flask import render_template, Blueprint, jsonify, abort, request, \
     Response, current_app, flash  # , make_response, redirect
 from flask_login import login_required, current_user
-from wtforms import TextField
-from wtforms.validators import DataRequired
 from wtforms.ext.sqlalchemy.fields import QuerySelectField
 
 from .misc import get_ajax_search_objects, get_category, get_shop, get_list, get_category_for_new_item
@@ -34,7 +32,6 @@ def add():
             blank_text="Select a user",
             description="User",
         )
-        # TextField("User", validators=[DataRequired()])
         form = AddListAsAdmin()
         # form.user = current_user
     else:
