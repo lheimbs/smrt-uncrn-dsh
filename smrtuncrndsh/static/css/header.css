@@ -60,6 +60,7 @@ body.login-page a.login-page,
 body.home-page a.home-page,
 body.graph-page a.graph-page,
 body.register-page a.register-page,
-body.shopping-add a.shopping-add-page {
+body.shopping-add a.shopping-add-page,
+body.shopping-view-page a.shopping-view-page {
     background-color: var(--background-medium);
 }
