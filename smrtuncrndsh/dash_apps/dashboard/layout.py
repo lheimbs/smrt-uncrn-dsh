@@ -167,7 +167,7 @@ layout = html.Div(
                             id='rpi-status',
                         ),
                         html.Span(
-                            "Raspberry Pi",
+                            "Smrt-Uncrn-Cllctr",
                             className="tooltiptext",
                         ),
                     ]

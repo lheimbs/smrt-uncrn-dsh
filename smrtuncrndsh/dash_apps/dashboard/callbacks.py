@@ -283,11 +283,14 @@ def init_callbacks(app):                    # noqa: C901
         state = sql.get_latest_state("computer")
 
         if not sql.is_data_in_state_table() or not state:
+            className = className.replace("gone", "").replace("off", "").replace("on", "")
             className += " gone"
 
         if state and state.state in ['online', 'on']:
+            className = className.replace("gone", "").replace("off", "").replace("on", "")
             className += " on"
         else:
+            className = className.replace("gone", "").replace("off", "").replace("on", "")
             className += " off"
 
         return state.state if state else "", className
@@ -304,11 +307,14 @@ def init_callbacks(app):                    # noqa: C901
         state = sql.get_latest_state("voice_assistant")
 
         if not sql.is_data_in_state_table() or not state:
+            className = className.replace("gone", "").replace("off", "").replace("on", "")
             className += " gone"
 
         if state and state.state in ['online', 'on']:
+            className = className.replace("gone", "").replace("off", "").replace("on", "")
             className += " on"
         else:
+            className = className.replace("gone", "").replace("off", "").replace("on", "")
             className += " off"
 
         return state.state if state else "", className
@@ -325,11 +331,14 @@ def init_callbacks(app):                    # noqa: C901
         state = sql.get_latest_state("esp_bme_rf")
 
         if not sql.is_data_in_state_table() or not state:
+            className = className.replace("gone", "").replace("off", "").replace("on", "")
             className += " gone"
 
         if state and state.state in ['online', 'on']:
+            className = className.replace("gone", "").replace("off", "").replace("on", "")
             className += " on"
         else:
+            className = className.replace("gone", "").replace("off", "").replace("on", "")
             className += " off"
 
         return state.state if state else "", className
@@ -343,14 +352,17 @@ def init_callbacks(app):                    # noqa: C901
         [State('rpi-status-container', 'className')]
     )
     def rpi_status(n, className):
-        state = sql.get_latest_state("raspberry_pi")
+        state = sql.get_latest_state("smrt-uncrn-cllctr")
 
         if not sql.is_data_in_state_table() or not state:
+            className = className.replace("gone", "").replace("off", "").replace("on", "")
             className += " gone"
 
         if state and state.state in ['online', 'on']:
+            className = className.replace("gone", "").replace("off", "").replace("on", "")
             className += " on"
         else:
+            className = className.replace("gone", "").replace("off", "").replace("on", "")
             className += " off"
 
         return state.state if state else "?", className
