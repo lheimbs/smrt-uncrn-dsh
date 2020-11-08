@@ -139,7 +139,7 @@ def init_callbacks(app):                    # noqa: C901
 
             trace = go.Scatter(
                 mode='lines',
-                hovertemplate='%{x}.: %{y:.2f}€',
+                hovertemplate="%{x}.: %{y:.2f}€ | " + month_name[month] + "<extra></extra>",
                 x=months_data.Days,
                 y=months_data.price,
                 name=month_name[month],
@@ -157,10 +157,10 @@ def init_callbacks(app):                    # noqa: C901
                 fig.add_trace(
                     go.Bar(
                         opacity=0.5,
-                        hovertemplate="%{x}.: %{y:.2f}€",
                         x=data[data.date.dt.month == month].date.dt.day,
                         y=data[data.date.dt.month == month].price,
                         name=month_name[month],
+                        hovertemplate="%{x}.: %{y:.2f}€ | " + month_name[month] + "<extra></extra>",
                         marker={
                             'color': COLORS['foreground'],
                         },
