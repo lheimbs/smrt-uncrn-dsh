@@ -72,6 +72,7 @@ $(function() {
         shop.val("");
         category.val("");
         items.val("");
+        $("input.flexdatalist-set#items").attr("value", "");
     }
     // custom form clearing on reset button press
     $(".clear-form").click(clear_form);
