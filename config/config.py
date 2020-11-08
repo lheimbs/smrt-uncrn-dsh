@@ -6,7 +6,7 @@ from dotenv import load_dotenv
 from smrtuncrndsh import get_base_dir
 
 BASE_DIR = get_base_dir()
-load_dotenv(os.path.join(BASE_DIR, '.env'))
+load_dotenv(verbose=True)
 
 
 class Config:
@@ -16,6 +16,9 @@ class Config:
     FLASK_APP = os.environ.get('FLASK_APP')
     FLASK_ENV = os.environ.get('FLASK_ENV')
     SECRET_KEY = os.environ.get('SECRET_KEY')
+
+    DISABLE_CACHE = os.environ.get("FLASK_APP_DISABLE_CACHE", "")
+    DISABLE_FORCE_HTTPS = os.environ.get("FLASK_APP_DISABLE_FORCE_HTTPS", "")
 
     # Static Assets
     STATIC_FOLDER = 'static'
@@ -27,12 +30,12 @@ class Config:
     MQTT_SERVER = 'lennyspi.local'
     SECRET_KEY = 'key'
     ADMIN = {
-        'username': 'admin',
-        'email': 'admin@admin.de',
-        'password': 'admin'
+        'username': os.environ.get('FLASK_APP_ADMIN', 'admin'),
+        'email': os.environ.get('FLASK_APP_ADMIN_EMAIL', 'admin@admin.de'),
+        'password': os.environ.get('FLASK_APP_ADMIN_PASSWORD', 'admin')
     }
 
-    DROP_ALL = os.environ.get('DROP_ALL', '')
+    DROP_ALL = os.environ.get('FLASK_APP_DROP_ALL', '')
     SQLALCHEMY_DATABASE_URI = 'sqlite:///data.db'
 
     SQLALCHEMY_BINDS = {
@@ -61,63 +64,39 @@ class Config:
         ]
     }
 
+    # PostgreSQL database
+    SQLALCHEMY_DATABASE_URI = 'postgresql://{}:{}@{}:{}/{}'.format(
+        os.environ.get('FLASK_APP_DATABASE_USER'),
+        os.environ.get('FLASK_APP_DATABASE_PASSWORD'),
+        os.environ.get('FLASK_APP_DATABASE_HOST'),
+        os.environ.get('FLASK_APP_DATABASE_PORT'),
+        os.environ.get('FLASK_APP_DATABASE_DATA_NAME')
+    )
+
+    SQLALCHEMY_BINDS = {
+        'probe_request': 'postgresql://{}:{}@{}:{}/{}'.format(
+            os.environ.get('FLASK_APP_DATABASE_USER'),
+            os.environ.get('FLASK_APP_DATABASE_PASSWORD'),
+            os.environ.get('FLASK_APP_DATABASE_HOST'),
+            os.environ.get('FLASK_APP_DATABASE_PORT'),
+            os.environ.get('FLASK_APP_DATABASE_PROBES_NAME')
+        ),
+        'users': 'postgresql://{}:{}@{}:{}/{}'.format(
+            os.environ.get('FLASK_APP_DATABASE_USER'),
+            os.environ.get('FLASK_APP_DATABASE_PASSWORD'),
+            os.environ.get('FLASK_APP_DATABASE_HOST'),
+            os.environ.get('FLASK_APP_DATABASE_PORT'),
+            os.environ.get('FLASK_APP_DATABASE_USERS_NAME')
+        ),
+    }
+
 
 class ProductionConfig(Config):
     """Uses production database server."""
-    DB_NAME = 'data_production'
-
-    # PostgreSQL database
-    SQLALCHEMY_DATABASE_URI = 'postgresql://{}:{}@{}:{}/{}'.format(
-        os.environ.get('DATABASE_USER', 'lenny'),
-        os.environ.get('DATABASE_PASSWORD', ''),
-        os.environ.get('DATABASE_HOST', 'dashboard.heimbs.me'),
-        os.environ.get('DATABASE_PORT', 65432),
-        os.environ.get('DATABASE_NAME', 'data_production')
-    )
-
-    SQLALCHEMY_BINDS = {
-        'probe_request': 'postgresql://{}:{}@{}:{}/{}'.format(
-            os.environ.get('DATABASE_USER', 'lenny'),
-            os.environ.get('DATABASE_PASSWORD', ''),
-            os.environ.get('DATABASE_HOST', 'dashboard.heimbs.me'),
-            os.environ.get('DATABASE_PORT', 65432),
-            os.environ.get('DATABASE_NAME', 'probes_production')
-        ),
-        'users': 'postgresql://{}:{}@{}:{}/{}'.format(
-            os.environ.get('DATABASE_USER', 'lenny'),
-            os.environ.get('DATABASE_PASSWORD', ''),
-            os.environ.get('DATABASE_HOST', 'dashboard.heimbs.me'),
-            os.environ.get('DATABASE_PORT', 65432),
-            os.environ.get('DATABASE_NAME', 'users_production')
-        ),
-    }
+    DEBUG = False
 
 
 class DevelopmentConfig(Config):
-    SQLALCHEMY_DATABASE_URI = 'postgresql://{}:{}@{}:{}/{}'.format(
-        os.environ.get('DATABASE_USER', 'pi'),
-        os.environ.get('DATABASE_PASSWORD', ''),
-        os.environ.get('DATABASE_HOST', 'lennyspi.local'),
-        os.environ.get('DATABASE_PORT', 5432),
-        os.environ.get('DATABASE_NAME', 'data')
-    )
-
-    SQLALCHEMY_BINDS = {
-        'probe_request': 'postgresql://{}:{}@{}:{}/{}'.format(
-            os.environ.get('DATABASE_USER', 'pi'),
-            os.environ.get('DATABASE_PASSWORD', ''),
-            os.environ.get('DATABASE_HOST', 'lennyspi.local'),
-            os.environ.get('DATABASE_PORT', 5432),
-            os.environ.get('DATABASE_NAME', 'probes')
-        ),
-        'users': 'postgresql://{}:{}@{}:{}/{}'.format(
-            os.environ.get('DATABASE_USER', 'pi'),
-            os.environ.get('DATABASE_PASSWORD', ''),
-            os.environ.get('DATABASE_HOST', 'lennyspi.local'),
-            os.environ.get('DATABASE_PORT', 5432),
-            os.environ.get('DATABASE_NAME', 'users')
-        ),
-    }
     MQTT_SERVER = 'localhost'
     MQTT_PORT = 1883
     DEBUG = True

@@ -87,8 +87,12 @@ def create_app():
         from .models import db
         migrate = Migrate(app, db)          # noqa: F841
 
+        disable_https = app.config['DISABLE_FORCE_HTTPS']
+        if disable_https:
+            app.logger.debug("Disabling talismans https forcing!")
         talisman.init_app(
             app,
+            force_https=bool(disable_https),
             content_security_policy=app.config['CSP'],
             content_security_policy_nonce_in=['script-src'],
         )

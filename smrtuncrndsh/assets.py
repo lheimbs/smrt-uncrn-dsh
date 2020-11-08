@@ -91,6 +91,11 @@ def compile_assets(app):
         'plotly_js': plotly_js,
     }
 
+    # selinux prevents flask-assets to dynamically build/access cached files
+    if app.config['DISABLE_CACHE']:
+        assets.cache = False
+        assets.manifest = False
+
     assets.register(bundles)
     # assets.register('css_all', css)
     return assets

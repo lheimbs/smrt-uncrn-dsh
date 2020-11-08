@@ -1,6 +1,6 @@
 # from flask import current_app
 from flask_sqlalchemy import SQLAlchemy
-from sqlalchemy import func
+from sqlalchemy import func, exc
 
 db = SQLAlchemy()
 
@@ -50,15 +50,28 @@ def init_db(app):
             db.drop_all()
         db.create_all()
 
-        admin = app.config['ADMIN']['username']
-        user = User.query.filter_by(username=admin).first()
-        if not user:
-            user = User(
-                name='Admin',
-                is_admin=True,
-                is_activated=True,
-                username=app.config['ADMIN']['username'],
-                email=app.config['ADMIN']['email']
+        admin_uname = app.config['ADMIN']['username']
+        admin_email = app.config['ADMIN']['email']
+
+        if not admin_email or not admin_uname:
+            app.logger.error(
+                "Username and email needs to be set for administrator user! No admin user added"
             )
-            user.set_password(app.config['ADMIN']['password'])
-            user.add_to_db()
+        else:
+            user = User.query.filter_by(username=admin_uname).filter_by(email=admin_email).first()
+            if not user:
+                user = User(
+                    name='Admin',
+                    is_admin=True,
+                    is_activated=True,
+                    username=admin_uname,
+                    email=admin_email
+                )
+                user.set_password(app.config['ADMIN']['password'])
+
+                try:
+                    user.add_to_db()
+                except exc.IntegrityError:
+                    app.logger.debug(
+                        "Admin user violates unique email/username constraint! No admin user added.!"
+                    )
