@@ -30,6 +30,7 @@ $(function() {
         "processing": true,
         "serverSide": true,
         "autoWidth": false,
+        "stateSave":  true,
         "ajax": {
             url: "{{ url_for('admin_bp.query_shopping_list') }}",
             type: 'POST'
