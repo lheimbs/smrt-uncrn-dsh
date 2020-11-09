@@ -10,7 +10,11 @@ def register_handlers(app):
     @app.errorhandler(CSRFError)
     def handle_csrf_error(error):
         app.logger.error(f"CSRF Error: {error.description}")
-        return jsonify(error.description), 400
+        return render_template(
+            "errors/error.html", title="Error 400", error_code="400",
+            error_msg="Sheit, I think you need to reload this... or it is broken >.<"
+        ), 400
+        # return jsonify(error.description), 400
 
     @app.errorhandler(403)
     def forbidden_page(*args, **kwargs):
@@ -41,5 +45,13 @@ def register_handlers(app):
         # do stuff
         return render_template(
             "errors/error.html", title="Error 500", error_code="500",
-            error_msg="Yikes, this one is on me. I must have fucked up the programming or something >.<"
+            error_msg="Yikes, this one is on me. I must have fucked up the programming or something :("
+        ), 500
+
+    @app.errorhandler(500)
+    def server_error_not_implemented(*args, **kwargs):
+        # do stuff
+        return render_template(
+            "errors/error.html", title="Error 500", error_code="500",
+            error_msg="Ugh, it seem like I forgot to implement something...Sorryyyyyy"
         ), 500
