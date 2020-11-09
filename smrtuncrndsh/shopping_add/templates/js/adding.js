@@ -151,11 +151,18 @@ $(function() {
                 });
 
                 // set search value as new items name
-                $("#name").val($("#items-flexdatalist").val());
+                $("#add-new-item-form #name").val($("#items-flexdatalist").val());
+                if ($("#add-new-item-form #name").val()) {
+                    // focus price if the items name is already set
+                    $("#add-new-item-form #price").focus();
+                }
+                else {
+                    // otherwise focus the name input
+                    $("#add-new-item-form #name").focus();
+                }
             },
             error: function(response, textStatus, errorThrown) {
                 $.modal.close();
-                $('#add-new-item-form').remove();
                 handleAjaxError(response, textStatus, errorThrown);
             }
         });
@@ -175,16 +182,15 @@ $(function() {
                 if (response.status=="success") {
                     const newLocal = $("#items").flexdatalist('value');
                     var current_selected = newLocal;
-
                     current_selected.push(response.item);
 
                     var items = load_items_list();
                     $("#items").flexdatalist('value', JSON.stringify(current_selected));
 
                     $.modal.close();
-                    $('#add-new-item-form').remove();
 
                     makeFlashMessage("success", response.text);
+                    $("#items-flexdatalist").focus();
                 }
                 else {
                     if ("fields" in response) {
@@ -193,18 +199,21 @@ $(function() {
                     else {
                         makeFlashMessage("error", response.status+": "+response.text);
                         $.modal.close();
-                        $('#add-new-item-form').remove();
                     }
                 }
                 console.debug(JSON.stringify(response));
             },
             error: function(response, textStatus, errorThrown) {
                 $.modal.close();
-                $('#add-new-item-form').remove();
                 handleAjaxError(response, textStatus, errorThrown);
             },
         });
     });
+});
+
+// Remove a modal's html after closing
+$(document).on($.modal.AFTER_CLOSE, function(event, modal) {
+    $('#add-new-item-form').remove();
 });
 
 $(document).on('focus', 'input', function() {
