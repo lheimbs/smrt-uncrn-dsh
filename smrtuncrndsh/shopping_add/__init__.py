@@ -110,17 +110,17 @@ def shopping_add_new_item():
 
 @shopping_add_bp.route('/shopping/query/shops', methods=['GET', 'POST'])
 def query_shops():
-    return get_ajax_search_objects(Shop, request.args)
+    return get_ajax_search_objects(Shop, request.json)
 
 
 @shopping_add_bp.route('/shopping/query/categories', methods=['GET', 'POST'])
 def query_categories():
-    return get_ajax_search_objects(Category, request.args)
+    return get_ajax_search_objects(Category, request.json)
 
 
 @shopping_add_bp.route('/shopping/query/items', methods=['GET', 'POST'])
 def query_items():
-    return get_ajax_search_objects(Item, request.args)
+    return get_ajax_search_objects(Item, request.json)
 
 
 @shopping_add_bp.route("/adding_js")

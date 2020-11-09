@@ -125,6 +125,9 @@ def get_ajax_search_objects(obj, request):
         else:
             query = query.filter(obj.name.startswith(request['keyword']))
 
+    if obj == Item and request and 'keyword' in request.keys() and request['keyword']:
+        query = query.order_by(Item.price.asc())
+
     if 'load' in request:
         query = query.limit(request['limit'])
 
