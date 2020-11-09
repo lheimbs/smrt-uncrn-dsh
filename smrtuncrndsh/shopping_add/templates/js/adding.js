@@ -64,18 +64,19 @@ $(function() {
     });
 
     function clear_form() {
-        console.log("Cear form");
         $("#add-form")[0].reset();
         $("#date").val("");
         $("#price").val("");
         $("#shop-category").val("");
         shop.val("");
         category.val("");
-        items.val("");
-        $("input.flexdatalist-set#items").attr("value", "");
+
+        var items = load_items_list();
     }
     // custom form clearing on reset button press
-    $(".clear-form").click(clear_form);
+    $(".clear-form").on("click", function() {
+        clear_form();
+    });
 
     // when search for a shop returns nothing, the new shops category field will appear
     $('#shop-name.flexdatalist').on('after:flexdatalist.search', function(event, keyword, data, items) {
@@ -177,7 +178,6 @@ $(function() {
 
                     current_selected.push(response.item);
 
-                    $("#items").flexdatalist('reset');
                     var items = load_items_list();
                     $("#items").flexdatalist('value', JSON.stringify(current_selected));
 
