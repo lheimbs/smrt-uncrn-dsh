@@ -128,7 +128,7 @@ def get_ajax_search_objects(obj, request):
     if obj == Item and request and 'keyword' in request.keys() and request['keyword']:
         query = query.order_by(Item.price.asc())
 
-    if 'load' in request:
+    if 'load' in request.keys() and 'limit' in request.keys():
         query = query.limit(request['limit'])
 
     return make_response(jsonify({
