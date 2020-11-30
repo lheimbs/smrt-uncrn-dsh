@@ -54,6 +54,18 @@
     background: var(--background-card);
 }
 
+.shopping-add-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 1.6em;
+
+    
+}
+.shopping-add-header .material-icons {
+    vertical-align: bottom;
+    font-size: 1.75em;
+}
 
 
 @media only screen and (max-width:900px),(min-device-width:808px) and (max-device-width:1024px) {
