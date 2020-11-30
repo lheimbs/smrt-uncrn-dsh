@@ -1,0 +1,47 @@
+{% from "macros.html" import render_all_flashes %}
+{% extends "base.html" %}
+
+{% block extra_assets %}
+{% assets "jquerymodal_js" %}
+    <script type="text/javascript" src="{{ ASSET_URL }}"></script>
+{% endassets %}
+{% assets "jquerymodal_css" %}
+    <link rel="stylesheet" href="{{ ASSET_URL }}" />
+{% endassets %}
+<script type="text/javascript" src="{{ url_for('shopping_add_bp.scanning_js') }}"></script>
+
+{% endblock %}
+
+
+{% block content %}
+
+{{ render_all_flashes() }}
+
+<form method="POST" enctype="multipart/form-data">
+    {{ form.csrf_token }}
+    <div id="scan-form-content-container">
+        <div id="scan-form-reciept-upload" class="scan-form-element">
+            <fieldset class="{{ form.reciept.type }}">
+                {{ form.reciept.label }}
+                {{ form.reciept }}
+                {% if form.reciept.errors %}<ul class="errors">{% for error in form.reciept.errors %}<li>{{ error }}</li>{% endfor %}</ul>{% endif %}
+            </fieldset>
+        </div>
+        <div id="scan-form-shop-select" class="scan-form-element">
+            <fieldset class="{{ form.shop.type }}">
+                {{ form.shop.label }}
+                {{ form.shop }}
+                {% if form.shop.errors %}<ul class="errors">{% for error in form.shop.errors %}<li>{{ error }}</li>{% endfor %}</ul>{% endif %}
+            </fieldset>
+        </div>
+    </div>
+    
+
+    <div class="shopping submit-button sticky">
+        <input class="material-icons" type="submit" value="send"/>
+        <button type="button" class="clear-form material-icons">clear</button>
+    </div>
+    
+</form>
+
+{% endblock %}
