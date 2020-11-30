@@ -26,7 +26,10 @@
 
 {# render form #}
 <div class="card">
-    <h3>Add Shopping List</h3>
+    <div class="shopping-add-header">
+        <h3>Add Shopping List</h3>
+        <a href="{#{ url_for('shopping_add_bp.shopping_add_scan_pdf') }#}" id="btn-scan-pdf" class="is-visible" rel="ajax:modal">Scan pdf <span class="material-icons">add_a_photo</span></a>
+    </div>
     <form id="add-form" method="POST">
         {{ form.csrf_token }}
 
