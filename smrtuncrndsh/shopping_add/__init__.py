@@ -128,6 +128,11 @@ def adding_js():
     return Response(render_template("/js/adding.js"), mimetype="application/javascript;")
 
 
+@shopping_add_bp.route("/scanning_js")
+def scanning_js():
+    return Response(render_template("/js/scanning.js"), mimetype="application/javascript;")
+
+
 @shopping_add_bp.before_request
 @login_required
 def before_request():
