@@ -41,6 +41,7 @@ def register_blueprints(app):
     app.register_blueprint(auth_bp)
 
     from .shopping_add import shopping_add_bp, add, query_shops  # noqa: F401
+    from .shopping_add.scanner import scan_reciept  # noqa: F401
     app.register_blueprint(shopping_add_bp)
 
     from .shopping_view import shopping_view_bp, shopping_view_list  # noqa: F401
