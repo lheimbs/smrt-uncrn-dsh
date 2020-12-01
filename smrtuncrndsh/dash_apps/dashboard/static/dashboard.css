@@ -5,7 +5,8 @@
         "temp temp humid humid press press"
         "day_hrs day_hrs day_hrs day_hrs brightness altitude"
         "day_hrs day_hrs day_hrs day_hrs pc_status rpi_status"
-        "day_hrs day_hrs day_hrs day_hrs bme_status voiceassistant_status";
+        "day_hrs day_hrs day_hrs day_hrs bme_status voiceassistant_status"
+        "weather weather weather weather tablet tablet";
     
     grid-gap: 10px;
 }
@@ -25,10 +26,18 @@
             "pc_status"
             "rpi_status"
             "bme_status"
-            "voiceassistant_status";
+            "voiceassistant_status"
+            "tablet";
     }
 }
 
+.tablet-status-container {
+    grid-area: tablet;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    flex-wrap: wrap;
+}
 .temperature-current-container {
     grid-area: temp;
     display: flex;
