@@ -1,8 +1,11 @@
 #!/usr/bin/env python3
 
+from datetime import datetime, timedelta
+
 from ...models import db
 from ...models.RoomData import RoomData
 from ...models.State import State
+from ...models.Tablet import TabletBattery
 
 
 def is_data_in_roomdata_table():
@@ -13,6 +16,12 @@ def is_data_in_roomdata_table():
 
 def is_data_in_state_table():
     if State.query.first():
+        return True
+    return False
+
+
+def is_data_in_tablet_table():
+    if TabletBattery.query.first():
         return True
     return False
 
@@ -59,4 +68,20 @@ def get_last_24_hrs(start, end):
 
 
 def get_latest_state(device):
-    return State.query.filter_by(device=device).order_by(State.id.desc()).first()
+    state = State.query.filter_by(device=device).order_by(State.id.desc()).first()
+    if device == 'esp_bme_rf' and is_data_in_roomdata_table():
+        data = get_latest_roomdata()
+        if state.date > data['date']:
+            return state
+        else:
+            return State(device=device, state="online")
+    return state
+
+
+def get_latest_tablet_data():
+    battery = TabletBattery.query.order_by(TabletBattery.id.desc()).first()
+    if battery:
+        if datetime.now() < battery.date - timedelta(minutes=30):
+            return "online", battery.level
+        return "offline", battery.level
+    return "?", -99
