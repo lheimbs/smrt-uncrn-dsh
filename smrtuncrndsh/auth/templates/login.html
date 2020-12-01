@@ -24,9 +24,21 @@
 
         <fieldset class="password">
             {{ form.password(placeholder='Password') }}
-            {% if form.username.errors %}
+            {% if form.password.errors %}
                 <ul class="errors">
                     {% for error in form.password.errors %}
+                        <li>{{ error }}</li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+        </fieldset>
+
+        <fieldset class="remember_me">
+            {{ form.remember_me }}
+            {{ form.remember_me.label }}
+            {% if form.remember_me.errors %}
+                <ul class="errors">
+                    {% for error in form.remember_me.errors %}
                         <li>{{ error }}</li>
                     {% endfor %}
                 </ul>
