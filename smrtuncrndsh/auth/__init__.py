@@ -65,8 +65,8 @@ def login():
     if form.validate_on_submit():
         user = User.query.filter_by(username=form.username.data).first()
         if user and user.check_password(password=form.password.data):
-            login_user(user)
-            if login_user(user):  # Log in as newly created user
+            logged_in = login_user(user, remember=form.remember_me.data)
+            if logged_in:  # Log in as newly created user
                 user.last_login = datetime.now()
                 user.db_commit()
             next_page = request.args.get('next')
