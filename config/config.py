@@ -95,6 +95,11 @@ class ProductionConfig(Config):
     """Uses production database server."""
     DEBUG = False
 
+    SESSION_COOKIE_SECURE = True
+    REMEMBER_COOKIE_SECURE = True
+    SESSION_COOKIE_HTTPONLY = True
+    REMEMBER_COOKIE_HTTPONLY = True
+
 
 class DevelopmentConfig(Config):
     MQTT_SERVER = 'localhost'
