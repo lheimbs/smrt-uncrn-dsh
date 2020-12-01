@@ -12,6 +12,25 @@ from .import sql
 from ..variables import COLORS
 
 
+def create_devices_callback(device):
+    def device_callback(n, className):
+        state = sql.get_latest_state(device)
+
+        if not sql.is_data_in_state_table() or not state:
+            className = className.replace("gone", "").replace("off", "").replace("on", "")
+            className += " gone"
+        else:
+            if state and state.state in ['online', 'on']:
+                className = className.replace("gone", "").replace("off", "").replace("on", "")
+                className += " on"
+            else:
+                className = className.replace("gone", "").replace("off", "").replace("on", "")
+                className += " off"
+
+        return state.state if state else "?", className
+    return device_callback
+
+
 def init_callbacks(app):                    # noqa: C901
     app.clientside_callback(
         ClientsideFunction(
@@ -115,7 +134,7 @@ def init_callbacks(app):                    # noqa: C901
                 'max': 0,
                 'display': 0
             }
-        print(old_data)
+        # print(old_data)
         return old_data
 
     @app.callback(
@@ -271,98 +290,39 @@ def init_callbacks(app):                    # noqa: C901
             ))
         return fig
 
-    @app.callback(
-        [
-            Output('computer-status', 'children'),
-            Output('computer-status-container', 'className'),
-        ],
-        [Input('data-overview-update', 'n_intervals')],
-        [State('computer-status-container', 'className')]
-    )
-    def computer_status(n, className):
-        state = sql.get_latest_state("computer")
-
-        if not sql.is_data_in_state_table() or not state:
-            className = className.replace("gone", "").replace("off", "").replace("on", "")
-            className += " gone"
-
-        if state and state.state in ['online', 'on']:
-            className = className.replace("gone", "").replace("off", "").replace("on", "")
-            className += " on"
-        else:
-            className = className.replace("gone", "").replace("off", "").replace("on", "")
-            className += " off"
-
-        return state.state if state else "", className
+    devices = ['computer', 'voice_assistant', 'esp_bme_rf', 'smrt-uncrn-cllctr', ]#'tablet']
+    for device in devices:
+        dynamically_generated_function = create_devices_callback(device)
+        app.callback(
+            [
+                Output(f'{device}-status', 'children'),
+                Output(f'{device}-status-container', 'className'),
+            ],
+            [Input('data-overview-update', 'n_intervals')],
+            [State(f'{device}-status-container', 'className')]
+        )(dynamically_generated_function)
 
     @app.callback(
         [
-            Output('voiceassistant-status', 'children'),
-            Output('voiceassistant-status-container', 'className'),
+            Output('tablet-status', 'children'),
+            Output('tablet-level', 'children'),
+            Output('tablet-status-container', 'className'),
         ],
         [Input('data-overview-update', 'n_intervals')],
-        [State('voiceassistant-status-container', 'className')]
+        [State('tablet-status-container', 'className')]
     )
-    def voiceassistant_status(n, className):
-        state = sql.get_latest_state("voice_assistant")
+    def device_callback(n, className):
+        state, level = sql.get_latest_tablet_data()
 
-        if not sql.is_data_in_state_table() or not state:
+        if not sql.is_data_in_tablet_table() or state == "?":
             className = className.replace("gone", "").replace("off", "").replace("on", "")
             className += " gone"
-
-        if state and state.state in ['online', 'on']:
-            className = className.replace("gone", "").replace("off", "").replace("on", "")
-            className += " on"
         else:
-            className = className.replace("gone", "").replace("off", "").replace("on", "")
-            className += " off"
+            if state in ['online', 'on']:
+                className = className.replace("gone", "").replace("off", "").replace("on", "")
+                className += " on"
+            else:
+                className = className.replace("gone", "").replace("off", "").replace("on", "")
+                className += " off"
 
-        return state.state if state else "", className
-
-    @app.callback(
-        [
-            Output('bme-status', 'children'),
-            Output('bme-status-container', 'className'),
-        ],
-        [Input('data-overview-update', 'n_intervals')],
-        [State('bme-status-container', 'className')]
-    )
-    def bme_status(n, className):
-        state = sql.get_latest_state("esp_bme_rf")
-
-        if not sql.is_data_in_state_table() or not state:
-            className = className.replace("gone", "").replace("off", "").replace("on", "")
-            className += " gone"
-
-        if state and state.state in ['online', 'on']:
-            className = className.replace("gone", "").replace("off", "").replace("on", "")
-            className += " on"
-        else:
-            className = className.replace("gone", "").replace("off", "").replace("on", "")
-            className += " off"
-
-        return state.state if state else "", className
-
-    @app.callback(
-        [
-            Output('rpi-status', 'children'),
-            Output('rpi-status-container', 'className'),
-        ],
-        [Input('data-overview-update', 'n_intervals')],
-        [State('rpi-status-container', 'className')]
-    )
-    def rpi_status(n, className):
-        state = sql.get_latest_state("smrt-uncrn-cllctr")
-
-        if not sql.is_data_in_state_table() or not state:
-            className = className.replace("gone", "").replace("off", "").replace("on", "")
-            className += " gone"
-
-        if state and state.state in ['online', 'on']:
-            className = className.replace("gone", "").replace("off", "").replace("on", "")
-            className += " on"
-        else:
-            className = className.replace("gone", "").replace("off", "").replace("on", "")
-            className += " off"
-
-        return state.state if state else "?", className
+        return state, level, className
