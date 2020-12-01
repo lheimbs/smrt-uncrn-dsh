@@ -2,11 +2,12 @@
     display: grid;
     grid-template-columns: repeat(6, 1fr);
     grid-template-areas: 
-        "temp temp humid humid press press"
-        "day_hrs day_hrs day_hrs day_hrs brightness altitude"
-        "day_hrs day_hrs day_hrs day_hrs pc_status rpi_status"
-        "day_hrs day_hrs day_hrs day_hrs bme_status voiceassistant_status"
-        "weather weather weather weather tablet tablet";
+        "temp    temp    humid   humid   press        press"
+        "day_hrs day_hrs day_hrs day_hrs brightness   altitude"
+        "day_hrs day_hrs day_hrs day_hrs pc_status    rpi_status"
+        "day_hrs day_hrs day_hrs day_hrs bme_status   voiceassistant_status"
+        "weather weather weather weather tablet_place tablet_place"
+        "weather weather weather weather . .";
     
     grid-gap: 10px;
 }
@@ -27,12 +28,47 @@
             "rpi_status"
             "bme_status"
             "voiceassistant_status"
-            "tablet";
+            "tablet_place";
     }
 }
 
-.tablet-status-container {
-    grid-area: tablet;
+.weather-container {
+    grid-area: weather;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    grid-template-areas: 
+        "current hours hours"
+        "current days days";
+    grid-gap: 10px;
+}
+.weather-container.day {
+    background-color: var(--foreground) !important;
+}
+.weather-container.night {
+    background-color: var(--foreground-dark) !important;
+}
+.weather-container .weather-current-container {
+    grid-area: current;
+}
+.weather-container .weather-hours-container {
+    grid-area: hours;
+}
+.weather-container .weather-days-container {
+    grid-area: days;
+}
+.weather-current-sub-container {
+    display: flex;
+    align-items: center;
+}
+.weather-container p, h6 {
+    margin: 0;
+}
+.weather-container .weather-current-date {
+    font-size: small;
+}
+
+.tablet-status-ctainer {
+    grid-area: tablet_place;
     display: flex;
     justify-content: space-around;
     align-items: center;
@@ -112,16 +148,16 @@
     stroke: var(--colorway-2);
 }
 
-.computer-status-container {
+.computer-status-ctainer {
     grid-area: pc_status;
 }
-.voiceassistant-status-container {
+.voice_assistant-status-ctainer {
     grid-area: voiceassistant_status;
 }
-.bme-status-container {
+.esp_bme_rf-status-ctainer {
     grid-area: bme_status;
 }
-.rpi-status-container {
+.smrt-uncrn-cllctr-status-ctainer {
     grid-area: rpi_status;
 }
 

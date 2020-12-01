@@ -18,6 +18,7 @@ layout = html.Div(
         dcc.Store(id='pressure_store'),
         dcc.Store(id='last_entry'),
         dcc.Store(id='last_24_hrs'),
+        dcc.Store(id='weather'),
 
         html.Div(
             className='dashboard-content',
@@ -117,7 +118,7 @@ layout = html.Div(
                     ]
                 ),
                 html.Div(
-                    className="computer-status-container device-state card tooltip",
+                    className="computer-status-ctainer device-state card tooltip",
                     id="computer-status-container",
                     children=[
                         html.H6("computer", className="material-icons"),
@@ -131,7 +132,7 @@ layout = html.Div(
                     ]
                 ),
                 html.Div(
-                    className="voice_assistant-status-container device-state card tooltip",
+                    className="voice_assistant-status-ctainer device-state card tooltip",
                     id="voice_assistant-status-container",
                     children=[
                         html.H6("mic", className="material-icons"),
@@ -145,7 +146,7 @@ layout = html.Div(
                     ]
                 ),
                 html.Div(
-                    className="esp_bme_rf-status-container device-state card tooltip",
+                    className="esp_bme_rf-status-ctainer device-state card tooltip",
                     id="esp_bme_rf-status-container",
                     children=[
                         html.H6("fireplace", className="material-icons"),
@@ -159,7 +160,7 @@ layout = html.Div(
                     ]
                 ),
                 html.Div(
-                    className="smrt-uncrn-cllctr-status-container device-state card tooltip",
+                    className="smrt-uncrn-cllctr-status-ctainer device-state card tooltip",
                     id="smrt-uncrn-cllctr-status-container",
                     children=[
                         html.H6("developer_board", className="material-icons"),
@@ -173,15 +174,46 @@ layout = html.Div(
                     ]
                 ),
                 html.Div(
-                    className="tablet-status-container device-state card tooltip",
+                    className="tablet-status-ctainer device-state card tooltip",
                     id="tablet-status-container",
                     children=[
                         html.H6("tablet_android", className="material-icons"),
                         html.H6(id='tablet-status'),
                         html.H6(id='tablet-level'),
                         html.Span(
-                            "tablet",
+                            "Tablet",
                             className="tooltiptext",
+                        ),
+                    ]
+                ),
+                html.Div(
+                    className="weather-container card",
+                    id="weather-container",
+                    children=[
+                        html.Div(
+                            id="weather-current-container",
+                            className="weather-current-container",
+                            children=[
+                                html.P(id="weather-current-date"),
+                                html.H6(id="weather-current-location"),
+                                html.Div([
+                                    html.Img(id="weather-current-icon", width=50, height=50),
+                                    html.H6(id="weather-current-temp"),
+                                ], className="weather-current-sub-container"),
+                                html.P(id="weather-current-feel"),
+                                html.Div([
+                                    html.I("navigation", className="material-icons", id="weather-current-wind-icon"),
+                                    html.P(id="weather-current-wind"),
+                                ], className="weather-current-sub-container"),
+                            ]
+                        ),
+                        html.Div(
+                            id="weather-hours-container",
+                            className="weather-hours-container",
+                        ),
+                        html.Div(
+                            id="weather-days-container",
+                            className="weather-days-container",
                         ),
                     ]
                 ),
