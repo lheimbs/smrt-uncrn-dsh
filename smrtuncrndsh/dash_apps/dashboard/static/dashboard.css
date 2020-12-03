@@ -7,10 +7,34 @@
         "day_hrs day_hrs day_hrs day_hrs pc_status    rpi_status"
         "day_hrs day_hrs day_hrs day_hrs bme_status   voiceassistant_status"
         "weather weather weather weather tablet_place tablet_place"
+        "weather weather weather weather . ."
         "weather weather weather weather . .";
     
     grid-gap: 10px;
 }
+.weather-container {
+    grid-area: weather;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    grid-template-areas: 
+        "current hours hours"
+        "current days days";
+    grid-gap: 10px;
+}
+
+
+/* @media(max-width:1264px) {
+    .weather-container {
+        grid-template-columns: 1fr;
+        grid-template-areas: 
+            "current"
+            "hours"
+            "days";
+    }
+    .weather-container .weather-current-container {
+        border-right: 0px solid var(--foreground-dark);
+    }
+} */
 
 @media(max-width:768px) {
     .dashboard-content {
@@ -28,33 +52,38 @@
             "rpi_status"
             "bme_status"
             "voiceassistant_status"
-            "tablet_place";
+            "tablet_place"
+            "weather";
+    }
+    .weather-container {
+        grid-template-columns: 1fr;
+        grid-template-areas: 
+            "current"
+            "hours"
+            "days";
     }
 }
 
-.weather-container {
-    grid-area: weather;
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    grid-template-areas: 
-        "current hours hours"
-        "current days days";
-    grid-gap: 10px;
-}
 .weather-container.day {
     background-color: var(--foreground) !important;
+    color: var(--background-card) !important;
 }
 .weather-container.night {
     background-color: var(--foreground-dark) !important;
 }
 .weather-container .weather-current-container {
     grid-area: current;
+    border-right: 1px solid var(--foreground-dark);
 }
 .weather-container .weather-hours-container {
     grid-area: hours;
 }
 .weather-container .weather-days-container {
     grid-area: days;
+}
+.weather-current-details {
+    display: flex;
+    justify-content: space-between;
 }
 .weather-current-sub-container {
     display: flex;
@@ -65,6 +94,22 @@
 }
 .weather-container .weather-current-date {
     font-size: small;
+}
+.weather-days-container {
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+}
+.weather-days-container .weather-daily-day:not(:first-child) {
+    padding: 0 2px;
+    border-left: 1px solid var(--foreground-dark) ;
+}
+.weather-daily-day {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 12.5%;
+    min-width: 50px;
 }
 
 .tablet-status-ctainer {

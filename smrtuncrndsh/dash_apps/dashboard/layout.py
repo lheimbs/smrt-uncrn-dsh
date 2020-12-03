@@ -149,7 +149,7 @@ layout = html.Div(
                     className="esp_bme_rf-status-ctainer device-state card tooltip",
                     id="esp_bme_rf-status-container",
                     children=[
-                        html.H6("fireplace", className="material-icons"),
+                        html.H6("whatshot", className="material-icons"),
                         html.H6(
                             id='esp_bme_rf-status',
                         ),
@@ -197,19 +197,46 @@ layout = html.Div(
                                 html.P(id="weather-current-date"),
                                 html.H6(id="weather-current-location"),
                                 html.Div([
-                                    html.Img(id="weather-current-icon", width=50, height=50),
+                                    html.I(id="weather-current-icon", style={'margin-right': '5px'}),
                                     html.H6(id="weather-current-temp"),
                                 ], className="weather-current-sub-container"),
                                 html.P(id="weather-current-feel"),
+                                html.Hr(),
                                 html.Div([
-                                    html.I("navigation", className="material-icons", id="weather-current-wind-icon"),
-                                    html.P(id="weather-current-wind"),
-                                ], className="weather-current-sub-container"),
+                                    html.Div([
+                                        html.Div([
+                                            html.I(
+                                                "navigation",
+                                                className="material-icons",
+                                                id="weather-current-wind-icon"
+                                            ),
+                                            html.P(id="weather-current-wind"),
+                                        ], className="weather-current-sub-container"),
+                                        html.P(id="weather-current-visibility"),
+                                        html.P(id="weather-current-dew"),
+                                    ], className="weather-current-details-side"),
+                                    html.Div([
+                                        html.P(id="weather-current-humidity"),
+                                        html.P(id="weather-current-pressure"),
+                                        html.P(id="weather-current-uv"),
+                                    ], className="weather-current-details-side"),
+                                ], className="weather-current-details"),
                             ]
                         ),
                         html.Div(
                             id="weather-hours-container",
                             className="weather-hours-container",
+                            children=[
+                                dcc.Graph(
+                                    id="weather-hours-graph",
+                                    style={'height': '15vh'},
+                                    config={
+                                        'staticPlot': False,
+                                        'displayModeBar': False,
+                                    },
+                                    className="dash-graph",
+                                ),
+                            ]
                         ),
                         html.Div(
                             id="weather-days-container",

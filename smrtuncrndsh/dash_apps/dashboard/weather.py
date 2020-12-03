@@ -22,7 +22,7 @@ def get_weather(location):
             res = {
                 'current': res_obj.current.to_dict(),
                 'hours': [hourly.to_dict() for hourly in res_obj.forecast_hourly],
-                'days': [daily.to_dict() for daily in res_obj.forecast_daily[0:6]],
+                'days': [daily.to_dict() for daily in res_obj.forecast_daily],
             }
         except OSMExceptions.BadGatewayError:
             err = "OWM API backends suffers communication issues."
