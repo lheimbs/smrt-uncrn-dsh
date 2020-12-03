@@ -12,6 +12,6 @@
 {% if current_user.is_authenticated %}
     <a class="material-icons" href="{{ url_for('home_bp.logout') }}">exit_to_app</a>
 {% else %}
-    <a class="login-page material-icons" href="{{ url_for('auth_bp.login') }}">login</a>
+    <a class="login-page material-icons" href="{{ url_for('auth_bp.login') }}">exit_to_app</a>
 {% endif %}
 </div>
