@@ -24,6 +24,8 @@ class Config:
     STATIC_FOLDER = 'static'
     TEMPLATES_FOLDER = 'templates'
 
+    OWM_API_KEY = os.environ.get("OWM_API_KEY", "")
+
     DEBUG = False
     TESTING = False
     DB_NAME = 'data'
@@ -94,6 +96,11 @@ class Config:
 class ProductionConfig(Config):
     """Uses production database server."""
     DEBUG = False
+
+    SESSION_COOKIE_SECURE = True
+    REMEMBER_COOKIE_SECURE = True
+    SESSION_COOKIE_HTTPONLY = True
+    REMEMBER_COOKIE_HTTPONLY = True
 
 
 class DevelopmentConfig(Config):

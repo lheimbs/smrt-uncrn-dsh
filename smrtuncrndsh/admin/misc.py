@@ -26,13 +26,13 @@ def add_remove_items_from_liste(new_items, repeated_items_raw, liste=None):
         To add multiple items to the Liste.items list repeated items are counted using js (repeated_items).
         This handles the adding/removing of all items.
     """
-    print(new_items, type(new_items), repeated_items_raw, type(repeated_items_raw))
+    # print(new_items, type(new_items), repeated_items_raw, type(repeated_items_raw))
 
     repeated_items = get_repeated_items(repeated_items_raw)
     if repeated_items_raw and not repeated_items:
         return False
 
-    print(new_items, type(new_items), repeated_items, type(repeated_items))
+    # print(new_items, type(new_items), repeated_items, type(repeated_items))
 
     add_items = []
     for item in new_items:

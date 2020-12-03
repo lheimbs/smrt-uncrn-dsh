@@ -10,8 +10,8 @@ from smrtuncrndsh import create_app
 
 class RedactingFilter(Filter):
     def filter(self, record):
-        print(record.msg)
-        print(self.redact(record.msg))
+        # print(record.msg)
+        # print(self.redact(record.msg))
         record.msg = self.redact(record.msg)
         if isinstance(record.args, dict):
             for k in record.args.keys():
@@ -21,7 +21,7 @@ class RedactingFilter(Filter):
         return True
 
     def replace_pwd(self, match_object):
-        print(match_object.group("pwd"))
+        # print(match_object.group("pwd"))
         if match_object.group("pwd"):
             hashed_pwd = sha512(match_object.group("pwd").encode()).hexdigest()
             return match_object[0].replace(match_object.group('pwd'), hashed_pwd)

@@ -25,6 +25,10 @@
     left: 50%;
     margin-left: -60px;
 }
+.tooltip .tooltiptext.large {
+    width: 250px;
+    margin-left: -125px;
+}
 
 .tooltip .tooltiptext.bottom {
   top: 250%;

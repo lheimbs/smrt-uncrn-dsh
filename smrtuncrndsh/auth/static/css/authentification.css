@@ -24,3 +24,13 @@ form .login-register {
     flex-direction: column;
     align-items: center;
 }
+
+form fieldset.remember_me {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-evenly;
+}
+
+form fieldset.remember_me label {
+    width: unset;
+}
