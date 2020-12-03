@@ -19,7 +19,8 @@ from .weather import get_weather
 def is_daytime(sunrise, sunset, now=None):
     if not now:
         now = datetime.now()
-        now = datetime(year=now.year, month=now.month, day=now.day, hour=22)
+        if current_app.config['DEBUG']:
+            now = datetime(year=now.year, month=now.month, day=now.day, hour=22)
 
     if sunrise < now < sunset:
         return True
