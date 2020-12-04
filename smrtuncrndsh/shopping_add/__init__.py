@@ -108,6 +108,15 @@ def shopping_add_new_item():
     return render_template("item_form.html", form=form)
 
 
+# @shopping_add_bp.route('/shopping/add/scan/ebon', methods=['GET', 'POST'])
+# def shopping_add_new_item():
+#     result = {'status': 'success', 'text': ""}
+#     form = AddItem()
+
+#     if request.method == 'POST':
+#         print()
+
+
 @shopping_add_bp.route('/shopping/query/shops', methods=['GET', 'POST'])
 def query_shops():
     return get_ajax_search_objects(Shop, request.json)

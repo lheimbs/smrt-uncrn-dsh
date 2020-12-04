@@ -8,7 +8,7 @@
     transition: .3s;
     border-radius: 5px;
     background-color: var(--background-card-transparent);
-    margin: 2% 5%;
+    margin: 5px 5%;
     padding: .5%;
 
     display: flex;

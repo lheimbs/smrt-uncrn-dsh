@@ -214,6 +214,7 @@ $(function() {
 // Remove a modal's html after closing
 $(document).on($.modal.AFTER_CLOSE, function(event, modal) {
     $('#add-new-item-form').remove();
+    $('#scan-pdf-form').remove();
 });
 
 $(document).on('focus', 'input', function() {
