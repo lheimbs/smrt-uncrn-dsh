@@ -42,7 +42,11 @@ def create_devices_callback(device):
                 className = className.replace("gone", "").replace("off", "").replace("on", "")
                 className += " off"
 
-        return state.state if state else "?", className
+        return (
+            state.state if state else "?",
+            className,
+            f"Last update: {state.date.strftime('%a, %d.%m.%Y %H:%M:%S')}" if state else "Last Update: Unknown"
+        )
     return device_callback
 
 
@@ -312,6 +316,7 @@ def init_callbacks(app):                    # noqa: C901
             [
                 Output(f'{device}-status', 'children'),
                 Output(f'{device}-status-container', 'className'),
+                Output(f'{device}-status-date', 'children'),
             ],
             [Input('data-overview-update', 'n_intervals')],
             [State(f'{device}-status-container', 'className')]
@@ -322,12 +327,13 @@ def init_callbacks(app):                    # noqa: C901
             Output('tablet-status', 'children'),
             Output('tablet-level', 'children'),
             Output('tablet-status-container', 'className'),
+            Output('tablet-status-date', 'children'),
         ],
         [Input('data-overview-update', 'n_intervals')],
         [State('tablet-status-container', 'className')]
     )
     def device_callback(n, className):
-        state, level = sql.get_latest_tablet_data()
+        state, level, date = sql.get_latest_tablet_data()
 
         if not sql.is_data_in_tablet_table() or state == "?":
             className = className.replace("gone", "").replace("off", "").replace("on", "")
@@ -340,7 +346,7 @@ def init_callbacks(app):                    # noqa: C901
                 className = className.replace("gone", "").replace("off", "").replace("on", "")
                 className += " off"
 
-        return state, level, className
+        return state, level, className, f"Last update: {date.strftime('%a, %d.%m.%Y %H:%M:%S')}" if date else "Last Update: Unknown"
 
     @app.callback(
         Output('weather', 'data'),
