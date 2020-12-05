@@ -121,69 +121,87 @@ layout = html.Div(
                     className="computer-status-ctainer device-state card tooltip",
                     id="computer-status-container",
                     children=[
-                        html.H6("computer", className="material-icons"),
-                        html.H6(
-                            id='computer-status',
-                        ),
-                        html.Span(
-                            "Computer",
-                            className="tooltiptext",
-                        ),
+                        html.Div([
+                            html.H6("computer", className="material-icons"),
+                            html.H6(
+                                id='computer-status',
+                            ),
+                            html.Span(
+                                "Computer",
+                                className="tooltiptext",
+                            ),
+                        ], className="status-details-container"),
+                        html.P(id="computer-status-date", className="status-date")
                     ]
                 ),
                 html.Div(
                     className="voice_assistant-status-ctainer device-state card tooltip",
                     id="voice_assistant-status-container",
                     children=[
-                        html.H6("mic", className="material-icons"),
-                        html.H6(
-                            id='voice_assistant-status',
-                        ),
-                        html.Span(
-                            "Terminator",
-                            className="tooltiptext",
-                        ),
+                        html.Div([
+                            html.H6("mic", className="material-icons"),
+                            html.H6(
+                                id='voice_assistant-status',
+                            ),
+                            html.Span(
+                                "Terminator",
+                                className="tooltiptext",
+                            ),
+                        ], className="status-details-container"),
+                        html.P(id="voice_assistant-status-date", className="status-date")
                     ]
                 ),
                 html.Div(
                     className="esp_bme_rf-status-ctainer device-state card tooltip",
                     id="esp_bme_rf-status-container",
                     children=[
-                        html.H6("whatshot", className="material-icons"),
-                        html.H6(
-                            id='esp_bme_rf-status',
-                        ),
-                        html.Span(
-                            "Room Sensors",
-                            className="tooltiptext",
-                        ),
+                        html.Div([
+                            html.H6("whatshot", className="material-icons"),
+                            html.H6(
+                                id='esp_bme_rf-status',
+                            ),
+                            html.Span(
+                                "Room Sensors",
+                                className="tooltiptext",
+                            ),
+                        ], className="status-details-container"),
+                        html.P(id="esp_bme_rf-status-date", className="status-date")
                     ]
                 ),
                 html.Div(
                     className="smrt-uncrn-cllctr-status-ctainer device-state card tooltip",
                     id="smrt-uncrn-cllctr-status-container",
                     children=[
-                        html.H6("developer_board", className="material-icons"),
-                        html.H6(
-                            id='smrt-uncrn-cllctr-status',
-                        ),
-                        html.Span(
-                            "Smrt-Uncrn-Cllctr",
-                            className="tooltiptext",
-                        ),
+                        html.Div([
+                            html.H6("developer_board", className="material-icons"),
+                            html.H6(
+                                id='smrt-uncrn-cllctr-status',
+                            ),
+                            html.Span(
+                                "Smrt-Uncrn-Cllctr",
+                                className="tooltiptext",
+                            ),
+                        ], className="status-details-container"),
+                        html.P(id="smrt-uncrn-cllctr-status-date", className="status-date")
                     ]
                 ),
                 html.Div(
                     className="tablet-status-ctainer device-state card tooltip",
                     id="tablet-status-container",
                     children=[
-                        html.H6("tablet_android", className="material-icons"),
-                        html.H6(id='tablet-status'),
-                        html.H6(id='tablet-level'),
-                        html.Span(
-                            "Tablet",
-                            className="tooltiptext",
-                        ),
+                        html.Div([
+                            html.H6("tablet_android", className="material-icons"),
+                            html.H6(id='tablet-status'),
+                            html.Div([
+                                html.Span("battery_std", className="material-icons"),
+                                html.H6(id='tablet-level'),
+                            ], className="tablet-status-battery-cntnr"),
+                            html.Span(
+                                "Tablet",
+                                className="tooltiptext",
+                            ),
+                        ], className="status-details-container"),
+                        html.P(id="tablet-status-date", className="status-date")
                     ]
                 ),
                 html.Div(

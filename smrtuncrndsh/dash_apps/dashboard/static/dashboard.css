@@ -114,6 +114,19 @@
 
 .tablet-status-ctainer {
     grid-area: tablet_place;
+    flex-direction: column;
+    align-items: normal !important;
+}
+.status-date {
+    margin-top: 5px;
+    text-align: center;
+    font-size: small;
+}
+.tablet-status-battery-cntnr {
+    display: flex;
+    align-items: center;
+}
+.status-details-container {
     display: flex;
     justify-content: space-around;
     align-items: center;
@@ -209,10 +222,10 @@
 .device-state {
     color: var(--foreground-dark);
 
-    display: flex;
+    /* display: flex;
     justify-content: space-around;
     align-items: center;
-    flex-wrap: wrap;
+    flex-wrap: wrap; */
 }
 .device-state.gone { background-color: var(--colorway-2); }
 .device-state.on { background-color: var(--colorway-1); }

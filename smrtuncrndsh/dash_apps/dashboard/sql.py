@@ -74,14 +74,14 @@ def get_latest_state(device):
         if state.date > data['date']:
             return state
         else:
-            return State(device=device, state="online")
+            return State(device=device, state="online", date=data['date'])
     return state
 
 
 def get_latest_tablet_data():
     battery = TabletBattery.query.order_by(TabletBattery.id.desc()).first()
     if battery:
-        if datetime.now() < battery.date - timedelta(minutes=30):
-            return "online", battery.level
-        return "offline", battery.level
-    return "?", -99
+        if datetime.now() < battery.date + timedelta(minutes=30):
+            return "online", battery.level, battery.date
+        return "offline", battery.level, battery.date
+    return "?", -99, None
