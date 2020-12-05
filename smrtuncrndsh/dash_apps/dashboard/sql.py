@@ -79,6 +79,7 @@ def get_latest_state(device):
 
 
 def get_latest_tablet_data():
+    # TODO incorperate charging state
     battery = TabletBattery.query.order_by(TabletBattery.id.desc()).first()
     if battery:
         if datetime.now() < battery.date + timedelta(minutes=30):
