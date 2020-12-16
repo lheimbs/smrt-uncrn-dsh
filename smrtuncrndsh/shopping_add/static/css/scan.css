@@ -1,3 +1,70 @@
+
 .modal#scan-pdf-form {
-    background-color: var(--background-card);
+    background-color: var(--background-card)
+}
+.modal#show-pdf-form-outer-container {
+    background-color:var(--background-card);
+    max-width:unset;
+    padding: 10px;
+}
+
+.show-pdf-items-table-row td.items-item {
+    width: unset;
+}
+.show-pdf-items-table-row td.items-price {
+    max-width: 75px;
+}
+.show-pdf-items-table-row td.items-amount {
+    max-width: 75px;
+}
+.show-pdf-items-table-row td.items-volume {
+    max-width: 75px;
+}
+.show-pdf-items-table-row td.items-ppv {
+    max-width: 75px;
+}
+.show-pdf-items-table-row td.items-remove {
+    max-width: 75px;
+}
+.show-pdf-items-table-row td.items-sale {
+    max-width: 70px;
+}
+.show-pdf-items-table-row td.items-sale input {
+    margin: 0;
+}
+ul.show-pdf-shops, ul.show-pdf-sums {
+    text-decoration: none;
+    padding-left: 0;
+}
+ul.show-pdf-shops li {
+    display: flex;
+}
+ul.show-pdf-sums li {
+    display: inline;
+}
+.sums-radio-label {
+    display: inline-flex;
+}
+
+ul.show-pdf-shops li input {
+    margin: 0 10px 0 10px;
+}
+.show-pdf-form-inner-container {
+    display: flex;
+    /* width: 90vw; */
+}
+#receipt-pdf {
+    width: 35vw;
+}
+#add-pdf-form {
+    width: 65vw;
+}
+#add-pdf-form .text-centered {
+    align-content: center;
+    display: flex;
+    text-align: center;
+    justify-content: center;
+}
+.add-table input[type=radio] {
+    width: unset !important;
 }
