@@ -62,6 +62,27 @@ def register_dash(app):
     register_dash_app(app, shopping(), 'activation_required')
 
 
+def protect_folders(app):
+    # TODO: also protect individual users files - currently other users can access all files
+    import os
+    from smrtuncrndsh import get_base_dir
+    from smrtuncrndsh.auth import activation_required
+    from flask import redirect, url_for, send_from_directory
+
+    @app.route('/static/upload/<path:filename>')
+    @activation_required
+    def serve_uploads(filename):
+        app.logger.debug(f"Accessing '{filename}'.")
+        try:
+            return send_from_directory(
+                os.path.join(get_base_dir(), app.config['UPLOAD_FOLDER']),
+                filename
+            )
+        except:
+            app.logger.exception("Can't send file!")
+            return redirect(url_for('home'))
+
+
 def create_app():
     """Construct core Flask application with embedded Dash app."""
     app = Flask(__name__, instance_relative_config=False)
@@ -99,6 +120,7 @@ def create_app():
         )
         register_blueprints(app)
         register_dash(app)
+        protect_folders(app)
 
         return app
 
