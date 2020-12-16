@@ -1,92 +1,85 @@
 #!/usr/bin/env python3
 from sqlalchemy.ext.associationproxy import association_proxy
+from sqlalchemy import func
 
 from . import db, BaseMixin
 
 
-class Liste(db.Model, BaseMixin):
-    __tablename__ = 'liste'
+class Category(db.Model, BaseMixin):
+    __tablename__ = 'category'
 
     id = db.Column(db.Integer, primary_key=True)
-    date = db.Column(db.Date, nullable=False)
-    price = db.Column(db.Float, nullable=False)
+    name = db.Column(db.String, nullable=False, unique=True)
 
-    user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
-    shop_id = db.Column(db.Integer, db.ForeignKey('shop.id'), nullable=False)
-    category_id = db.Column(db.Integer, db.ForeignKey('category.id'))
-
-    user = db.relationship('User', backref='lists')
-    shop = db.relationship('Shop', backref='lists')
-    category = db.relationship('Category', backref='lists')
-
-    items = association_proxy('liste_items', 'item')
-
-    def __init__(self, date, price, shop, category=None):
-        self.date = date
-        self.price = price
-        self.shop = shop
-        self.category = category
-
-    def __repr__(self):
-        return (
-            f"<Liste(id={self.id}, "
-            f"user={self.user}, "
-            f"date={self.date}, "
-            f"price={self.price}, "
-            f"shop='{self.shop}', "
-            f"category='{self.category}', "
-            f"items={[item.name for item in self.items]})>"
-        )
+    def to_dict(self):
+        return {
+            'name': self.name,
+        }
 
     def to_ajax(self):
         return {
             'edit': '',
             'delete': '',
             'id': self.id,
-            'user': self.user.name if self.user else '-',
-            'date': self.date,
-            'price': self.price,
-            'shop': self.shop.name if self.shop else '-',
-            'category': self.category.name if self.category else '-',
-            'items': [item.name for item in self.items],
+            'name': self.name,
         }
+
+    def __repr__(self):
+        return f"<Category(id={self.id}, name='{self.name}')>"
+
+    def get_category(category: str):
+        return Category.query.filter(func.lower(Category.name) == category.lower()).first()
+
+    def exists(self):
+        return db.session.query(Category.query.filter_by(
+            name=self.name,
+        ).exists()).scalar()
+
+
+class Shop(db.Model, BaseMixin):
+    __tablename__ = 'shop'
+
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String, nullable=False, unique=True)
+    category_id = db.Column(db.Integer, db.ForeignKey('category.id'))
+    # category_name = db.Column(db.String, db.ForeignKey('category.name'))
+    category = db.relationship('Category', backref='shops')
 
     def to_dict(self):
         return {
-            'id': self.id,
-            'user': self.user,
-            'date': self.date,
-            'price': self.price,
-            'shop': self.shop.to_dict(),
+            'name': self.name,
             'category': self.category.to_dict() if self.category else self.category,
-            'items': [item.to_dict() for item in self.items],
         }
 
+    def to_ajax(self):
+        return {
+            'edit': '',
+            'delete': '',
+            'id': self.id,
+            'name': self.name,
+            'category': self.category.name if self.category else '-',
+        }
 
-class ListeItem(db.Model, BaseMixin):
-    __tablename__ = 'liste_item'
-
-    id = db.Column(db.Integer, primary_key=True)
-    liste_id = db.Column(db.Integer, db.ForeignKey('liste.id'))  # , primary_key=True)
-    item_id = db.Column(db.Integer, db.ForeignKey('item.id'))  # , primary_key=True)
-    special_key = db.Column(db.String(50))
-
-    # bidirectional attribute/collection of "liste"/"liste_items"
-    liste = db.relationship(
-        Liste,
-        backref=db.backref(
-            "liste_items",
-            cascade="all, delete-orphan"
+    def __repr__(self):
+        return (
+            f"<Shop(id={self.id}, "
+            f"name='{self.name}', "
+            f"category='{self.category}')>"
         )
-    )
 
-    # reference to the "Keyword" object
-    item = db.relationship("Item", backref='lists')
+    def get_shop(shop: str, category_name: str = "", category_obj: Category = None):
+        shop_query = Shop.query.filter(func.lower(Shop.name) == shop.lower())
+        if category_name:
+            shop_query = shop_query.join(Shop.category).filter(func.lower(Category.name) == category_name.lower())
+        elif category_obj:
+            shop_query = shop_query.join(Shop.category).filter(Shop.category == category_obj)
+        return shop_query.all()
 
-    def __init__(self, item=None, liste=None, special_key=None):
-        self.liste = liste
-        self.item = item
-        self.special_key = special_key
+    def exists(self):
+        return db.session.query(Shop.query.filter_by(
+            name=self.name,
+            category_id=self.category_id,
+        ).exists()).scalar()
 
 
 class Item(db.Model, BaseMixin):
@@ -174,68 +167,109 @@ class Item(db.Model, BaseMixin):
             category_id=self.category_id,
         ).exists()).scalar()
 
+    def get_item(
+        name: str,
+        price: float,
+        volume: str = "",
+        price_per_volume: str = "",
+        sale: bool = False,
+        category_name: str = "",
+        category_obj: Category = None
+    ):
+        item_query = Item.query.filter(func.lower(Item.name) == name.lower()).filter(Item.price == price)
+        if volume:
+            item_query = item_query.filter(Item.volume == volume)
+        if price_per_volume:
+            item_query = item_query.filter(Item.price_per_volume == price_per_volume)
+        if sale:
+            item_query = item_query.filter(Item.sale == sale)
+        if category_name:
+            item_query = item_query.join(Item.category).filter(func.lower(Category.name) == category_name.lower())
+        elif category_obj:
+            item_query = item_query.join(Item.category).filter(Item.category == category_obj)
+        return item_query.all()
 
-class Shop(db.Model, BaseMixin):
-    __tablename__ = 'shop'
+
+class Liste(db.Model, BaseMixin):
+    __tablename__ = 'liste'
 
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String, nullable=False, unique=True)
+    date = db.Column(db.Date, nullable=False)
+    price = db.Column(db.Float, nullable=False)
+
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
+    shop_id = db.Column(db.Integer, db.ForeignKey('shop.id'), nullable=False)
     category_id = db.Column(db.Integer, db.ForeignKey('category.id'))
-    # category_name = db.Column(db.String, db.ForeignKey('category.name'))
-    category = db.relationship('Category', backref='shops')
 
-    def to_dict(self):
-        return {
-            'name': self.name,
-            'category': self.category.to_dict() if self.category else self.category,
-        }
+    user = db.relationship('User', backref='lists')
+    shop = db.relationship('Shop', backref='lists')
+    category = db.relationship('Category', backref='lists')
 
-    def to_ajax(self):
-        return {
-            'edit': '',
-            'delete': '',
-            'id': self.id,
-            'name': self.name,
-            'category': self.category.name if self.category else '-',
-        }
+    items = association_proxy('liste_items', 'item')
+
+    def __init__(self, date, price, shop, category=None):
+        self.date = date
+        self.price = price
+        self.shop = shop
+        self.category = category
 
     def __repr__(self):
         return (
-            f"<Shop(id={self.id}, "
-            f"name='{self.name}', "
-            f"category='{self.category}')>"
+            f"<Liste(id={self.id}, "
+            f"user={self.user}, "
+            f"date={self.date}, "
+            f"price={self.price}, "
+            f"shop='{self.shop}', "
+            f"category='{self.category}', "
+            f"items={[item.name for item in self.items]})>"
         )
-
-    def exists(self):
-        return db.session.query(Shop.query.filter_by(
-            name=self.name,
-            category_id=self.category_id,
-        ).exists()).scalar()
-
-
-class Category(db.Model, BaseMixin):
-    __tablename__ = 'category'
-
-    id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String, nullable=False, unique=True)
-
-    def to_dict(self):
-        return {
-            'name': self.name,
-        }
 
     def to_ajax(self):
         return {
             'edit': '',
             'delete': '',
             'id': self.id,
-            'name': self.name,
+            'user': self.user.name if self.user else '-',
+            'date': self.date,
+            'price': self.price,
+            'shop': self.shop.name if self.shop else '-',
+            'category': self.category.name if self.category else '-',
+            'items': [item.name for item in self.items],
         }
 
-    def __repr__(self):
-        return f"<Category(id={self.id}, name='{self.name}')>"
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'user': self.user,
+            'date': self.date,
+            'price': self.price,
+            'shop': self.shop.to_dict(),
+            'category': self.category.to_dict() if self.category else self.category,
+            'items': [item.to_dict() for item in self.items],
+        }
 
-    def exists(self):
-        return db.session.query(Category.query.filter_by(
-            name=self.name,
-        ).exists()).scalar()
+
+class ListeItem(db.Model, BaseMixin):
+    __tablename__ = 'liste_item'
+
+    id = db.Column(db.Integer, primary_key=True)
+    liste_id = db.Column(db.Integer, db.ForeignKey('liste.id'))  # , primary_key=True)
+    item_id = db.Column(db.Integer, db.ForeignKey('item.id'))  # , primary_key=True)
+    special_key = db.Column(db.String(50))
+
+    # bidirectional attribute/collection of "liste"/"liste_items"
+    liste = db.relationship(
+        Liste,
+        backref=db.backref(
+            "liste_items",
+            cascade="all, delete-orphan"
+        )
+    )
+
+    # reference to the "Keyword" object
+    item = db.relationship("Item", backref='lists')
+
+    def __init__(self, item=None, liste=None, special_key=None):
+        self.liste = liste
+        self.item = item
+        self.special_key = special_key
