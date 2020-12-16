@@ -1,0 +1,126 @@
+<div id="show-pdf-form-outer-container">
+    <div class="show-pdf-flashes"></div>
+    <div class="show-pdf-form-inner-container">
+        <form id="add-pdf-form" method="POST">
+            {{ form.csrf_token }}
+
+            <table class="add-table" cellspacing="0" cellpadding="0">
+                {#% for field in form if field.widget.input_type != 'hidden' %#}
+                <tr>
+                    <td>{{ form.date.label }}</td>
+                    <td><fieldset class="{{ form.date.type }}">
+                        {{ form.date }}
+                        {% if form.date.errors %}<ul class="errors">{% for error in form.date.errors %}<li>{{ error }}</li>{% endfor %}</ul>{% endif %}
+                    </fieldset></td>
+                </tr>
+                <tr>
+                    <td>{{ form.sums.label }}</td>
+                    <td>
+                        <fieldset class="{{ form.sums.type }}">
+                            {% for subfield in form.sums %}
+                                <label class="sums-radio-label">{{ subfield }}{{ subfield.label.text }}</label>
+                            {% endfor %}
+                            {% if form.sums.errors %}<ul class="errors">{% for error in form.sums.errors %}<li>{{ error }}</li>{% endfor %}</ul>{% endif %}
+                        </fieldset>
+                        <fieldset class="{{ form.price.type }}">
+                            {{ form.price(placeholder="Enter price here if none of the above are correct...") }}
+                            {% if form.price.errors %}<ul class="errors">{% for error in form.price.errors %}<li>{{ error }}</li>{% endfor %}</ul>{% endif %}
+                        </fieldset>
+                    </td>
+                </tr>
+                <tr>
+                    <td>{{ form.category.label }}</td>
+                    <td><fieldset class="{{ form.date.type }}">
+                        {{ form.category }}
+                        {% if form.category.errors %}<ul class="errors">{% for error in form.category.errors %}<li>{{ error }}</li>{% endfor %}</ul>{% endif %}
+                    </fieldset></td>
+                </tr>
+                {% if form.user %}
+                <tr>
+                    <td>{{ form.user.label }}</td>
+                    <td><fieldset class="{{ form.user.type }}">
+                        {{ form.user }}
+                        {% if form.user.errors %}<ul class="errors">{% for error in form.user.errors %}<li>{{ error }}</li>{% endfor %}</ul>{% endif %}
+                    </fieldset></td>
+                </tr>
+                {% endif %}
+                <tr>
+                    <td>{{ form.shops.label }}</td>
+                    
+                    <td class="table-data-relative">
+                        <fieldset class="{{ form.shops.type }}">
+
+                            <table id="show-pdf-shops-table">
+                                <thead><tr><td>Name</td><td>Category</td><td>Remove</td></tr></thead>
+                                <tbody>
+                                    {% for subfield in form.shops %}
+                                    <tr>
+                                        <td>{{ subfield.shop }}</td>
+                                        <td>{{ subfield.category }}</td>
+                                        <td>
+                                            <a class="btn-remove-pdf text-centered" class=""><span class="material-icons">delete</span></a>
+                                            {{ subfield.csrf_token }}
+                                        </td>
+                                    </tr>
+
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                            {# {{ shop.form.category(class='is-hidden', placeholder="Category name") }} #}
+                            {% if form.shops.errors %}<ul class="errors">{% for error in form.shops.errors %}<li>{{ error }}</li>{% endfor %}</ul>{% endif %}
+
+                        </fieldset>
+                        <a id="btn-add-shopping-category" class="is-hidden">Add Category <span class="material-icons">add</span></a>
+                    </td>
+                </tr>
+
+                <tr>
+                    <td>{{ form.items.label }}</td>
+                    
+                    <td class="table-data-relative">
+                        <fieldset class="{{ form.items.type }}">
+                            <table id="show-pdf-items-table">
+                                <thead><tr class="show-pdf-items-table-row">
+                                        <td class="items-item">Item</td>
+                                        <td class="items-price">Item price</td>
+                                        {# <td class="items-total">Total price</td> #}
+                                        <td class="items-amount">Amount</td>
+                                        <td class="items-volume">Volume</td>
+                                        <td class="items-ppv">Price per volume</td>
+                                        <td class="items-sale">Sale</td>
+                                        <td class="items-remove">Remove</td>
+                                </tr></thead>
+                                <tbody>
+                                    {% for subfield in form.items %}
+                                    {{ subfield.csrf_token }}
+                                    <tr class="show-pdf-items-table-row">
+                                        <td class="items-item">{{ subfield.item }}</td>
+                                        <td class="items-price">{{ subfield.price_per_piece }}</td>
+                                        {# <td class="items-total">{{ subfield.total_price }}</td> #}
+                                        <td class="items-amount">{{ subfield.amount }}</td>
+                                        <td class="items-volume">{{ subfield.volume }}</td>
+                                        <td class="items-ppv">{{ subfield.ppv }}</td>
+                                        <td class="items-sale">{{ subfield.sale }}</td>
+                                        <td><a class="btn-remove-pdf text-centered" class=""><span class="material-icons">delete</span></a></td>
+                                    </tr>
+                                    {% endfor %}
+
+                                    <tr>
+                                        <td></td><td></td><td></td><td></td><td></td><td></td>
+                                        <td><a class="btn-add-pdf-item text-centered" class=""><span class="material-icons">add</span></a></td></tr>
+                                </tbody>
+                            </table>
+                            {% if form.items.errors %}<ul class="errors">{% for error in form.items.errors %}<li>{{ error }}</li>{% endfor %}</ul>{% endif %}
+                        </fieldset>
+                        <a id="btn-add-shopping-category" class="is-hidden">Add Category <span class="material-icons">add</span></a>
+                    </td>
+                </tr>
+            </table>
+            <div class="shopping submit-button sticky">
+                <input class="material-icons" type="submit" value="send"/>
+                <button type="button" class="clear-receipt-form material-icons">clear</button>
+            </div>
+        </form>
+        <object id="receipt-pdf" data="{{ url_for('static', filename=pdf_filename) }}" type="application/pdf"></object>
+    </div>
+</div>
