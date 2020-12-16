@@ -9,6 +9,7 @@ instance/
 Jupyter/
 *.db-journal
 db_to_sqlalchemy.py
+smrtuncrndsh/static/upload
 
 # ignore generated web assets
 .webassets-cache/
