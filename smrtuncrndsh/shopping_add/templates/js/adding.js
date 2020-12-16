@@ -38,7 +38,7 @@ $(function() {
             maxShownResults: 100,
             valueProperty: ['id', 'name'],
             selectionRequired: true,
-            visibleProperties: ["name", "price", "volume", "price_per_volume", "sale"],//
+            visibleProperties: ["name", "price", "volume", "price_per_volume", "sale"],
             searchIn: 'name',
             searchContain: true,
             requestType: 'POST',
@@ -54,7 +54,7 @@ $(function() {
         maxShownResults: 100,
         valueProperty: ['id', 'name'],
         selectionRequired: true,
-        visibleProperties: ["name", "price", "volume", "price_per_volume", "sale"],//
+        visibleProperties: ["name", "price", "volume", "price_per_volume", "sale"],
         searchIn: 'name',
         searchContain: true,
         requestType: 'POST',
@@ -213,8 +213,7 @@ $(function() {
 
 // Remove a modal's html after closing
 $(document).on($.modal.AFTER_CLOSE, function(event, modal) {
-    $('#add-new-item-form').remove();
-    $('#scan-pdf-form').remove();
+    modal.elm[0].remove();
 });
 
 $(document).on('focus', 'input', function() {
