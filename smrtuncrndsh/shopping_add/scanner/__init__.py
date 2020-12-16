@@ -1,21 +1,24 @@
+import os
 import re
 import dateutil
-from datetime import datetime
 from difflib import get_close_matches
 from fuzzywuzzy import process, utils
 
-from sqlalchemy import func
-from flask import flash, request, redirect, url_for, render_template, jsonify
-# from werkzeug.utils import secure_filename
-# from flask_uploads import UploadSet, IMAGES, PDFS
-
 from pdftotext import PDF
+from sqlalchemy import func
+from flask import flash, request, redirect, render_template, current_app, render_template_string, Markup
+from flask_login import current_user
+from werkzeug.utils import secure_filename
+from wtforms.ext.sqlalchemy.fields import QuerySelectField
 
-from ...models.Shopping import Item, Shop, Category
+from smrtuncrndsh import get_base_dir
 from .. import shopping_add_bp
 from ..forms import PdfForm, ReceiptForm
+from ...models.Shopping import Item, Shop, Category, Liste
+from ...models.Users import User
 
 ALLOWED_EXTENSIONS = {'pdf', 'png', 'jpg', 'jpeg'}
+BASE_DIR = get_base_dir()
 
 
 def allowed_file(filename):
@@ -23,63 +26,153 @@ def allowed_file(filename):
            filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
 
+def clear_upload():
+    upload_dir = os.path.join(BASE_DIR, current_app.config['UPLOAD_FOLDER'])
+    for file in os.listdir(upload_dir):
+        file_path = os.path.join(upload_dir, file)
+        if os.path.isdir(file_path):
+            continue
+        os.remove(file_path)
+
+
 @shopping_add_bp.route("/scan", methods=['GET', 'POST'])
 def scan_reciept():
-    result = {'status': 'success', 'text': ""}
-    pdf_form = PdfForm()
+    pdf_form = PdfForm(prefix="pdf-form")
+
+    if current_user.is_admin:
+        current_app.logger.info("User is admin! Letting admin decide who is the owner of the added Receipt.")
+
+        class AdminReceiptForm(ReceiptForm):
+            pass
+
+        AdminReceiptForm.user = QuerySelectField(
+            query_factory=lambda: User.query,
+            get_label='username',
+            allow_blank=False,
+            blank_text="Select a user",
+            description="User",
+        )
+        receipt_form = AdminReceiptForm(prefix="receipt-form")
+        # form.user = current_user
+    else:
+        receipt_form = ReceiptForm(prefix="receipt-form")
 
     if request.method == 'POST':
-        if pdf_form.validate_on_submit():
-            f = pdf_form.reciept.data
+        if pdf_form.reciept.data and pdf_form.validate_on_submit():
+            file = pdf_form.reciept.data
 
-            if f.content_type == "application/pdf":
-                pdf = PDF(f)
-                lines = [line.strip().lower() for line in pdf[0].split('\n')]
+            if file.content_type == "application/pdf":
+                # save pdf file
+                if not file.filename:
+                    flash("No file selected!", 'error')
+                    return redirect(request.url)
+                if file and allowed_file(file.filename):
+                    filename = os.path.join(current_app.config['UPLOAD_FOLDER'], secure_filename(file.filename))
+                    file.save(os.path.join(BASE_DIR, filename))
+                else:
+                    filename = ''
 
-                shop_objs = shop = get_shop(lines)
-                if shop:
-                    shop_objs = Shop.query.filter(func.lower(Shop.name) == shop.lower()).all()
-                print("Shop: ", shop, " Shop obj: ", shop_objs)
+                with open(os.path.join(BASE_DIR, filename), 'rb') as pdf_file:
+                    pdf = PDF(pdf_file)
+                lines = [line.lstrip().lower() for line in pdf[0].split('\n')]
+                del pdf
 
-                date = get_date(lines)
-                print("Date: ", date)
-                sum = get_sum(lines)
-                print("Sum:  ", sum)
+                date, sums, shop_objs, items = get_receipt_data_from_pdf(lines)
 
-                items = []
-                for i, line in enumerate(lines):
-                    if i < len(lines) - 1:
-                        item = get_item(line, lines[i + 1])
-                        if item:
-                            items.append(item)
-                            print(item)
-                
-                receipt_form = ReceiptForm()
                 receipt_form.date.data = date
-                receipt_form.price.data = sum
-                receipt_form.shop.data = 
+                receipt_form.sums.choices = [(float(sum), sum) for sum in sums]
 
-            # result['status'] = 'error'
-            return jsonify(result)
+                if shop_objs:
+                    receipt_form.shops.pop_entry()
+                for shop in shop_objs:
+                    receipt_form.shops.append_entry({'shop': shop.name, 'category': shop.category.name})
+
+                if items:
+                    receipt_form.items.pop_entry()
+                    items.append({
+                        'item': '',
+                        'price_per_piece': 0,
+                        'total_price': '',
+                        'amount': 0,
+                        'volume': '',
+                        'ppv': '',
+                    })
+                for item in items:
+                    receipt_form.items.append_entry(item)
+
+                return render_template(
+                    'show_pdf.html',
+                    title='Scan Shopping List',
+                    template='shopping-scan',
+                    form=receipt_form,
+                    pdf_filename=filename.replace("static/", ""),
+                )
+            flash("Filetype must be pdf!", 'error')
+            return redirect(request.url)
+
+        elif receipt_form.date.data and receipt_form.validate_on_submit():
+            date = receipt_form.date.data
+            summ = receipt_form.sums.data
+            price = float(receipt_form.price.data)
+            category = receipt_form.category.data
+
+            shops = receipt_form.shops.data
+            items = receipt_form.items.data
+            # filter out removed or invalid
+            items = [
+                item for item in items if item['item'] and item['amount'] and item['price_per_piece']
+            ]
+            if hasattr(receipt_form, "user") and receipt_form.user.data and current_user.is_admin:
+                user = receipt_form.user.data
+            else:
+                user = current_user
+
+            print("Date: ", date, type(date))
+            print("Sum: ", summ, type(summ))
+            print("Price: ", price, type(price))
+            print("Category: ", category, type(category))
+            print("User: ", user, type(user))
+            print("Shops: ", shops)
+            print("Items: ", items)
+
+            ret_val, list_id = save_receipt(date, summ, price, shops, items, category, user)
+            if ret_val and list_id >= 0:
+                link = render_template_string(
+                    f"<a href=\"{{{{ url_for('shopping_view_bp.edit_shopping_list', "
+                    f"id={list_id}) }}}}\">{list_id}</a>"
+                )
+                flash(Markup(f"Receipt added successfully! See it's details here: {link}"), 'success')
+            else:
+                flash("Something failed saving the receipt. Try again!", 'error')
+            return redirect(request.url)
+        else:
+            print("No form submitted!")
+            flash("No form submitted!", 'error')
     return render_template(
-        'scanner.html',
+        'load_pdf.html',
         title='Scan Shopping List',
         template='shopping-scan',
-        pdf_form=pdf_form,
+        form=pdf_form,
     )
 
 
 def get_date(lines):
-    # Matches dates like 19.08.15 and 19. 08. 2015
-    date_format = r'(?P<date>(\d{2,4}(\.\s?|[^a-zA-Z\d])\d{2}(\.\s?|[^a-zA-Z\d])(19|20)?\d\d)\s+)'
-    # parse date
+    """ Matches dates like 19.08.15 and 19. 08. 2015 WITH WHITESPACE AFTER DATE
+
+        return:
+            datetime object of first date found
+            None if no date found
+    """
+    date_format = r'(?P<date>(\d{2,4}((\.|\/|-)\s?|[^a-zA-Z\d])\d{2}((\.|\/|-)\s?|[^a-zA-Z\d])(19|20)?\d\d)\s+)'
     for line in lines:
-        m = re.match(date_format, line)
+        m = re.search(date_format, line)
         if m:
             date_str = m.group(1)
             date_str = date_str.replace(" ", "")
-            dateutil.parser.parse(date_str)
-            return datetime.strptime(date_str, "%d.%m.%Y")
+            try:
+                return dateutil.parser.parse(date_str, dayfirst=True)
+            except dateutil.parser.ParserError:
+                pass
     return None
 
 
@@ -88,19 +181,20 @@ def get_shop(lines):
         'Penny': ['penny', 'p e n n y'],
         'REWE': ['rewe', 'r e w e'],
         'Real': ['real', 'r e a l'],
-        'Netto': ['netto-online'],
-        'Aldi': ['aldi'],
+        'Netto': ['netto-online', 'netto', 'n e t t o'],
+        'Aldi': ['aldi', 'ALDI', 'a l d i', 'A L D I'],
         'Lidl': ['lidl'],
         'Edeka': ['edeka'],
     }
+    finds = []
     for market, spellings in markets.items():
         for line in lines:
             if not utils.full_process(line):
                 continue
             highest = process.extractOne(line, spellings)
-            if highest[1] > 90:
-                return market
-    return ""
+            if highest[1] >= 90:
+                finds.append(market)
+    return list(set([market.lower() for market in finds]))
 
 
 def fuzzy_find(lines, keyword):
@@ -115,6 +209,7 @@ def fuzzy_find(lines, keyword):
 def get_sum(lines):
     sum_keys = ['summe', 'gesamtbetrag', 'gesamt', 'total', 'sum', 'zwischensumme', 'bar', 'te betalen']
     sum_format = r'\d+(\.\s?|,\s?|[^a-zA-Z\d])\d{2}'
+    found_sums = []
 
     for sum_key in sum_keys:
         sum_line = fuzzy_find(lines, sum_key)
@@ -125,15 +220,18 @@ def get_sum(lines):
             # Parse the sum
             sum_float = re.search(sum_format, sum_line)
             if sum_float:
-                return sum_float.group(0)
-    return 0
+                try:
+                    found_sums.append(float(sum_float.group(0)))
+                except ValueError:
+                    pass
+    return list(set(found_sums))
 
 
 def get_item(line, next_line):
     # items regex's
-    item_format = r'(?P<item>[\w. ]+)[ ]{4,}(?P<price>[\d,]+) [ba]'
+    item_format = r'(?:\d{3,})?(?P<item>[\w. !-]+)[ ]{4,}(?P<price>[\d,]+) [ba]'
     amount_format = r'(?P<amount>\d{1,3}) stk x[ ]+(?P<amount_price>\d{1,5},?\d*)'
-    volume_format = r'(?P<volume>\d{0,3},?\d{1,4} (kg|g|mg|l|ml)) x\s+(?P<ppv>\d{1,3},\d{2} eur\/(kg|g|mg|l|ml))'
+    volume_format = r'(?P<volume>\d{0,3}(,|.)?\d{1,4} (kg|g|mg|l|ml)) x\s+(?P<ppv>\d{1,3},\d{2} eur\/(kg|g|mg|l|ml))'
 
     item_match = re.match(item_format, line)
     if item_match:
@@ -148,9 +246,147 @@ def get_item(line, next_line):
 
             if amount_match:
                 amount = int(amount_match.group('amount'))
-                amount_price = float(amount_match.group('amount_price').replace(',','.'))
+                amount_price = float(amount_match.group('amount_price').replace(',', '.'))
             elif volume_match:
                 volume = volume_match.group('volume').replace(' ', '')
                 ppv = volume_match.group('ppv').replace('eur', '€')
-        return {'name': item, 'price_per_piece': price, 'total_price': amount_price, 'amount': amount, 'volume': volume, 'ppv': ppv}
+        return {
+            'item': item.title(),
+            'price_per_piece': price,
+            'total_price': amount_price,
+            'amount': amount,
+            'volume': volume.replace(" ", '').replace('$', '').replace('€', '').replace(',', '.'),
+            'ppv': ppv.replace(" ", '').replace('$', '').replace('€', '').replace(',', '.'),
+        }
     return {}
+
+
+def handle_duplicate_items(items):
+    seen = set()
+    new_items = []
+    for item_dict in items:
+        item_tuple = tuple(item_dict.items())
+        if item_tuple not in seen:
+            seen.add(item_tuple)
+            new_items.append(item_dict)
+        else:
+            # increase amount of existing item by one
+            for item in new_items:
+                if item == item_dict:
+                    item['amount'] += 1
+    return new_items
+
+
+def get_receipt_data_from_pdf(lines):
+    date = get_date(lines)
+    # print("Date: ", date)
+    sums = get_sum(lines)
+    # print("Sums:  ", sums)
+
+    shops = get_shop(lines)
+    shop_objs = []
+    for shop in shops:
+        shop_objs += Shop.query.filter(func.lower(Shop.name) == shop.lower()).all()
+        # print("Shop: ", shop, " Shop obj: ", shop_objs)
+
+    items = []
+    for i, line in enumerate(lines):
+        if i < len(lines) - 1:
+            item = get_item(line, lines[i + 1])
+            if item:
+                items.append(item)
+                # print(item)
+    items = handle_duplicate_items(items)
+
+    return date, sums, shop_objs, items
+
+
+def get_receipt_category(category):
+    category_obj = Category.get_category(category)
+    if category and not category_obj:
+        category_obj = Category(name=category)
+        category_obj.save_to_db()
+        current_app.logger.debug(f"Created new category '{category_obj}'")
+    return category_obj
+
+
+def get_receipt_shop(shops):
+    shops = Shop.get_shop(shops[0]['shop'], category_name=shops[0]['category'])
+    if shops:
+        shop = shops[0]
+        if len(shops) > 1:
+            flash(f"Multiple shops found. Using '{shop.name}'.")
+    else:
+        category = Category.get_category(shops[0]['category'])
+        if not category:
+            category = Category(shops[0]['category'])
+            category.save_to_db()
+            current_app.logger.debug(f"Created new shop's category '{category}'")
+
+        shop = Shop(shops[0]['shop'], category=category)
+        shop.save_to_db()
+        current_app.logger.debug(f"Created new shop '{shop}'")
+    return shop
+
+
+def get_receipt_items(items):
+    items_list = []
+    for item in items:
+        volume = "" if not item['volume'] else item['volume']
+        ppv = "" if not item['ppv'] else item['ppv']
+        item_objs = Item.get_item(
+            name=item['item'],
+            price=item['price_per_piece'],
+            volume=volume,
+            price_per_volume=ppv,
+        )
+        if len(item_objs) >= 1:
+            item_obj = item_objs[0]
+        else:
+            item_obj = Item(
+                name=item['item'],
+                price=item['price_per_piece'],
+                volume=volume,
+                price_per_volume=ppv,
+                sale=item['sale'],
+            )
+            item_obj.save_to_db()
+            current_app.logger.debug(f"Created new item '{item_obj}'")
+
+        for _ in item['amount']:
+            items_list.append(item_obj)
+    return items_list
+
+
+def save_receipt(date, summ, price, shops, items, category, user):
+    ret_val, list_id = True, -1
+
+    if summ and not price:
+        price = summ
+    elif price and not summ:
+        pass
+    elif not price and not summ:
+        ret_val = False
+        flash("Please enter a price for the receipt!", 'error')
+    else:
+        ret_val = False
+        flash("Please choose either a RadioButton option OR enter the price in the input field!", 'error')
+
+    if len(shops) > 1:
+        ret_val = False
+        flash("Please leave only ONE shop, remove all other!")
+
+    if ret_val:
+        category_obj = get_receipt_category(category)
+        shop = get_receipt_shop(shops)
+        items = get_receipt_items(items)
+
+        liste = Liste(date=date, price=price, shop=shop, category=category_obj, user=user)
+        for item in items:
+            liste.items.append(item)
+
+        liste.save_to_db()
+        current_app.logger.debug(f"Created new liste '{liste}'")
+        list_id = liste.id
+
+    return ret_val, list_id
