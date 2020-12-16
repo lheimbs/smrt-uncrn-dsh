@@ -20,7 +20,7 @@ shopping_add_bp = Blueprint(
 @shopping_add_bp.route('/add', methods=['GET', 'POST'])
 def add():
     if current_user.is_admin:
-        current_app.logger.info("User is admin! Letting admin decide who is the owner of the added Recepit.")
+        current_app.logger.info("User is admin! Letting admin decide who is the owner of the added receipt.")
 
         class AddListAsAdmin(AddList):
             pass
@@ -106,15 +106,6 @@ def shopping_add_new_item():
 
             return jsonify(result)
     return render_template("item_form.html", form=form)
-
-
-# @shopping_add_bp.route('/shopping/add/scan/ebon', methods=['GET', 'POST'])
-# def shopping_add_new_item():
-#     result = {'status': 'success', 'text': ""}
-#     form = AddItem()
-
-#     if request.method == 'POST':
-#         print()
 
 
 @shopping_add_bp.route('/shopping/query/shops', methods=['GET', 'POST'])
