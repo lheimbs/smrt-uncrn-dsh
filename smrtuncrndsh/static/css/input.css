@@ -29,3 +29,14 @@ input[type="date"], focus {
     -webkit-box-shadow: none;
     -moz-box-shadow: none;
 }
+
+fieldset.RadioField {
+    display: flex;
+    justify-content: space-evenly;
+}
+
+table select {
+    width: 100%;
+}
+
+/* TODO: unify input design */
