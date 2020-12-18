@@ -1,5 +1,5 @@
 from flask import render_template, Blueprint, jsonify, abort, request, \
-    Response, current_app, flash  # , make_response, redirect
+    Response, current_app, flash, render_template_string, Markup
 from flask_login import login_required, current_user
 from wtforms.ext.sqlalchemy.fields import QuerySelectField
 
@@ -58,7 +58,11 @@ def add():
                 new_list.user = current_user
 
             new_list.save_to_db()
-            flash("Successfully saved the entered receipt!", "success")
+            link = render_template_string(
+                f"<a href=\"{{{{ url_for('shopping_view_bp.shopping_view_list', "
+                f"id={new_list.id}) }}}}\">here</a>"
+            )
+            flash(Markup(f"Successfully saved the entered receipt. See it's details {link}."), 'success')
 
     return render_template(
         'add.html',

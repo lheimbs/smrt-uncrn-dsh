@@ -34,7 +34,7 @@
     <form id="add-form" method="POST">
         {{ form.csrf_token }}
 
-        <table class="add-table" cellspacing="0" cellpadding="0">
+        <table class="add-table data_table_item" cellspacing="0" cellpadding="0">
             {#% for field in form if field.widget.input_type != 'hidden' %#}
             <tr>
                 <td>{{ form.date.label }}</td>

@@ -6,7 +6,7 @@ from fuzzywuzzy import process, utils
 
 from pdftotext import PDF
 from sqlalchemy import func
-from flask import flash, request, redirect, render_template, current_app, render_template_string, Markup
+from flask import flash, request, redirect, render_template, current_app, render_template_string, Markup, safe_join
 from flask_login import current_user
 from werkzeug.utils import secure_filename
 from wtforms.ext.sqlalchemy.fields import QuerySelectField
@@ -18,6 +18,17 @@ from ...models.Shopping import Item, Shop, Category, Liste
 from ...models.Users import User
 
 ALLOWED_EXTENSIONS = {'pdf', 'png', 'jpg', 'jpeg'}
+# capitalisation is not considered for markets
+MARKETS = {
+    'Penny': ['penny', 'p e n n y'],
+    'REWE': ['rewe', 'r e w e'],
+    'Real': ['real', 'r e a l'],
+    'Netto': ['netto-online', 'netto', 'n e t t o'],
+    'Aldi': ['aldi', 'a l d i'],
+    'Lidl': ['lidl'],
+    'Edeka': ['edeka'],
+    'Amazon': ['amazon', 'a m a z o n']
+}
 BASE_DIR = get_base_dir()
 
 
@@ -26,17 +37,49 @@ def allowed_file(filename):
            filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
 
-def clear_upload():
-    upload_dir = os.path.join(BASE_DIR, current_app.config['UPLOAD_FOLDER'])
-    for file in os.listdir(upload_dir):
-        file_path = os.path.join(upload_dir, file)
-        if os.path.isdir(file_path):
-            continue
-        os.remove(file_path)
+def clear_user_uploads():
+    upload_dir = safe_join(current_app.config['UPLOAD_FOLDER_PATH'], str(current_user.get_id()))
+    if os.path.exists(upload_dir):
+        for file in os.listdir(upload_dir):
+            file_path = os.path.join(upload_dir, file)
+            if os.path.isdir(file_path):
+                continue
+            current_app.logger.debug(f"Removing file '{file_path}' from uploads folder!")
+            os.remove(file_path)
+
+
+def save_file(file):
+    # save pdf file
+    filename = ''
+    if not file.filename:
+        flash("No file selected!", 'error')
+        return None
+    if file and allowed_file(file.filename):
+        filename = secure_filename(file.filename)
+        file_basepath = safe_join(
+            current_app.config['UPLOAD_FOLDER_PATH'],
+            str(current_user.get_id())
+        )
+        if not os.path.exists(file_basepath):
+            os.mkdir(file_basepath)
+        file_path = safe_join(
+            file_basepath,
+            filename
+        )
+        current_app.logger.debug(f"Saving file '{file_path}'.")
+        file.save(file_path)
+    else:
+        file_path = None
+    return file_path, filename
 
 
 @shopping_add_bp.route("/scan", methods=['GET', 'POST'])
 def scan_reciept():
+    # @after_this_request
+    # def remove_upload(request):
+    #     clear_upload()
+    #     return request
+
     pdf_form = PdfForm(prefix="pdf-form")
 
     if current_user.is_admin:
@@ -61,19 +104,20 @@ def scan_reciept():
         if pdf_form.reciept.data and pdf_form.validate_on_submit():
             file = pdf_form.reciept.data
 
-            if file.content_type == "application/pdf":
-                # save pdf file
-                if not file.filename:
-                    flash("No file selected!", 'error')
+            if file.mimetype == "application/pdf":
+                file_path, filename = save_file(file)
+                if not file_path:
                     return redirect(request.url)
-                if file and allowed_file(file.filename):
-                    filename = os.path.join(current_app.config['UPLOAD_FOLDER'], secure_filename(file.filename))
-                    file.save(os.path.join(BASE_DIR, filename))
-                else:
-                    filename = ''
 
-                with open(os.path.join(BASE_DIR, filename), 'rb') as pdf_file:
-                    pdf = PDF(pdf_file)
+                try:
+                    with open(file_path, 'rb') as pdf_file:
+                        pdf = PDF(pdf_file)
+                except Exception:
+                    current_app.logger.exception("Can not read file! Please make sure that the uploaded file is a valid pdf file!")
+                    flash("Can not read file! Please make sure that the uploaded file is a valid pdf file!", 'error')
+                    clear_user_uploads()
+                    return redirect(request.url)
+
                 lines = [line.lstrip().lower() for line in pdf[0].split('\n')]
                 del pdf
 
@@ -92,7 +136,7 @@ def scan_reciept():
                     items.append({
                         'item': '',
                         'price_per_piece': 0,
-                        'total_price': '',
+                        'total_price': 0,
                         'amount': 0,
                         'volume': '',
                         'ppv': '',
@@ -105,16 +149,18 @@ def scan_reciept():
                     title='Scan Shopping List',
                     template='shopping-scan',
                     form=receipt_form,
-                    pdf_filename=filename.replace("static/", ""),
+                    pdf_filename=filename,
                 )
             flash("Filetype must be pdf!", 'error')
             return redirect(request.url)
 
         elif receipt_form.date.data and receipt_form.validate_on_submit():
+            clear_user_uploads()
+
             date = receipt_form.date.data
             summ = receipt_form.sums.data
             price = float(receipt_form.price.data)
-            category = receipt_form.category.data
+            category = receipt_form.category.data if receipt_form.category.data is not None else ''
 
             shops = receipt_form.shops.data
             items = receipt_form.items.data
@@ -138,10 +184,10 @@ def scan_reciept():
             ret_val, list_id = save_receipt(date, summ, price, shops, items, category, user)
             if ret_val and list_id >= 0:
                 link = render_template_string(
-                    f"<a href=\"{{{{ url_for('shopping_view_bp.edit_shopping_list', "
-                    f"id={list_id}) }}}}\">{list_id}</a>"
+                    f"<a href=\"{{{{ url_for('shopping_view_bp.shopping_view_list', "
+                    f"id={list_id}) }}}}\">here</a>"
                 )
-                flash(Markup(f"Receipt added successfully! See it's details here: {link}"), 'success')
+                flash(Markup(f"Receipt added successfully! See it's details {link}."), 'success')
             else:
                 flash("Something failed saving the receipt. Try again!", 'error')
             return redirect(request.url)
@@ -151,7 +197,7 @@ def scan_reciept():
     return render_template(
         'load_pdf.html',
         title='Scan Shopping List',
-        template='shopping-scan',
+        template='shopping-add',
         form=pdf_form,
     )
 
@@ -177,17 +223,8 @@ def get_date(lines):
 
 
 def get_shop(lines):
-    markets = {
-        'Penny': ['penny', 'p e n n y'],
-        'REWE': ['rewe', 'r e w e'],
-        'Real': ['real', 'r e a l'],
-        'Netto': ['netto-online', 'netto', 'n e t t o'],
-        'Aldi': ['aldi', 'ALDI', 'a l d i', 'A L D I'],
-        'Lidl': ['lidl'],
-        'Edeka': ['edeka'],
-    }
     finds = []
-    for market, spellings in markets.items():
+    for market, spellings in MARKETS.items():
         for line in lines:
             if not utils.full_process(line):
                 continue
@@ -353,7 +390,7 @@ def get_receipt_items(items):
             item_obj.save_to_db()
             current_app.logger.debug(f"Created new item '{item_obj}'")
 
-        for _ in item['amount']:
+        for _ in range(item['amount']):
             items_list.append(item_obj)
     return items_list
 
@@ -381,7 +418,8 @@ def save_receipt(date, summ, price, shops, items, category, user):
         shop = get_receipt_shop(shops)
         items = get_receipt_items(items)
 
-        liste = Liste(date=date, price=price, shop=shop, category=category_obj, user=user)
+        liste = Liste(date=date, price=price, shop=shop, category=category_obj)
+        liste.user = user
         for item in items:
             liste.items.append(item)
 

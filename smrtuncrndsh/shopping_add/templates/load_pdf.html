@@ -1,32 +1,4 @@
-{% from "macros.html" import render_all_flashes %}
-{% extends "base.html" %}
 
-{% block extra_assets %}
-{% assets "flexdatalist_js" %}
-    <script type="text/javascript" src="{{ ASSET_URL }}"></script>
-{% endassets %}
-{% assets "flexdatalist_css" %}
-    <link rel="stylesheet" href="{{ ASSET_URL }}" />
-{% endassets %}
-{% assets "jquerymodal_js" %}
-    <script type="text/javascript" src="{{ ASSET_URL }}"></script>
-{% endassets %}
-{% assets "jquerymodal_css" %}
-    <link rel="stylesheet" href="{{ ASSET_URL }}" />
-{% endassets %}
-
-{# <script type="text/javascript" src="{{ url_for('shopping_add_bp.adding_js') }}"></script> #}
-<script type="text/javascript" src="{{ url_for('shopping_add_bp.scanning_js') }}"></script>
-
-{% endblock %}
-
-
-{% block content %}
-
-{{ render_all_flashes() }}
-
-{# render form #}
-<div class="card">
     <form id="scan-pdf-form" action="{{ url_for('shopping_add_bp.scan_reciept') }}" method="post" enctype="multipart/form-data">
         {{ form.csrf_token }}
         <div id="scan-form-content-container">
@@ -52,6 +24,3 @@
         </div>
         
     </form>
-</div>
-
-{% endblock %}

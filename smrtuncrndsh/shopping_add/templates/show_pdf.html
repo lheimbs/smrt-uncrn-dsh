@@ -1,10 +1,41 @@
+{% from "macros.html" import render_all_flashes %}
+{% extends "base.html" %}
+
+{% block extra_assets %}
+{% assets "flexdatalist_js" %}
+    <script type="text/javascript" src="{{ ASSET_URL }}"></script>
+{% endassets %}
+{% assets "flexdatalist_css" %}
+    <link rel="stylesheet" href="{{ ASSET_URL }}" />
+{% endassets %}
+{% assets "jquerymodal_js" %}
+    <script type="text/javascript" src="{{ ASSET_URL }}"></script>
+{% endassets %}
+{% assets "jquerymodal_css" %}
+    <link rel="stylesheet" href="{{ ASSET_URL }}" />
+{% endassets %}
+
+{# <script type="text/javascript" src="{{ url_for('shopping_add_bp.adding_js') }}"></script> #}
+<script type="text/javascript" src="{{ url_for('shopping_add_bp.scanning_js') }}"></script>
+
+{% endblock %}
+
+
+{% block content %}
+
+{{ render_all_flashes() }}
+
+{# render form #}
+<div class="card">
+
 <div id="show-pdf-form-outer-container">
     <div class="show-pdf-flashes"></div>
     <div class="show-pdf-form-inner-container">
+        <div id="add-pdf-form-container">
         <form id="add-pdf-form" method="POST">
             {{ form.csrf_token }}
 
-            <table class="add-table" cellspacing="0" cellpadding="0">
+            <table class="add-table data_table_item" cellspacing="0" cellpadding="0">
                 {#% for field in form if field.widget.input_type != 'hidden' %#}
                 <tr>
                     <td>{{ form.date.label }}</td>
@@ -50,14 +81,14 @@
                     <td class="table-data-relative">
                         <fieldset class="{{ form.shops.type }}">
 
-                            <table id="show-pdf-shops-table">
+                            <table class="data_table" id="show-pdf-shops-table">
                                 <thead><tr><td>Name</td><td>Category</td><td>Remove</td></tr></thead>
                                 <tbody>
                                     {% for subfield in form.shops %}
                                     <tr>
-                                        <td>{{ subfield.shop }}</td>
-                                        <td>{{ subfield.category }}</td>
-                                        <td>
+                                        <td data-title="Shop">{{ subfield.shop }}</td>
+                                        <td data-title="Category">{{ subfield.category }}</td>
+                                        <td data-title="Remove">
                                             <a class="btn-remove-pdf text-centered" class=""><span class="material-icons">delete</span></a>
                                             {{ subfield.csrf_token }}
                                         </td>
@@ -79,7 +110,7 @@
                     
                     <td class="table-data-relative">
                         <fieldset class="{{ form.items.type }}">
-                            <table id="show-pdf-items-table">
+                            <table class="data_table" id="show-pdf-items-table">
                                 <thead><tr class="show-pdf-items-table-row">
                                         <td class="items-item">Item</td>
                                         <td class="items-price">Item price</td>
@@ -94,19 +125,24 @@
                                     {% for subfield in form.items %}
                                     {{ subfield.csrf_token }}
                                     <tr class="show-pdf-items-table-row">
-                                        <td class="items-item">{{ subfield.item }}</td>
-                                        <td class="items-price">{{ subfield.price_per_piece }}</td>
-                                        {# <td class="items-total">{{ subfield.total_price }}</td> #}
-                                        <td class="items-amount">{{ subfield.amount }}</td>
-                                        <td class="items-volume">{{ subfield.volume }}</td>
-                                        <td class="items-ppv">{{ subfield.ppv }}</td>
-                                        <td class="items-sale">{{ subfield.sale }}</td>
-                                        <td><a class="btn-remove-pdf text-centered" class=""><span class="material-icons">delete</span></a></td>
+                                        <td data-title="Item" class="items-item">{{ subfield.item(placeholder="Name") }}</td>
+                                        <td data-title="Price" class="items-price">{{ subfield.price_per_piece(placeholder=0) }}</td>
+                                        {# <td data-title="" class="items-total">{{ subfield.total_price }}</td> #}
+                                        <td data-title="Amount" class="items-amount">{{ subfield.amount(placeholder=0) }}</td>
+                                        <td data-title="Volume" class="items-volume">{{ subfield.volume(placeholder="Volume") }}</td>
+                                        <td data-title="Price per volume" class="items-ppv">{{ subfield.ppv(placeholder="Price per volume") }}</td>
+                                        <td data-title="Sale" class="items-sale">{{ subfield.sale }}</td>
+                                        <td data-title="Remove" ><a class="btn-remove-pdf text-centered" class=""><span class="material-icons">delete</span></a></td>
                                     </tr>
                                     {% endfor %}
 
                                     <tr>
-                                        <td></td><td></td><td></td><td></td><td></td><td></td>
+                                        <td class="empty_table_data"></td>
+                                        <td class="empty_table_data"></td>
+                                        <td class="empty_table_data"></td>
+                                        <td class="empty_table_data"></td>
+                                        <td class="empty_table_data"></td>
+                                        <td class="empty_table_data"></td>
                                         <td><a class="btn-add-pdf-item text-centered" class=""><span class="material-icons">add</span></a></td></tr>
                                 </tbody>
                             </table>
@@ -121,6 +157,14 @@
                 <button type="button" class="clear-receipt-form material-icons">clear</button>
             </div>
         </form>
-        <object id="receipt-pdf" data="{{ url_for('static', filename=pdf_filename) }}" type="application/pdf"></object>
+        </div>
+        <div id="receipt-pdf-container">
+        <object id="receipt-pdf" data="{{ url_for('serve_upload', filename=pdf_filename) }}" type="application/pdf"></object>
+        </div>
     </div>
 </div>
+
+
+</div>
+
+{% endblock %}

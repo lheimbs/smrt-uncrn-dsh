@@ -8,6 +8,39 @@
     padding: 10px;
 }
 
+#receipt-pdf-container {
+    width: 35vw;
+}
+#add-pdf-form-container {
+    width: 65vw;
+}
+#receipt-pdf {
+    height: 100%;
+    width: 100%;
+}
+
+@media (max-width: 1150px) {
+    .show-pdf-form-inner-container {
+        flex-direction: column;
+    }
+    #add-pdf-form-container {
+        width: 100% !important;
+        height: 45vh;
+    }
+    #receipt-pdf-container {
+        width: 100% !important;
+        height: 35vh;
+    }
+    #add-pdf-form {
+        height: 100%;
+        overflow-y: scroll;
+    }
+    .add-table {
+        height: 100%;
+    }
+}
+
+
 .show-pdf-items-table-row td.items-item {
     width: unset;
 }
@@ -53,12 +86,6 @@ ul.show-pdf-shops li input {
     display: flex;
     /* width: 90vw; */
 }
-#receipt-pdf {
-    width: 35vw;
-}
-#add-pdf-form {
-    width: 65vw;
-}
 #add-pdf-form .text-centered {
     align-content: center;
     display: flex;
@@ -67,4 +94,30 @@ ul.show-pdf-shops li input {
 }
 .add-table input[type=radio] {
     width: unset !important;
+}
+
+@media 
+only screen and (max-width: 900px),
+(min-device-width: 808px) and (max-device-width: 1024px)  {
+    .show-pdf-items-table-row td.items-item {
+        width: unset;
+    }
+    .show-pdf-items-table-row td.items-price {
+        max-width: unset;
+    }
+    .show-pdf-items-table-row td.items-amount {
+        max-width: unset;
+    }
+    .show-pdf-items-table-row td.items-volume {
+        max-width: unset;
+    }
+    .show-pdf-items-table-row td.items-ppv {
+        max-width: unset;
+    }
+    .show-pdf-items-table-row td.items-remove {
+        max-width: unset;
+    }
+    .show-pdf-items-table-row td.items-sale {
+        max-width: unset;
+    }
 }

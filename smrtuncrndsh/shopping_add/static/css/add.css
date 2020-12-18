@@ -69,13 +69,13 @@
 
 
 @media only screen and (max-width:900px),(min-device-width:808px) and (max-device-width:1024px) {
-    td {
+    /* td {
         padding-left: initial !important;
-    }
+    } */
 
     #btn-add-shopping-category, #btn-add-new-item {
         bottom: unset;
-        top: -30px;
+        top: 20px;
         background-color: var(--background-card);
         border-radius: 3px;
     }

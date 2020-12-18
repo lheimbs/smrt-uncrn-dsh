@@ -209,6 +209,22 @@ $(function() {
             },
         });
     });
+
+    // open pdf-scan document form modal
+    $(document).on('click', '#btn-scan-pdf', function(event) {
+        event.preventDefault();
+
+        // var num = parseInt($(this).prop('id').match(/\d+/g), 10);
+        $.ajax({
+            url: $(this).attr("href"),
+            type: "GET",
+            success: function(newHTML, textStatus, jqXHR) {
+                console.log("RESPONSE:\n"+textStatus);
+                $.modal.close();
+                $(newHTML).appendTo('body').modal();
+            }
+        });
+    });
 });
 
 // Remove a modal's html after closing

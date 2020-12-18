@@ -16,19 +16,19 @@ $(function() {
     }
 
     // handle submit of receipt scan
-    $(document).on('submit', '#scan-pdf-form', function(event) {
-        event.preventDefault();
+    // $(document).on('submit', '#scan-pdf-form', function(event) {
+    //     event.preventDefault();
 
-        $.ajax({
-            url: "{{ url_for('shopping_add_bp.scan_reciept') }}",
-            type: "POST",
-            data: new FormData( this ),
-            processData: false,
-            contentType: false,
-            success: function(newHTML, textStatus, jqXHR) {
-                console.log("RESPONSE:\n"+textStatus);
-                $.modal.close();
-                $(newHTML).appendTo('body').modal();
+    //     $.ajax({
+    //         url: "{#{ url_for('shopping_add_bp.scan_reciept') }#}",
+    //         type: "POST",
+    //         data: new FormData( this ),
+    //         processData: false,
+    //         contentType: false,
+    //         success: function(newHTML, textStatus, jqXHR) {
+    //             console.log("RESPONSE:\n"+textStatus);
+    //             $.modal.close();
+    //             $(newHTML).appendTo('body').modal();
 
                 // category flexdatalist
                 var receipt_category = $("#receipt-form-category").flexdatalist({
@@ -82,16 +82,16 @@ $(function() {
                     // items.flexdatalist('value', prev_value);
                     $('#'+this.id+'-flexdatalist').val(prev_value);
                 });
-            },
-            error: function(response, textStatus, errorThrown) {
-                $.modal.close();
-                handleAjaxError(response, textStatus, errorThrown);
-            },
-            complete: function(jqXHR, textStatus) {
+        //     },
+        //     error: function(response, textStatus, errorThrown) {
+        //         $.modal.close();
+        //         handleAjaxError(response, textStatus, errorThrown);
+        //     },
+        //     complete: function(jqXHR, textStatus) {
 
-            }
-        });
-    });
+        //     }
+        // });
+    // });
 
     $(document).on('submit', '#add-pdf-form', function(event) {
         var price = $("#receipt-form-price");
