@@ -1,3 +1,11 @@
+.centered-content {
+    margin-top: 5vh;
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
+    align-items: center;
+}
+
 fieldset {
     border: 0px;
 }
@@ -15,14 +23,6 @@ form .submit-button {
 form .login-register {
     padding: 5px;
     text-align: center;
-}
-
-.form-wrapper {
-    margin-top: 5vh;
-    display: flex;
-    justify-content: center;
-    flex-direction: column;
-    align-items: center;
 }
 
 form fieldset.remember_me {
