@@ -24,6 +24,7 @@ class Config:
     STATIC_FOLDER = 'static'
     TEMPLATES_FOLDER = 'templates'
     UPLOAD_FOLDER = os.path.join(STATIC_FOLDER, os.environ.get("FLASK_APP_UPLOAD_FOLDER", "upload"))
+    MAX_CONTENT_LENGTH = 1 * 1024 * 1024  # 1MB
 
     OWM_API_KEY = os.environ.get("OWM_API_KEY", "")
 

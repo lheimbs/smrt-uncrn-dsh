@@ -2,6 +2,7 @@ import os
 import sys
 from .config import config_dict
 from smrtuncrndsh import get_base_dir
+from flask import safe_join
 
 
 def init_config(app):
@@ -18,6 +19,4 @@ def init_config(app):
     app.logger.debug(f"SQLALCHEMY_DATABASE_URI: {app.config['SQLALCHEMY_DATABASE_URI']}")
 
     BASE_DIR = get_base_dir()
-    if not os.path.exists(os.path.join(BASE_DIR, app.config['UPLOAD_FOLDER'])):
-        app.logger.debug(f"UPLOAD_FOLDER '{os.path.join(BASE_DIR, app.config['UPLOAD_FOLDER'])}' does not exist. Creating it!")
-        os.mkdir(os.path.join(BASE_DIR, app.config['UPLOAD_FOLDER']))
+    app.config['UPLOAD_FOLDER_PATH'] = safe_join(BASE_DIR, app.config['UPLOAD_FOLDER'])
