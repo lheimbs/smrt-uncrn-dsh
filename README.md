@@ -16,10 +16,13 @@ pip3 install -r requirements.txt
 
 ## TODO
  - [] make page dsgvo compliant
- - [] ngix or apache deployment w/ gunicorn?
+ - [x] ngix or apache deployment w/ gunicorn?
  - [] security [OWASP Cheat Sheet](https://cheatsheetseries.owasp.org/), [OWASP Developer Guide](https://github.com/OWASP/DevGuide), [OWASP Testing Guide](https://wiki.owasp.org/index.php/OWASP_Testing_Guide_v4_Table_of_Contents)
- - [] https
-
+ - [x] https
+ - [] max_content_length validation [uploads](https://blog.miguelgrinberg.com/post/handling-file-uploads-with-flask)
+ - [] user id in url and upload folder masken
+ - [] fix jrange not resizing (minor)
+ - [] unify input design (minor)
 
 ## License
 [GNU General Public License v3.0](/LICENSE)
