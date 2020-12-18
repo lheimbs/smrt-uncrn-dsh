@@ -1,0 +1,186 @@
+/* 
+Generic Styling, for Desktops/Laptops 
+*/
+table { 
+	width: 100%;
+	max-width: 100%;
+    border-collapse: collapse;
+    text-align: center;
+}
+/* Zebra striping */
+tr:nth-of-type(odd) { 
+	background: var(--background); 
+}
+th { 
+	background: var(--background-light); 
+	color: var(--font-foreground); 
+	font-weight: bold; 
+}
+td, th { 
+	padding: 6px; 
+	border: 1px solid var(--border-medium); 
+	text-align: left; 
+}
+
+.data-table {
+	table-layout: fixed;
+	width: 100%;
+}
+
+.data-table th, .data-table td {
+	word-wrap: break-word;
+	word-break: break-all;
+}
+
+.data-table .edit_delete_header { width: 30px; }
+.data-table .model_id { width: 62px; }
+
+.col-small { width: 60px; }
+.col-medium { width: 10%; }
+.col-large { width: 30%; }
+
+/* 
+Max width before this PARTICULAR table gets nasty
+This query will take effect for any screen smaller than 760px
+and also iPads specifically.
+*/
+@media 
+only screen and (max-width: 900px),
+(min-device-width: 808px) and (max-device-width: 1024px)  {
+	.data_table.small-title td { padding-left: 25% !important; }
+
+	.scrolling_table_x {
+		display: block;
+		overflow-x: scroll;
+		white-space: nowrap;
+	}
+
+	/* Force table to not be like tables anymore */
+	.data_table table,
+	.data_table thead,
+	.data_table tbody,
+	.data_table th,
+	.data_table td,
+	.data_table tr,
+	.data_table_item thead,
+	.data_table_item tbody,
+	.data_table_item th,
+	.data_table_item td,
+	.data_table_item tr  { 
+		display: block; 
+	}
+	
+
+	.data_table thead tr { 
+		position: absolute;
+		top: -9999px;
+		left: -9999px;
+	}
+
+	.data_table td, td.data_table { 
+		/* Behave  like a "row" */
+		border: none;
+		border-bottom: 1px solid var(--border-medium);
+		position: relative;
+		padding-left: 50%; 
+		white-space: normal;
+		text-align:left;
+		min-height: 40px;
+	}
+
+	.data_table td:before, td.data_table:before { 
+		/* Now like a table header */
+		position: absolute;
+		/* Top/left values mimic padding */
+		top: 6px;
+		left: 6px;
+		width: 45%; 
+		padding-right: 10px; 
+		white-space: nowrap;
+		text-align:left;
+		font-weight: bold;
+	}
+
+	/*
+	Label the data
+	*/
+	.data_table td:before { content: attr(data-title); }
+
+	.data_table td:last-of-type { border-bottom: 2px solid var(--border-light); }
+
+	/* hide empty rows */
+	.empty_table_data {
+		min-height: 0 !important;
+		height: 0;
+		border: unset !important;
+		padding: 0 !important;
+	}
+
+    .data-table td:nth-last-of-type(2):before { content: "Edit"; }
+    .data-table td:nth-last-of-type(1):before { content: "Delete"; }
+	.data-table td:nth-of-type(1):before { content: "Id"; }
+
+    #shopping-list-table td:nth-of-type(2):before { content: "Date"; }
+    #shopping-list-table td:nth-of-type(3):before { content: "Price"; }
+    #shopping-list-table td:nth-of-type(4):before { content: "Shop"; }
+    #shopping-list-table td:nth-of-type(5):before { content: "Category"; }
+    #shopping-list-table td:nth-of-type(6):before { content: "Owner"; }
+    #shopping-list-table td:nth-of-type(7):before { content: "Items"; }
+
+    #shopping-list-items-table td:nth-of-type(1):before { content: "Item Name"; }
+    #shopping-list-items-table td:nth-of-type(2):before { content: "Item Price"; }
+
+	#shopping-items-table td:nth-of-type(2):before { content: "Name"; }
+	#shopping-items-table td:nth-of-type(3):before { content: "Price"; }
+	#shopping-items-table td:nth-of-type(4):before { content: "Volume"; }
+	#shopping-items-table td:nth-of-type(5):before { content: "Price per volume"; }
+	#shopping-items-table td:nth-of-type(6):before { content: "Sale"; }
+	#shopping-items-table td:nth-of-type(7):before { content: "Note"; }
+	#shopping-items-table td:nth-of-type(8):before { content: "Category"; }
+
+	#shopping-shops-table td:nth-of-type(2):before { content: "Name"; }
+    #shopping-shops-table td:nth-of-type(3):before { content: "Category"; }
+
+	#shopping-categories-table td:nth-of-type(2):before { content: "Name"; }
+
+    #mqtt-table td:nth-of-type(2):before { content: "Date"; }
+    #mqtt-table td:nth-of-type(3):before { content: "Topic"; }
+    #mqtt-table td:nth-of-type(4):before { content: "Payload"; }
+    #mqtt-table td:nth-of-type(5):before { content: "QOS"; }
+	#mqtt-table td:nth-of-type(6):before { content: "Retain"; }
+	
+    #probe-request-table td:nth-of-type(2):before { content: "Date"; }
+    #probe-request-table td:nth-of-type(3):before { content: "Mac-Address"; }
+    #probe-request-table td:nth-of-type(4):before { content: "Make"; }
+    #probe-request-table td:nth-of-type(5):before { content: "ssid"; }
+	#probe-request-table td:nth-of-type(6):before { content: "rssi"; }
+
+    #rf-data-table td:nth-of-type(2):before { content: "Date"; }
+    #rf-data-table td:nth-of-type(3):before { content: "Decimal"; }
+    #rf-data-table td:nth-of-type(4):before { content: "Bits"; }
+    #rf-data-table td:nth-of-type(5):before { content: "Binary"; }
+	#rf-data-table td:nth-of-type(6):before { content: "Pulse Length"; }
+	#rf-data-table td:nth-of-type(7):before { content: "Protocol"; }
+
+	#state-table td:nth-of-type(2):before { content: "Date"; }
+	#state-table td:nth-of-type(3):before { content: "Device"; }
+    #state-table td:nth-of-type(4):before { content: "State"; }
+
+    #room-data-table td:nth-of-type(2):before { content: "Date"; }
+    #room-data-table td:nth-of-type(3):before { content: "Temperature"; }
+    #room-data-table td:nth-of-type(4):before { content: "Humidity"; }
+    #room-data-table td:nth-of-type(5):before { content: "Pressure"; }
+	#room-data-table td:nth-of-type(6):before { content: "Brightness"; }
+	#room-data-table td:nth-of-type(7):before { content: "Altitude"; }
+
+    #tablet-battery-table td:nth-of-type(2):before { content: "Date"; }
+	#tablet-battery-table td:nth-of-type(3):before { content: "Level"; }
+
+	#shopping-view-list-table td:nth-of-type(1):before { content: "Date" }
+	#shopping-view-list-table td:nth-of-type(2):before { content: "Price" }
+	#shopping-view-list-table td:nth-of-type(3):before { content: "Shop" }
+	#shopping-view-list-table td:nth-of-type(4):before { content: "Category" }
+	#shopping-view-list-table td:nth-of-type(5):before { content: "Items" }
+	#shopping-view-list-table td:nth-of-type(6):before { content: "Edit" }
+	#shopping-view-list-table td:nth-of-type(7):before { content: "Remove" }
+}
