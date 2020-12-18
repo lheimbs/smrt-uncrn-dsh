@@ -19,11 +19,6 @@
     flex: 1;
 }
 
-
-table select {
-    width: 100%;
-}
-
 form .shopping.submit-button {
     display: flex;
     justify-content: space-around;

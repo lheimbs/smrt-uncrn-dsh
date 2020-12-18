@@ -5,11 +5,9 @@
 {% include "adminbar.html" %}
 <div class="card">
     {{ render_all_flashes() }}
-    <table class="users-table">
+    <table class="users-table data_table">
         <thead>
             <tr>
-                <th>Edit</th>
-                <th>Delete</th>
                 <th>Name</th>
                 <th>Email</th>
                 <th>Username</th>
@@ -17,24 +15,26 @@
                 <th>Last Login</th>
                 <th>Is Admin</th>
                 <th>Is Activated</th>
+                <th>Edit</th>
+                <th>Delete</th>
             </tr>
         </thead>
         <tbody id="table-users-data">
             {% for user in all_users %}
             <tr>
-                <td class="link">
+                <td data-title="Name">{{ user.name }}</td>
+                <td data-title="E-Mail">{{ user.email }}</td>
+                <td data-title="Username">{{ user.username }}</td>
+                <td data-title="Created on">{{ user.created_on.strftime('%d.%m.%Y %H:%M:%S') if user.created_on else '-' }}</td>
+                <td data-title="Last login">{{ user.last_login.strftime('%d.%m.%Y %H:%M:%S') if user.last_login else '-' }}</td>
+                <td data-title="Is Admin">{{ user.is_admin }}</td>
+                <td data-title="Is Activated">{{ user.is_activated }}</td>
+                <td class="link" data-title="Edit">
                     <a href="{{ url_for('admin_bp.edit_user', username=user.username) }}" class="material-icons">edit</a>
                 </td>
-                <td class="link">
+                <td class="link" data-title="Delete">
                     <a href="{{ url_for('admin_bp.delete_user', username=user.username) }}" class="material-icons">delete_forever</a>
                 </td>
-                <td>{{ user.name }}</td>
-                <td>{{ user.email }}</td>
-                <td>{{ user.username }}</td>
-                <td>{{ user.created_on.strftime('%d.%m.%Y %H:%M:%S') if user.created_on else '-' }}</td>
-                <td>{{ user.last_login.strftime('%d.%m.%Y %H:%M:%S') if user.last_login else '-' }}</td>
-                <td>{{ user.is_admin }}</td>
-                <td>{{ user.is_activated }}</td>
             </tr>
             {% endfor %}
         </tbody>

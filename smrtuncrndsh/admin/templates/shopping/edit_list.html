@@ -14,118 +14,115 @@
 {% include "adminbar.html" %}
 
 <div class="card">
-    <div class="form-wrapper">
+    {{ render_all_flashes() }}
 
-        {{ render_all_flashes() }}
+    <h3>Edit Shopping Liste {{ liste.id }}</h3>
 
-        <h3>Edit Shopping Liste {{ liste.id }}</h3>
+    <form id="list-edit-form" method="POST" action="{{ url_for('admin_bp.edit_shopping_list', id=liste.id) }}">
+        {{ form.csrf_token }}
+        {{ form.test }}
 
-        <form id="list-edit-form" method="POST" action="{{ url_for('admin_bp.edit_shopping_list', id=liste.id) }}">
-            {{ form.csrf_token }}
-            {{ form.test }}
-
-            <table class="admin-table" cellspacing="0" cellpadding="0">
-                <tr>
-                    <td>Date</td>
-                    <td>
-                        <fieldset class="date">
-                            {{ form.date }}
-                            {% if form.date.errors %}
-                            <ul class="errors">
-                                {% for error in form.date.errors %}
-                                    <li>{{ error }}</li>
-                                {% endfor %}
-                            </ul>
-                            {% endif %}
-                        </fieldset>
-                    </td>
-                </tr>
-                <tr>
-                    <td>Price</td>
-                    <td>
-                        <fieldset class="price">
-                            {{ form.price }}
-                            {% if form.price.errors %}
-                            <ul class="errors">
-                                {% for error in form.price.errors %}
-                                    <li>{{ error }}</li>
-                                {% endfor %}
-                            </ul>
-                            {% endif %}
-                        </fieldset>
-                    </td>
-                </tr>
-                <tr>
-                    <td>Shop</td>
-                    <td>
-                        <fieldset class="shop">
-                            {{ form.shop(class="js-example-basic-single") }}
-                            {% if form.shop.errors %}
-                              <ul class="errors">
-                                {% for error in form.shop.errors %}
-                                    <li>{{ error }}</li>
-                                {% endfor %}
-                              </ul>
-                            {% endif %}
-                        </fieldset>
-                    </td>
-                </tr>
-                <tr>
-                    <td>Category</td>
-                    <td>
-                        <fieldset class="category">
-                            {{ form.category(class="js-example-basic-single") }}
-                            {% if form.category.errors %}
-                              <ul class="errors">
-                                {% for error in form.category.errors %}
-                                    <li>{{ error }}</li>
-                                {% endfor %}
-                              </ul>
-                            {% endif %}
-                        </fieldset>
-                    </td>
-                </tr>
-                <tr>
-                    <td>User</td>
-                    <td>
-                        <fieldset class="user">
-                            {{ form.user(class="js-example-basic-single") }}
-                            {% if form.user.errors %}
-                              <ul class="errors">
-                                {% for error in form.user.errors %}
-                                    <li>{{ error }}</li>
-                                {% endfor %}
-                              </ul>
-                            {% endif %}
-                        </fieldset>
-                    </td>
-                </tr>
-                <tr>
-                    <td>Items</td>
-                    <td>
-                        <fieldset class="items">
-                            {{ form.items_obj(class="select-items-multi-chosen", multiple="multiple") }}
-                            {% if form.items_obj.errors %}
-                              <ul class="errors">
-                                {% for error in form.items_obj.errors %}
-                                    <li>{{ error }}</li>
-                                {% endfor %}
-                              </ul>
-                            {% endif %}
-                            {% for id, amount in multiples.items() %}
-                              <span class="multi-items-amount" value="{{ id }}" style="display: none;">{{ amount }}</span>
+        <table class="admin-table data_table_item" cellspacing="0" cellpadding="0">
+            <tr>
+                <td>Date</td>
+                <td>
+                    <fieldset class="date">
+                        {{ form.date }}
+                        {% if form.date.errors %}
+                        <ul class="errors">
+                            {% for error in form.date.errors %}
+                                <li>{{ error }}</li>
                             {% endfor %}
-                        </fieldset>
-                    </td>
-                </tr>
-            </table>
-            <div class="shopping submit-button">
-                <input class="material-icons" type="submit" value="send"/>
-                <a class="material-icons" href="{{ url_for('admin_bp.delete_shopping_list', id=liste.id) }}">delete</a>
-                <a class="material-icons" href="{{ url_for('admin_bp.new_shopping_list') }}">add_circle</a>
-            </div>
-        </form>
-    </div>
+                        </ul>
+                        {% endif %}
+                    </fieldset>
+                </td>
+            </tr>
+            <tr>
+                <td>Price</td>
+                <td>
+                    <fieldset class="price">
+                        {{ form.price }}
+                        {% if form.price.errors %}
+                        <ul class="errors">
+                            {% for error in form.price.errors %}
+                                <li>{{ error }}</li>
+                            {% endfor %}
+                        </ul>
+                        {% endif %}
+                    </fieldset>
+                </td>
+            </tr>
+            <tr>
+                <td>Shop</td>
+                <td>
+                    <fieldset class="shop">
+                        {{ form.shop(class="js-example-basic-single") }}
+                        {% if form.shop.errors %}
+                            <ul class="errors">
+                            {% for error in form.shop.errors %}
+                                <li>{{ error }}</li>
+                            {% endfor %}
+                            </ul>
+                        {% endif %}
+                    </fieldset>
+                </td>
+            </tr>
+            <tr>
+                <td>Category</td>
+                <td>
+                    <fieldset class="category">
+                        {{ form.category(class="js-example-basic-single") }}
+                        {% if form.category.errors %}
+                            <ul class="errors">
+                            {% for error in form.category.errors %}
+                                <li>{{ error }}</li>
+                            {% endfor %}
+                            </ul>
+                        {% endif %}
+                    </fieldset>
+                </td>
+            </tr>
+            <tr>
+                <td>User</td>
+                <td>
+                    <fieldset class="user">
+                        {{ form.user(class="js-example-basic-single") }}
+                        {% if form.user.errors %}
+                            <ul class="errors">
+                            {% for error in form.user.errors %}
+                                <li>{{ error }}</li>
+                            {% endfor %}
+                            </ul>
+                        {% endif %}
+                    </fieldset>
+                </td>
+            </tr>
+            <tr>
+                <td>Items</td>
+                <td>
+                    <fieldset class="items">
+                        {{ form.items_obj(class="select-items-multi-chosen", multiple="multiple") }}
+                        {% if form.items_obj.errors %}
+                            <ul class="errors">
+                            {% for error in form.items_obj.errors %}
+                                <li>{{ error }}</li>
+                            {% endfor %}
+                            </ul>
+                        {% endif %}
+                        {% for id, amount in multiples.items() %}
+                            <span class="multi-items-amount" value="{{ id }}" style="display: none;">{{ amount }}</span>
+                        {% endfor %}
+                    </fieldset>
+                </td>
+            </tr>
+        </table>
+        <div class="shopping submit-button">
+            <input class="material-icons" type="submit" value="send"/>
+            <a class="material-icons" href="{{ url_for('admin_bp.delete_shopping_list', id=liste.id) }}">delete</a>
+            <a class="material-icons" href="{{ url_for('admin_bp.new_shopping_list') }}">add_circle</a>
+        </div>
+    </form>
 </div>
 <div class="shopping-extra-options">
     

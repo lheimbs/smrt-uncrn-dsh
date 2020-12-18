@@ -4,96 +4,93 @@
 {% block content %}
 {% include "adminbar.html" %}
 <div class="card">
-    <div class="form-wrapper">
+    {{ render_all_flashes() }}
 
-        {{ render_all_flashes() }}
+    <h3>Edit User {{ user.username }}</h3>
 
-        <h3>Edit User {{ user.username }}</h3>
+    <form id="user-edit-form" method="POST" action="{{ url_for('admin_bp.edit_user', username=user.username) }}">
+        {{ form.csrf_token }}
 
-        <form id="user-edit-form" method="POST" action="{{ url_for('admin_bp.edit_user', username=user.username) }}">
-            {{ form.csrf_token }}
-
-            <table class="admin-table" cellspacing="0" cellpadding="0">
-                <tr>
-                    <td>Username</td>
-                    <td>
-                        <fieldset class="username">
-                            {{ form.username }}
-                            {% if form.username.errors %}
+        <table class="admin-table" cellspacing="0" cellpadding="0">
+            <tr>
+                <td>Username</td>
+                <td>
+                    <fieldset class="username">
+                        {{ form.username }}
+                        {% if form.username.errors %}
+                        <ul class="errors">
+                            {% for error in form.username.errors %}
+                                <li>{{ error }}</li>
+                            {% endfor %}
+                        </ul>
+                        {% endif %}
+                    </fieldset>
+                </td>
+            </tr>
+            <tr>
+                <td>Name</td>
+                <td>
+                    <fieldset class="name">
+                        {{ form.name }}
+                        {% if form.name.errors %}
+                        <ul class="errors">
+                            {% for error in form.name.errors %}
+                                <li>{{ error }}</li>
+                            {% endfor %}
+                        </ul>
+                        {% endif %}
+                    </fieldset>
+                </td>
+            </tr>
+            <tr>
+                <td>Email</td>
+                <td>
+                    <fieldset class="email">
+                        {{ form.email }}
+                        {% if form.email.errors %}
                             <ul class="errors">
-                                {% for error in form.username.errors %}
-                                    <li>{{ error }}</li>
-                                {% endfor %}
+                            {% for error in form.email.errors %}
+                                <li>{{ error }}</li>
+                            {% endfor %}
                             </ul>
-                            {% endif %}
-                        </fieldset>
-                    </td>
-                </tr>
-                <tr>
-                    <td>Name</td>
-                    <td>
-                        <fieldset class="name">
-                            {{ form.name }}
-                            {% if form.name.errors %}
+                        {% endif %}
+                    </fieldset>
+                </td>
+            </tr>
+            <tr>
+                <td>User is Admin</td>
+                <td>
+                    <fieldset class="is_admin">
+                        {{ form.is_admin }}
+                        {% if form.is_admin.errors %}
                             <ul class="errors">
-                                {% for error in form.name.errors %}
-                                    <li>{{ error }}</li>
-                                {% endfor %}
+                            {% for error in form.is_admin.errors %}
+                                <li>{{ error }}</li>
+                            {% endfor %}
                             </ul>
-                            {% endif %}
-                        </fieldset>
-                    </td>
-                </tr>
-                <tr>
-                    <td>Email</td>
-                    <td>
-                        <fieldset class="email">
-                            {{ form.email }}
-                            {% if form.email.errors %}
-                              <ul class="errors">
-                                {% for error in form.email.errors %}
-                                    <li>{{ error }}</li>
-                                {% endfor %}
-                              </ul>
-                            {% endif %}
-                        </fieldset>
-                    </td>
-                </tr>
-                <tr>
-                    <td>User is Admin</td>
-                    <td>
-                        <fieldset class="is_admin">
-                            {{ form.is_admin }}
-                            {% if form.is_admin.errors %}
-                              <ul class="errors">
-                                {% for error in form.is_admin.errors %}
-                                    <li>{{ error }}</li>
-                                {% endfor %}
-                              </ul>
-                            {% endif %}
-                        </fieldset>
-                    </td>
-                </tr>
-                <tr>
-                    <td>User is Activated</td>
-                    <td>
-                        <fieldset class="is_activated">
-                            {{ form.is_activated }}
-                            {% if form.is_activated.errors %}
-                              <ul class="errors">
-                                {% for error in form.is_activated.errors %}
-                                    <li>{{ error }}</li>
-                                {% endfor %}
-                              </ul>
-                            {% endif %}
-                        </fieldset>
-                    </td>
-                </tr>
-            </table>
-            <div class="submit-button">
-                <input class="material-icons" type="submit" value="send"/>
-            </div>
-        </form>
-    </div>
+                        {% endif %}
+                    </fieldset>
+                </td>
+            </tr>
+            <tr>
+                <td>User is Activated</td>
+                <td>
+                    <fieldset class="is_activated">
+                        {{ form.is_activated }}
+                        {% if form.is_activated.errors %}
+                            <ul class="errors">
+                            {% for error in form.is_activated.errors %}
+                                <li>{{ error }}</li>
+                            {% endfor %}
+                            </ul>
+                        {% endif %}
+                    </fieldset>
+                </td>
+            </tr>
+        </table>
+        <div class="submit-button">
+            <input class="material-icons" type="submit" value="send"/>
+        </div>
+    </form>
 </div>
 {% endblock %}

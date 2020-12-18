@@ -5,38 +5,35 @@
 {% include "adminbar.html" %}
 
 <div class="card">
-    <div class="form-wrapper">
+    {{ render_all_flashes() }}
 
-        {{ render_all_flashes() }}
+    <h3>New Category</h3>
 
-        <h3>New Category</h3>
+    <form id="categort-new-form" method="POST">
+        {{ form.csrf_token }}
 
-        <form id="categort-new-form" method="POST">
-            {{ form.csrf_token }}
-
-            <table class="admin-table" cellspacing="0" cellpadding="0">
-                {% for field in form if field.widget.input_type != 'hidden' %}
-                <tr>
-                    <td>{{ field.label }}</td>
-                    <td>
-                        <fieldset class="{{ field.type }}">
-                            {{ field }}
-                            {% if field.errors %}
-                            <ul class="errors">
-                                {% for error in field.errors %}
-                                    <li>{{ error }}</li>
-                                {% endfor %}
-                            </ul>
-                            {% endif %}
-                        </fieldset>
-                    </td>
-                </tr>
-                {% endfor %}
-            </table>
-            <div class="shopping submit-button">
-                <input class="material-icons" type="submit" value="send"/>
-            </div>
-        </form>
-    </div>
+        <table class="admin-table" cellspacing="0" cellpadding="0">
+            {% for field in form if field.widget.input_type != 'hidden' %}
+            <tr>
+                <td>{{ field.label }}</td>
+                <td>
+                    <fieldset class="{{ field.type }}">
+                        {{ field }}
+                        {% if field.errors %}
+                        <ul class="errors">
+                            {% for error in field.errors %}
+                                <li>{{ error }}</li>
+                            {% endfor %}
+                        </ul>
+                        {% endif %}
+                    </fieldset>
+                </td>
+            </tr>
+            {% endfor %}
+        </table>
+        <div class="shopping submit-button">
+            <input class="material-icons" type="submit" value="send"/>
+        </div>
+    </form>
 </div>
 {% endblock %}

@@ -7,6 +7,7 @@ $(function() {
         linkedCalendars: false,
     });
 
+    // TODO: bar does not resize properly
     var min_price = getMinPrice();
     var max_price = getMaxPrice();
     $('.price-slider').jRange({
