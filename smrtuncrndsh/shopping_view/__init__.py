@@ -26,7 +26,8 @@ def before_request():
 
 @login_required
 @shopping_view_bp.route('/list/', methods=['GET', 'POST'])
-def shopping_view_list():
+@shopping_view_bp.route('/list/<int:id>', methods=['GET', 'POST'])
+def shopping_view_list(id=-1):
     return render_template(
         'list.html',
         title='Your Shopping Lists',
@@ -34,7 +35,8 @@ def shopping_view_list():
         data={
             'min_price': min_price(),
             'max_price': max_price(),
-        }
+        },
+        edit_id=id,
     )
 
 
@@ -61,7 +63,7 @@ def query_shopping_list():
 
 
 @login_required
-@shopping_view_bp.route('/list/edit/<id>', methods=['POST', 'GET'])
+@shopping_view_bp.route('/list/edit/<int:id>', methods=['POST', 'GET'])
 def edit_shopping_list(id):
     current_app.logger.debug(f"Edit shopping list View, list id: {id}")
     liste = Liste.query.filter_by(user=current_user).filter_by(id=id).scalar()
@@ -81,7 +83,7 @@ def edit_shopping_list(id):
         add_remove_items_from_liste(list_form.items_obj.data, list_form.test.data, liste)
 
         liste.db_commit()
-        return redirect(request.url)
+        return redirect(url_for('shopping_view_bp.shopping_view_list', id=liste.id))
     else:
         if list_form.errors:
             current_app.logger.debug(f"Errors: {list_form.errors}")
@@ -91,13 +93,13 @@ def edit_shopping_list(id):
         liste=liste,
         form=list_form,
         multiples=get_multiple_items(liste),
-        title='Admin Panel - Edit Shopping Liste',
-        template="admin-page",
+        title='Edit Shopping List',
+        template='shopping-view-page',
     )
 
 
 @login_required
-@shopping_view_bp.route('/list/delete/<id>', methods=['POST', 'GET'])
+@shopping_view_bp.route('/list/delete/<int:id>', methods=['POST', 'GET'])
 def delete_shopping_list(id):
     if id:
         liste = Liste.query.filter_by(user=current_user).filter_by(id=id).scalar()
@@ -113,3 +115,9 @@ def delete_shopping_list(id):
 @shopping_view_bp.route("/shopping_view_list_js")
 def shopping_view_list_js():
     return Response(render_template("/js/list_view.js"), mimetype="text/javascript")
+
+
+@login_required
+@shopping_view_bp.route("/shopping_edit_list_js")
+def shopping_edit_list_js():
+    return Response(render_template("/js/edit_list.js"), mimetype="text/javascript")

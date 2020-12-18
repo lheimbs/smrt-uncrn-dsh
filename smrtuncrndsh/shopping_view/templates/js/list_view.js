@@ -28,7 +28,7 @@ $(function() {
         setValue: Math.floor(min_price)+','+Math.ceil(max_price),
     });
 
-    var table = $("#shopping-list-table").DataTable( {
+    var table = $("#shopping-view-list-table").DataTable( {
         "processing": true,
         "serverSide": true,
         "autoWidth": false,
@@ -42,6 +42,7 @@ $(function() {
             {
                 "data": "date",
                 "render": $.fn.dataTable.render.text(),
+                "data-title": "Date",
             },
             {
                 "data": "price",
@@ -64,7 +65,7 @@ $(function() {
                 "orderable": false,
                 fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {
                     {% set url = url_for('shopping_view_bp.edit_shopping_list', id='0') %}
-                    $(nTd).html("<a href='{{ url }}"+oData.id+"' class='material-icons'>edit</a>");
+                    $(nTd).html("<a href='{{ url }}"+oData.id+"' class='material-icons edit-user-list' id='"+oData.id+"' rel='ajax:modal'>edit</a>");
                 },
             },
             {
@@ -80,8 +81,37 @@ $(function() {
     });
 
     register_search(table);
+
+    if (parseInt($('#edit-instead-of-view').text(), 10) > -1) {
+        {% set url = url_for('shopping_view_bp.edit_shopping_list', id='0') %}
+        $.ajax({
+            url: '{{ url }}' + parseInt($('#edit-instead-of-view').text(), 10),
+            type: "GET",
+            data: '',
+            success: function(newHTML, textStatus, jqXHR) {
+                console.log("RESPONSE:\n"+textStatus);
+                $.modal.close();
+                $(newHTML).appendTo('body').modal();
+                $(".multi-items-amount").each(function() {
+                    var val=$( this ).attr("value");
+                    var amount=$( this ).text();
+                    console.log("Add id '"+val+"' "+amount+"x to options");
+                    for (var i = 1; i < amount; i++) { 
+                        $("#items_obj option[value='"+val+"']").first().clone().appendTo("#items_obj");
+                    }
+                });
+                $(".select-items-multi-chosen").chosen();
+            }
+        });
+    }
 });
 
+
+
+// Remove a modal's html after closing
+$(document).on($.modal.AFTER_CLOSE, function(event, modal) {
+    modal.elm[0].remove();
+});
 
 var csrf_token = "{{ csrf_token() }}";
 $.ajaxSetup({
@@ -92,3 +122,24 @@ $.ajaxSetup({
     },
     error: handleAjaxError,
 });
+
+function handleAjaxError(response, textStatus, errorThrown) {
+    console.debug("ajax setup, error");
+    console.debug("RESPONSE: ", response, "STATUS: ", textStatus, "ERROR: ", errorThrown);
+    // Handle AJAX errors
+    if (response.status==0) {
+        makeFlashMessage('error', 'You are offline! Please Check Your Network.');
+    } else if(response.status==404) {
+        makeFlashMessage('error', 'Requested URL not found.');
+    } else if(response.status==500) {
+        makeFlashMessage('error', 'Internal Server Error.');
+    } else if(textStatus=='parsererror') {
+        makeFlashMessage('error', 'Parsing JSON Request failed.');
+    } else if(textStatus=='timeout'){
+        makeFlashMessage('error', 'Request Time out.');
+    } else if(response.responseJSON=="The CSRF token has expired."){
+        makeFlashMessage('error', "The CSRF token has expired. Please refresh the page.");
+    } else {
+        makeFlashMessage('error', 'Unknow Error: '+errorThrown);
+    }
+}
