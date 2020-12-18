@@ -11,7 +11,7 @@ def compile_assets(app):
     css = Bundle(
         'css/*.css', 'css/dash/*.css',
         'home_bp/css/*.css', 'admin_bp/css/*.css', 'auth_bp/css/*.css',
-        'shopping_add_bp/css/*.css',
+        'shopping_add_bp/css/*.css', 'shopping_view_bp/css/*.css',
         filters='cssmin', output='gen/packed.css'
     )
     jquery = Bundle(
