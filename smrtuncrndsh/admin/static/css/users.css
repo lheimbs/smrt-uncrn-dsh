@@ -1,59 +1,26 @@
-div.users-table-grid .table-header, .table-content{
-    display: grid;
-    grid-template-columns: 50px 50px 1fr 3fr 1fr 2fr 2fr 100px 100px;
-    border-top: 1px solid var(--border-medium);
-    border-right: 1px solid var(--border-medium);
-}
-
-div.users-table-grid > span {
-    padding: 8px 4px;
-    border-left: 1px solid var(--border-medium);
-    border-bottom: 1px solid var(--border-medium);
+.users-table td.link a, td.link {
     text-align: center;
 }
 
-td.link a {
-    color: var(--font-foreground);
+.users-extra-options {
+    display: flex;
+    justify-content: space-evenly;
+}
+
+.users-table thead th {
+    word-wrap: break-word;
+    word-break: break-all;
+}
+.users-table tbody td {
+    word-wrap: break-word;
+    word-break: break-word;
+}
+
+table.users-activate-table > td, th {
     text-align: center;
-    /* padding: 14px 16px; */
-    text-decoration: none;
-}
-td.link {
-    text-align: center;
 }
 
-@media 
-only screen and (max-width: 900px),
-(min-device-width: 808px) and (max-device-width: 1024px)  {
-	/*
-	Label the data
-	*/
-	.users-table td:nth-of-type(1):before { content: "Edit"; }
-	.users-table td:nth-of-type(2):before { content: "Delete"; }
-	.users-table td:nth-of-type(3):before { content: "Name"; }
-	.users-table td:nth-of-type(4):before { content: "Email"; }
-	.users-table td:nth-of-type(5):before { content: "Username"; }
-	.users-table td:nth-of-type(6):before { content: "Created On"; }
-	.users-table td:nth-of-type(7):before { content: "Last Login"; }
-	.users-table td:nth-of-type(8):before { content: "Is Admin"; }
-	.users-table td:nth-of-type(9):before { content: "Is Activated"; }
-}
-
-.admin-table table {
-    border: none;
-}
-
-.admin-table tr:nth-of-type(2n+1) {
-    background: unset;
-}
-
-.admin-table td, th {
-    padding: 6px;
-    border: none;
-    text-align: left;
-}
-
-input[type=submit] {
+.users-table input[type=submit], .users-activate-table input[type=submit] {
     margin: 10px 0;
     width: 50%;
 }
@@ -61,12 +28,7 @@ input[type=submit] {
 @media 
 only screen and (max-width: 900px),
 (min-device-width: 808px) and (max-device-width: 1024px)  {
-
-    .admin-table tr { border: none; }
-    .admin-table td, th { text-align: center };
-}
-
-.users-extra-options {
-    display: flex;
-    justify-content: space-evenly;
+    .users-table td.link a, td.link {
+        text-align: left;
+    }
 }
