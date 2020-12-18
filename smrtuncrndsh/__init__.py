@@ -6,6 +6,7 @@ from flask import Flask
 from flask_migrate import Migrate
 from flask_wtf.csrf import CSRFProtect
 from flask_talisman import Talisman
+from werkzeug.exceptions import NotFound
 
 csrf = CSRFProtect()
 talisman = Talisman()
@@ -64,23 +65,24 @@ def register_dash(app):
 
 def protect_folders(app):
     # TODO: also protect individual users files - currently other users can access all files
-    import os
-    from smrtuncrndsh import get_base_dir
     from smrtuncrndsh.auth import activation_required
-    from flask import redirect, url_for, send_from_directory
+    from flask import send_from_directory, safe_join
 
     @app.route('/static/upload/<path:filename>')
     @activation_required
-    def serve_uploads(filename):
-        app.logger.debug(f"Accessing '{filename}'.")
-        try:
-            return send_from_directory(
-                os.path.join(get_base_dir(), app.config['UPLOAD_FOLDER']),
-                filename
-            )
-        except:
-            app.logger.exception("Can't send file!")
-            return redirect(url_for('home'))
+    def serve_upload(filename):
+        from flask_login import current_user
+
+        app.logger.debug(f"File '{filename}' requested.")
+        # try:
+        return send_from_directory(
+            safe_join(app.config['UPLOAD_FOLDER_PATH'], str(current_user.get_id())),
+            filename
+        )
+        # except NotFound:
+        #     app.logger.exception("Can't find file!")
+        #     flash("Could not find file.", 'error')
+        #     return redirect(request.url)
 
 
 def create_app():
