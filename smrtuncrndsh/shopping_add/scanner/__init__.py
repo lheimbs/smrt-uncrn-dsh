@@ -114,7 +114,9 @@ def scan_reciept():
                     with open(file_path, 'rb') as pdf_file:
                         pdf = PDF(pdf_file)
                 except Exception:
-                    current_app.logger.exception("Can not read file! Please make sure that the uploaded file is a valid pdf file!")
+                    current_app.logger.exception(
+                        "Can not read file! Please make sure that the uploaded file is a valid pdf file!"
+                    )
                     flash("Can not read file! Please make sure that the uploaded file is a valid pdf file!", 'error')
                     clear_user_uploads()
                     return redirect(request.url)
@@ -122,10 +124,18 @@ def scan_reciept():
                 lines = [line.lstrip().lower() for line in pdf[0].split('\n')]
                 del pdf
 
-                date, sums, shop_objs, items = get_receipt_data_from_pdf(lines)
+                dates, sums, shop_objs, items = get_receipt_data_from_pdf(lines)
 
-                receipt_form.date.data = date
-                receipt_form.sums.choices = [(float(sum), sum) for sum in sums]
+                if len(dates) == 1:
+                    receipt_form.date.data = dates[1]
+                else:
+                    receipt_form.dates.choices = [
+                        (str(date.strftime("%d.%m.%Y")), date.strftime("%d.%m.%Y")) for date in dates
+                    ]
+                if len(sums) == 1:
+                    receipt_form.price.data = sums[0]
+                else:
+                    receipt_form.sums.choices = [(float(sum), sum) for sum in sums]
 
                 if shop_objs:
                     receipt_form.shops.pop_entry()
@@ -155,10 +165,11 @@ def scan_reciept():
             flash("Filetype must be pdf!", 'error')
             return redirect(request.url)
 
-        elif receipt_form.date.data and receipt_form.validate_on_submit():
+        elif receipt_form.user.data and receipt_form.validate_on_submit():
             clear_user_uploads()
 
             date = receipt_form.date.data
+            dates = receipt_form.dates.data
             summ = receipt_form.sums.data
             price = float(receipt_form.price.data)
             category = receipt_form.category.data if receipt_form.category.data is not None else ''
@@ -174,15 +185,7 @@ def scan_reciept():
             else:
                 user = current_user
 
-            print("Date: ", date, type(date))
-            print("Sum: ", summ, type(summ))
-            print("Price: ", price, type(price))
-            print("Category: ", category, type(category))
-            print("User: ", user, type(user))
-            print("Shops: ", shops)
-            print("Items: ", items)
-
-            ret_val, list_id = save_receipt(date, summ, price, shops, items, category, user)
+            ret_val, list_id = save_receipt(date, dates, summ, price, shops, items, category, user)
             if ret_val and list_id >= 0:
                 link = render_template_string(
                     f"<a href=\"{{{{ url_for('shopping_view_bp.shopping_view_list', "
@@ -193,8 +196,11 @@ def scan_reciept():
                 flash("Something failed saving the receipt. Try again!", 'error')
             return redirect(url_for('shopping_add_bp.add'))
         else:
-            print("No form submitted!")
-            flash("No form submitted!", 'error')
+            current_app.logger.debug("No form submitted or both weren't verified!")
+            # flash("No form submitted!", 'error')
+            if receipt_form.errors:
+                current_app.logger.debug(f"Errors: {receipt_form.errors}")
+            return redirect(url_for('.add'))
     return render_template(
         'load_pdf.html',
         title='Scan Shopping List',
@@ -203,13 +209,14 @@ def scan_reciept():
     )
 
 
-def get_date(lines):
+def get_dates(lines):
     """ Matches dates like 19.08.15 and 19. 08. 2015 WITH WHITESPACE AFTER DATE
 
         return:
-            datetime object of first date found
-            None if no date found
+            list of unique date objects
+            empty list if no dates found
     """
+    dates_found = []
     date_format = r'(?P<date>(\d{2,4}((\.|\/|-)\s?|[^a-zA-Z\d])\d{2}((\.|\/|-)\s?|[^a-zA-Z\d])(19|20)?\d\d)\s+)'
     for line in lines:
         m = re.search(date_format, line)
@@ -217,10 +224,10 @@ def get_date(lines):
             date_str = m.group(1)
             date_str = date_str.replace(" ", "")
             try:
-                return dateutil.parser.parse(date_str, dayfirst=True)
+                dates_found.append(dateutil.parser.parse(date_str, dayfirst=True))
             except dateutil.parser.ParserError:
                 pass
-    return None
+    return list(set(dates_found))
 
 
 def get_shop(lines):
@@ -316,16 +323,13 @@ def handle_duplicate_items(items):
 
 
 def get_receipt_data_from_pdf(lines):
-    date = get_date(lines)
-    # print("Date: ", date)
+    dates = get_dates(lines)
     sums = get_sum(lines)
-    # print("Sums:  ", sums)
 
     shops = get_shop(lines)
     shop_objs = []
     for shop in shops:
         shop_objs += Shop.query.filter(func.lower(Shop.name) == shop.lower()).all()
-        # print("Shop: ", shop, " Shop obj: ", shop_objs)
 
     items = []
     for i, line in enumerate(lines):
@@ -333,10 +337,9 @@ def get_receipt_data_from_pdf(lines):
             item = get_item(line, lines[i + 1])
             if item:
                 items.append(item)
-                # print(item)
     items = handle_duplicate_items(items)
 
-    return date, sums, shop_objs, items
+    return dates, sums, shop_objs, items
 
 
 def get_receipt_category(category):
@@ -396,19 +399,26 @@ def get_receipt_items(items):
     return items_list
 
 
-def save_receipt(date, summ, price, shops, items, category, user):
+def save_receipt(date, dates, summ, price, shops, items, category, user):
     ret_val, list_id = True, -1
 
     if summ and not price:
         price = summ
-    elif price and not summ:
-        pass
     elif not price and not summ:
         ret_val = False
         flash("Please enter a price for the receipt!", 'error')
     else:
         ret_val = False
-        flash("Please choose either a RadioButton option OR enter the price in the input field!", 'error')
+        flash("Please choose either a RadioButton price option OR enter the price in the input field!", 'error')
+
+    if dates and not date:
+        date = dates
+    elif not dates and not date:
+        ret_val = False
+        flash("Please enter a date for the receipt!", 'error')
+    else:
+        ret_val = False
+        flash("Please choose either a RadioButton date option OR enter the date in the input field!", 'error')
 
     if len(shops) > 1:
         ret_val = False

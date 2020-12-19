@@ -1,3 +1,5 @@
+import dateutil
+
 from flask_wtf import FlaskForm
 from wtforms.fields.html5 import DateField, DecimalField, IntegerField
 from wtforms import TextField, FieldList, FormField, BooleanField, RadioField
@@ -54,10 +56,16 @@ class ShopSelectForm(FlaskForm):
     category = TextField("Category")
 
 
+def parse_date_string(date):
+    return dateutil.parser.parse(date, dayfirst=True)
+
+
 class ReceiptForm(FlaskForm):
-    date = DateField("Date", validators=[DataRequired()])
-    sums = RadioField("Prices", coerce=float, validate_choice=False)
+    date = DateField("Date", validators=[Optional()])
+    dates = RadioField("Dates", coerce=parse_date_string, validate_choice=False)
     price = DecimalField("Price", validators=[Optional()])
+    sums = RadioField("Prices", coerce=float, validate_choice=False)
+
     category = TextField("Category")
     shops = FieldList(
         FormField(ShopSelectForm),
