@@ -1,4 +1,4 @@
-from flask import render_template, jsonify
+from flask import render_template
 from flask_wtf.csrf import CSRFError
 
 
@@ -16,6 +16,14 @@ def register_handlers(app):
         ), 400
         # return jsonify(error.description), 400
 
+    @app.errorhandler(401)
+    def unauthorized(*args, **kwargs):
+        # do stuff
+        return render_template(
+            "errors/error.html", title="Error 401", error_code="401",
+            error_msg="Fuck, you sadly don't have access to this :'("
+        ), 403
+
     @app.errorhandler(403)
     def forbidden_page(*args, **kwargs):
         # do stuff
@@ -29,7 +37,7 @@ def register_handlers(app):
         # do stuff
         return render_template(
             "errors/error.html", title="Error 404", error_code="404",
-            error_msg="Damn, this page does not seem to exist :/"
+            error_msg="Damn, this page or w/e does not seem to exist :/"
         ), 404
 
     @app.errorhandler(410)
@@ -48,10 +56,10 @@ def register_handlers(app):
             error_msg="Yikes, this one is on me. I must have fucked up the programming or something :("
         ), 500
 
-    @app.errorhandler(500)
+    @app.errorhandler(501)
     def server_error_not_implemented(*args, **kwargs):
         # do stuff
         return render_template(
-            "errors/error.html", title="Error 500", error_code="500",
+            "errors/error.html", title="Error 501", error_code="501",
             error_msg="Ugh, it seem like I forgot to implement something...Sorryyyyyy"
-        ), 500
+        ), 501
