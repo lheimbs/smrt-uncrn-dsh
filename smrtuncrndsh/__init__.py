@@ -6,7 +6,6 @@ from flask import Flask
 from flask_migrate import Migrate
 from flask_wtf.csrf import CSRFProtect
 from flask_talisman import Talisman
-from werkzeug.exceptions import NotFound
 
 csrf = CSRFProtect()
 talisman = Talisman()
