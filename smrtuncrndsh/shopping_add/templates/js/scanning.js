@@ -15,83 +15,59 @@ $(function() {
         });
     }
 
-    // handle submit of receipt scan
-    // $(document).on('submit', '#scan-pdf-form', function(event) {
-    //     event.preventDefault();
+    // category flexdatalist
+    var receipt_category = $("#receipt-form-category").flexdatalist({
+        url: "{{ url_for('shopping_add_bp.query_categories') }}",
+        minLength: 0,
+        // maxShownResults: 100,
+        valueProperty: 'name',
+        selectionRequired: false,
+        visibleProperties: "name",
+        searchIn: 'name',
+        searchContain: true,
+        requestType: 'POST',
+        requestContentType: 'json',
+        cache: false,
+    });
+    $("#add-pdf-form input[name^=receipt-form-shops-][name$=-category]").each(function( index ) {
+        $(this).flexdatalist({
+            url: "{{ url_for('shopping_add_bp.query_categories') }}",
+            minLength: 0,
+            // maxShownResults: 100,
+            valueProperty: 'name',
+            selectionRequired: false,
+            visibleProperties: "name",
+            searchIn: 'name',
+            searchContain: true,
+            requestType: 'POST',
+            requestContentType: 'json',
+            cache: false,
+        });
+    });
+    $("#add-pdf-form input[name^=receipt-form-shops-][name$=-shop]").each(function( index ) {
+        $(this).flexdatalist({
+            url: "{{ url_for('shopping_add_bp.query_shops') }}",
+            minLength: 0,
+            // maxShownResults: 100,
+            valueProperty: 'name',
+            selectionRequired: false,
+            visibleProperties: "name",
+            searchIn: 'name',
+            searchContain: true,
+            requestType: 'POST',
+            requestContentType: 'json',
+            cache: false,
+        });
+    });
 
-    //     $.ajax({
-    //         url: "{#{ url_for('shopping_add_bp.scan_reciept') }#}",
-    //         type: "POST",
-    //         data: new FormData( this ),
-    //         processData: false,
-    //         contentType: false,
-    //         success: function(newHTML, textStatus, jqXHR) {
-    //             console.log("RESPONSE:\n"+textStatus);
-    //             $.modal.close();
-    //             $(newHTML).appendTo('body').modal();
-
-                // category flexdatalist
-                var receipt_category = $("#receipt-form-category").flexdatalist({
-                    url: "{{ url_for('shopping_add_bp.query_categories') }}",
-                    minLength: 0,
-                    // maxShownResults: 100,
-                    valueProperty: 'name',
-                    selectionRequired: false,
-                    visibleProperties: "name",
-                    searchIn: 'name',
-                    searchContain: true,
-                    requestType: 'POST',
-                    requestContentType: 'json',
-                    cache: false,
-                });
-                $("#add-pdf-form input[name^=receipt-form-shops-][name$=-category]").each(function( index ) {
-                    $(this).flexdatalist({
-                        url: "{{ url_for('shopping_add_bp.query_categories') }}",
-                        minLength: 0,
-                        // maxShownResults: 100,
-                        valueProperty: 'name',
-                        selectionRequired: false,
-                        visibleProperties: "name",
-                        searchIn: 'name',
-                        searchContain: true,
-                        requestType: 'POST',
-                        requestContentType: 'json',
-                        cache: false,
-                    });
-                });
-                $("#add-pdf-form input[name^=receipt-form-shops-][name$=-shop]").each(function( index ) {
-                    $(this).flexdatalist({
-                        url: "{{ url_for('shopping_add_bp.query_shops') }}",
-                        minLength: 0,
-                        // maxShownResults: 100,
-                        valueProperty: 'name',
-                        selectionRequired: false,
-                        visibleProperties: "name",
-                        searchIn: 'name',
-                        searchContain: true,
-                        requestType: 'POST',
-                        requestContentType: 'json',
-                        cache: false,
-                    });
-                });
-                $("#add-pdf-form input[name^=receipt-form-items-][name$=-item]").each(function( index ) {
-                    var prev_value = $(this).val();
-                    // console.log(prev_value);
-                    var items = load_items_fdl($(this));
-                    // items.flexdatalist(prev_value, prev_value);
-                    // items.flexdatalist('value', prev_value);
-                    $('#'+this.id+'-flexdatalist').val(prev_value);
-                });
-        //     },
-        //     error: function(response, textStatus, errorThrown) {
-        //         $.modal.close();
-        //         handleAjaxError(response, textStatus, errorThrown);
-        //     },
-        //     complete: function(jqXHR, textStatus) {
-
-        //     }
-        // });
-    // });
+    $("#add-pdf-form input[name^=receipt-form-items-][name$=-item]").each(function( index ) {
+        var prev_value = $(this).val();
+        // console.log(prev_value);
+        var items = load_items_fdl($(this));
+        // items.flexdatalist(prev_value, prev_value);
+        // items.flexdatalist('value', prev_value);
+        $('#'+this.id+'-flexdatalist').val(prev_value);
+    });
 
     $(document).on('submit', '#add-pdf-form', function(event) {
         var price = $("#receipt-form-price");
@@ -110,6 +86,18 @@ $(function() {
         if ($('input[name^=receipt-form-shops-][name$=-shop]').length > 1) {
             event.preventDefault();
             makeFlashMessage('info', "Too many shop options. Please remove all other shops so that only one remains.", "show-pdf-flashes");
+        }
+
+        var date = $("#receipt-form-date");
+        console.debug(Date.parse(date.val()));
+        console.debug($("input[name=receipt-form-dates]:checked").length);
+        if (!$("input[name=receipt-form-dates]:checked").length && !$("#receipt-form-date").val()) {
+            event.preventDefault();
+            makeFlashMessage('info', "Date missing! Please select a date for the receipt from the options or enter one manually.", "show-pdf-flashes");
+        }
+        if ($("input[name=receipt-form-dates]:checked").length && $("#receipt-form-date").val()) {
+            event.preventDefault();
+            makeFlashMessage('info', "Duplicate dates! Please either select a date for the receipt from the options or enter one manually.", "show-pdf-flashes");
         }
     });
 

@@ -39,10 +39,23 @@
                 {#% for field in form if field.widget.input_type != 'hidden' %#}
                 <tr>
                     <td>{{ form.date.label }}</td>
-                    <td><fieldset class="{{ form.date.type }}">
-                        {{ form.date }}
-                        {% if form.date.errors %}<ul class="errors">{% for error in form.date.errors %}<li>{{ error }}</li>{% endfor %}</ul>{% endif %}
-                    </fieldset></td>
+                    <td>
+                        <fieldset class="{{ form.dates.type }}">
+                            {% for subfield in form.dates %}
+                                <label class="sums-radio-label">{{ subfield }}{{ subfield.label.text }}</label>
+                            {% endfor %}
+                            {% if form.dates.errors %}<ul class="errors">{% for error in form.dates.errors %}<li>{{ error }}</li>{% endfor %}</ul>{% endif %}
+                        </fieldset>
+                        <fieldset class="{{ form.date.type }}">
+                            {{ form.date(placeholder="Enter date here if none of the above are correct...") }}
+                            {% if form.date.errors %}<ul class="errors">{% for error in form.date.errors %}<li>{{ error }}</li>{% endfor %}</ul>{% endif %}
+                        </fieldset>
+                    
+                        {# <fieldset class="{{ form.date.type }}">
+                            {{ form.date }}
+                            {% if form.date.errors %}<ul class="errors">{% for error in form.date.errors %}<li>{{ error }}</li>{% endfor %}</ul>{% endif %}
+                        </fieldset> #}
+                    </td>
                 </tr>
                 <tr>
                     <td>{{ form.sums.label }}</td>
