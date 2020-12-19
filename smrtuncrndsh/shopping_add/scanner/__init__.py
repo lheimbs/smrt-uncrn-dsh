@@ -6,7 +6,8 @@ from fuzzywuzzy import process, utils
 
 from pdftotext import PDF
 from sqlalchemy import func
-from flask import flash, request, redirect, render_template, current_app, render_template_string, Markup, safe_join
+from flask import flash, request, redirect, render_template, current_app, \
+    render_template_string, Markup, safe_join, url_for
 from flask_login import current_user
 from werkzeug.utils import secure_filename
 from wtforms.ext.sqlalchemy.fields import QuerySelectField
@@ -190,7 +191,7 @@ def scan_reciept():
                 flash(Markup(f"Receipt added successfully! See it's details {link}."), 'success')
             else:
                 flash("Something failed saving the receipt. Try again!", 'error')
-            return redirect(request.url)
+            return redirect(url_for('shopping_add_bp.add'))
         else:
             print("No form submitted!")
             flash("No form submitted!", 'error')
