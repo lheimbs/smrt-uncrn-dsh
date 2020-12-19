@@ -1,5 +1,5 @@
 from flask import Blueprint, current_app, render_template, request, \
-    redirect, flash, url_for, jsonify, make_response, Response
+    redirect, flash, url_for, jsonify, make_response, Response, abort
 
 from flask_login import login_required, current_user
 
@@ -66,7 +66,19 @@ def query_shopping_list():
 @shopping_view_bp.route('/list/edit/<int:id>', methods=['POST', 'GET'])
 def edit_shopping_list(id):
     current_app.logger.debug(f"Edit shopping list View, list id: {id}")
-    liste = Liste.query.filter_by(user=current_user).filter_by(id=id).scalar()
+    liste = Liste.query.filter_by(id=id)
+    if not liste:
+        current_app.logger.warning(f"Resource unavailable. Liste with id {id} does not exist!")
+        # flash("Not found. Something must have gone wrong.", 'error')
+        abort(404)
+
+    liste = liste.filter_by(user=current_user).scalar()
+    if not liste:
+        current_app.logger.warning(
+            f"Access denied. User {current_user.get_id()} does have access to this shopping list"
+        )
+        # flash("Access denied. You do not have access to this shopping list!", 'error')
+        abort(401, "You do not have access to this shopping list!")
 
     list_form = ListForm(obj=liste)
     list_form.items_obj.data = [item for item in liste.items]
