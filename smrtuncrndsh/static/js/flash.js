@@ -5,6 +5,8 @@ function makeFlashMessage(type, message, flashclass = "flashes") {
         .append($("<i>").addClass("close-flash material-icons").text("close"));
 
     $(new_message).appendTo("."+flashclass);
+
+    $('main').animate({ scrollTop: (0) }, 'fast');
 }
 
 function makeAddItemFlashMessage(type, message) {

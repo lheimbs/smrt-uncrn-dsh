@@ -233,7 +233,7 @@ $(document).on($.modal.AFTER_CLOSE, function(event, modal) {
 });
 
 $(document).on('focus', 'input', function() {
-    $('html, body').animate({
+    $('main').animate({
         scrollTop: $(this).offset().top + 'px'
     }, 'fast');
 });
