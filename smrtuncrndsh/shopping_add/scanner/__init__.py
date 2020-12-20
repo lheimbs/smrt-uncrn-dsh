@@ -276,7 +276,7 @@ def get_sum(lines):
 
 def get_item(line, next_line):
     # items regex's
-    item_format = r'(?:\d{3,})?(?P<item>[\w. !-]+)[ ]{4,}(?P<price>[\d,]+) [ba]'
+    item_format = r'(?:\d{3,})?(?P<item>[\w. !%,-]+)[ ]{4,}(?P<price>-?[\d,]+) [ba]'
     amount_format = r'(?P<amount>\d{1,3}) stk x[ ]+(?P<amount_price>\d{1,5},?\d*)'
     volume_format = r'(?P<volume>\d{0,3}(,|.)?\d{1,4} (kg|g|mg|l|ml)) x\s+(?P<ppv>\d{1,3},\d{2} eur\/(kg|g|mg|l|ml))'
 
