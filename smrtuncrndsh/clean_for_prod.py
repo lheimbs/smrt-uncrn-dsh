@@ -17,19 +17,19 @@ def clean_for_prod():
                 print(f"opening {file}")
                 with open(file_path, 'r') as file:
                     lines = file.readlines()
-                    change = False
-                    for line in lines:
-                        if "// LIBRARY FILE" in line:
-                            print(f"Skipping '{file_path}' due to library file!")
-                            break
-                        if "console.log(" in line:
-                            change = True
-                            line = line.replace("console.log(", "// console.log(")
-                            print(line)
-                        if "console.debug(" in line:
-                            change = True
-                            line = line.replace("console.debug(", "// console.debug(")
-                            print(line)
+                change = False
+                for line in lines:
+                    if "// LIBRARY FILE" in line:
+                        print(f"Skipping '{file_path}' due to library file!")
+                        break
+                    if "console.log(" in line:
+                        change = True
+                        line = line.replace("console.log(", "// console.log(")
+                        print(line)
+                    if "console.debug(" in line:
+                        change = True
+                        line = line.replace("console.debug(", "// console.debug(")
+                        print(line)
                 with open(file_path, 'w') as file:
                     if change and lines:
                         file.writelines(lines)
