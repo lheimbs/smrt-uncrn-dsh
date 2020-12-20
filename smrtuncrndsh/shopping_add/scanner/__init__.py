@@ -156,13 +156,13 @@ def scan_reciept():
             else:
                 user = current_user
 
-            ret_val, list_id = save_receipt(date, dates, summ, price, shops, items, category, user)
+            ret_val, list_id, list_date = save_receipt(date, dates, summ, price, shops, items, category, user)
             if ret_val and list_id >= 0:
                 link = render_template_string(
                     f"<a href=\"{{{{ url_for('shopping_view_bp.shopping_view_list', "
                     f"id={list_id}) }}}}\">here</a>"
                 )
-                flash(Markup(f"Receipt added successfully! See it's details {link}."), 'success')
+                flash(Markup(f"Receipt from {list_date} added successfully! See it's details {link}."), 'success')
             else:
                 flash("Something failed saving the receipt. Try again!", 'error')
             return redirect(url_for('shopping_add_bp.add'))
@@ -183,9 +183,10 @@ def scan_reciept():
 def populate_receipt_form(receipt_form, dates, sums, shop_objs, items):
     if len(dates) == 1:
         receipt_form.date.data = dates[0]
-    receipt_form.dates.choices = [
-        (str(date.strftime("%d.%m.%Y")), date.strftime("%d.%m.%Y")) for date in dates
-    ]
+    else:
+        receipt_form.dates.choices = [
+            (date.strftime("%d.%m.%Y"), date.strftime("%d.%m.%Y")) for date in dates
+        ]
     if len(sums) == 1:
         receipt_form.price.data = sums[0]
     else:
@@ -400,10 +401,12 @@ def get_receipt_items(items):
 
 
 def save_receipt(date, dates, summ, price, shops, items, category, user):
-    ret_val, list_id = True, -1
+    ret_val, list_id, list_date = True, -1, ''
 
     if summ and not price:
         price = summ
+    elif not summ and price:
+        pass
     elif not price and not summ:
         ret_val = False
         flash("Please enter a price for the receipt!", 'error')
@@ -413,6 +416,8 @@ def save_receipt(date, dates, summ, price, shops, items, category, user):
 
     if dates and not date:
         date = dates
+    elif not dates and date:
+        pass
     elif not dates and not date:
         ret_val = False
         flash("Please enter a date for the receipt!", 'error')
@@ -437,5 +442,6 @@ def save_receipt(date, dates, summ, price, shops, items, category, user):
         liste.save_to_db()
         current_app.logger.debug(f"Created new liste '{liste}'")
         list_id = liste.id
+        list_date = liste.date.strftime("%d.%m.%Y")
 
-    return ret_val, list_id
+    return ret_val, list_id, list_date
