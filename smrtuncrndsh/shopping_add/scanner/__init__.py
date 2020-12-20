@@ -182,7 +182,7 @@ def scan_reciept():
 
 def populate_receipt_form(receipt_form, dates, sums, shop_objs, items):
     if len(dates) == 1:
-        receipt_form.date.data = dates[1]
+        receipt_form.date.data = dates[0]
     else:
         receipt_form.dates.choices = [
             (str(date.strftime("%d.%m.%Y")), date.strftime("%d.%m.%Y")) for date in dates
