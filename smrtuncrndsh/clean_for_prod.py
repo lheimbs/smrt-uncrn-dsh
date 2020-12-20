@@ -14,21 +14,25 @@ def clean_for_prod():
                 if file == __file__.split(os.sep)[-1]:
                     print("Skipping this file")
                     continue
-                with open(file_path) as file:
+                print(f"opening {file}")
+                with open(file_path, 'r') as file:
                     lines = file.readlines()
+                    change = False
                     for line in lines:
-                        change = False
                         if "// LIBRARY FILE" in line:
                             print(f"Skipping '{file_path}' due to library file!")
                             break
                         if "console.log(" in line:
                             change = True
                             line = line.replace("console.log(", "// console.log(")
+                            print(line)
                         if "console.debug(" in line:
                             change = True
-                            line = line.replace("console.log(", "// console.log(")
-                        if change:
-                            file.writelines(lines)
+                            line = line.replace("console.debug(", "// console.debug(")
+                            print(line)
+                with open(file_path, 'w') as file:
+                    if change:
+                        file.writelines(lines)
 
 
 if __name__ == "__main__":
