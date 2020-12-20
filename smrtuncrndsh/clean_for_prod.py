@@ -14,7 +14,7 @@ def clean_for_prod():
                 if file == __file__.split(os.sep)[-1]:
                     print("Skipping this file")
                     continue
-                print(f"opening {file}")
+                # print(f"opening {file}")
                 with open(file_path, 'r') as file:
                     lines = file.readlines()
                 change = False
@@ -33,8 +33,9 @@ def clean_for_prod():
                         print(line)
                     new_lines.append(line)
                 if change and new_lines:
+                    print("writing new lines to ", file_path)
                     with open(file_path, 'w') as file:
-                        file.writelines(lines)
+                        file.writelines(new_lines)
 
 
 if __name__ == "__main__":
