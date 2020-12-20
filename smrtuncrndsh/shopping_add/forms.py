@@ -42,8 +42,7 @@ class PdfForm(FlaskForm):
 
 class ReceiptItem(FlaskForm):
     item = TextField("Name")
-    price_per_piece = DecimalField("Price per piece")
-    total_price = DecimalField("Total Price")
+    price = DecimalField("Total Price")
     amount = IntegerField("Amount")
     volume = TextField("Volume")
     ppv = TextField("Price per Volume")
