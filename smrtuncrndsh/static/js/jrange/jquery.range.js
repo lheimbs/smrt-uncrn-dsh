@@ -1,3 +1,4 @@
+// LIBRARY FILE
 /*jshint multistr:true, curly: false */
 /*global jQuery:false, define: false */
 /**

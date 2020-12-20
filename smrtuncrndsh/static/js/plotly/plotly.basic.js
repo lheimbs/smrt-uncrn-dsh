@@ -1,3 +1,4 @@
+// LIBRARY FILE
 /**
 * plotly.js (basic - minified) v1.54.7
 * Copyright 2012-2020, Plotly, Inc.

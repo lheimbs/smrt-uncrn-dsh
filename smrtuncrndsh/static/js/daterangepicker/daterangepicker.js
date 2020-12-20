@@ -1,3 +1,4 @@
+// LIBRARY FILE
 /**
 * @version: 3.1
 * @author: Dan Grossman http://www.dangrossman.info/

@@ -1,3 +1,4 @@
+// LIBRARY FILE
 /**
  * jQuery Flexdatalist.
  * Autocomplete input fields, with support for datalists.

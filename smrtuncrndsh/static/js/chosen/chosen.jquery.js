@@ -1,3 +1,4 @@
+// LIBRARY FILE
 /*!
 Chosen, a Select Box Enhancer for jQuery and Prototype
 by Patrick Filler for Harvest, http://getharvest.com
