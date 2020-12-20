@@ -31,7 +31,7 @@ def clean_for_prod():
                             line = line.replace("console.debug(", "// console.debug(")
                             print(line)
                 with open(file_path, 'w') as file:
-                    if change:
+                    if change and lines:
                         file.writelines(lines)
 
 
