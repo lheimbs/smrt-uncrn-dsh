@@ -18,6 +18,7 @@ def clean_for_prod():
                 with open(file_path, 'r') as file:
                     lines = file.readlines()
                 change = False
+                new_lines = []
                 for line in lines:
                     if "// LIBRARY FILE" in line:
                         print(f"Skipping '{file_path}' due to library file!")
@@ -30,8 +31,9 @@ def clean_for_prod():
                         change = True
                         line = line.replace("console.debug(", "// console.debug(")
                         print(line)
-                with open(file_path, 'w') as file:
-                    if change and lines:
+                    new_lines.append(line)
+                if change and new_lines:
+                    with open(file_path, 'w') as file:
                         file.writelines(lines)
 
 
