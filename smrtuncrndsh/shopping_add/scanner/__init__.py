@@ -125,36 +125,7 @@ def scan_reciept():
                 del pdf
 
                 dates, sums, shop_objs, items = get_receipt_data_from_pdf(lines)
-
-                if len(dates) == 1:
-                    receipt_form.date.data = dates[1]
-                else:
-                    receipt_form.dates.choices = [
-                        (str(date.strftime("%d.%m.%Y")), date.strftime("%d.%m.%Y")) for date in dates
-                    ]
-                if len(sums) == 1:
-                    receipt_form.price.data = sums[0]
-                else:
-                    receipt_form.sums.choices = [(float(sum), sum) for sum in sums]
-
-                if shop_objs:
-                    receipt_form.shops.pop_entry()
-                for shop in shop_objs:
-                    receipt_form.shops.append_entry({'shop': shop.name, 'category': shop.category.name})
-
-                if items:
-                    receipt_form.items.pop_entry()
-                    items.append({
-                        'item': '',
-                        'price_per_piece': 0,
-                        'total_price': 0,
-                        'amount': 0,
-                        'volume': '',
-                        'ppv': '',
-                    })
-                for item in items:
-                    receipt_form.items.append_entry(item)
-
+                receipt_form = populate_receipt_form(receipt_form, dates, sums, shop_objs, items)
                 return render_template(
                     'show_pdf.html',
                     title='Scan Shopping List',
@@ -178,7 +149,7 @@ def scan_reciept():
             items = receipt_form.items.data
             # filter out removed or invalid
             items = [
-                item for item in items if item['item'] and item['amount'] and item['price_per_piece']
+                item for item in items if item['item'] and item['amount'] and item['price']
             ]
             if hasattr(receipt_form, "user") and receipt_form.user.data and current_user.is_admin:
                 user = receipt_form.user.data
@@ -207,6 +178,37 @@ def scan_reciept():
         template='shopping-add',
         form=pdf_form,
     )
+
+
+def populate_receipt_form(receipt_form, dates, sums, shop_objs, items):
+    if len(dates) == 1:
+        receipt_form.date.data = dates[1]
+    else:
+        receipt_form.dates.choices = [
+            (str(date.strftime("%d.%m.%Y")), date.strftime("%d.%m.%Y")) for date in dates
+        ]
+    if len(sums) == 1:
+        receipt_form.price.data = sums[0]
+    else:
+        receipt_form.sums.choices = [(float(sum), sum) for sum in sums]
+
+    if shop_objs:
+        receipt_form.shops.pop_entry()
+    for shop in shop_objs:
+        receipt_form.shops.append_entry({'shop': shop.name, 'category': shop.category.name})
+
+    if items:
+        receipt_form.items.pop_entry()
+        items.append({
+            'item': '',
+            'price': 0,
+            'amount': 0,
+            'volume': '',
+            'ppv': '',
+        })
+    for item in items:
+        receipt_form.items.append_entry(item)
+    return receipt_form
 
 
 def get_dates(lines):
@@ -282,7 +284,7 @@ def get_item(line, next_line):
     if item_match:
         item = item_match.group('item').strip()
         amount = 1
-        price = amount_price = float(item_match.group('price').replace(',', '.'))
+        price = float(item_match.group('price').replace(',', '.'))
         volume = ppv = ''
 
         if next_line:
@@ -291,14 +293,13 @@ def get_item(line, next_line):
 
             if amount_match:
                 amount = int(amount_match.group('amount'))
-                amount_price = float(amount_match.group('amount_price').replace(',', '.'))
+                price = price / amount
             elif volume_match:
                 volume = volume_match.group('volume').replace(' ', '')
                 ppv = volume_match.group('ppv').replace('eur', '€')
         return {
             'item': item.title(),
-            'price_per_piece': price,
-            'total_price': amount_price,
+            'price': price,
             'amount': amount,
             'volume': volume.replace(" ", '').replace('$', '').replace('€', '').replace(',', '.'),
             'ppv': ppv.replace(" ", '').replace('$', '').replace('€', '').replace(',', '.'),
@@ -377,7 +378,7 @@ def get_receipt_items(items):
         ppv = "" if not item['ppv'] else item['ppv']
         item_objs = Item.get_item(
             name=item['item'],
-            price=item['price_per_piece'],
+            price=item['price'],
             volume=volume,
             price_per_volume=ppv,
         )
@@ -386,7 +387,7 @@ def get_receipt_items(items):
         else:
             item_obj = Item(
                 name=item['item'],
-                price=item['price_per_piece'],
+                price=item['price'],
                 volume=volume,
                 price_per_volume=ppv,
                 sale=item['sale'],
