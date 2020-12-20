@@ -23,6 +23,6 @@ function handleAjaxError(response, textStatus, errorThrown) {
     } else if(response.responseJSON=="The CSRF token has expired."){
         makeFlashMessage('error', "The CSRF token has expired. Please refresh the page.");
     } else {
-        makeFlashMessage('error', 'Unknow Error: '+errorThrown);
+        makeFlashMessage('error', 'Unknow Error '+errorThrown+': '+textStatus);
     }
 }
