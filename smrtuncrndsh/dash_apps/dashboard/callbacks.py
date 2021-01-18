@@ -1,3 +1,4 @@
+import requests
 from datetime import datetime
 from math import ceil, floor
 from dateutil.relativedelta import relativedelta
@@ -17,6 +18,13 @@ from dash.exceptions import PreventUpdate
 from .import sql
 from ..variables import COLORS
 from .weather import get_weather
+
+
+RKI_LANDKREISDATEN = (
+    "https://services7.arcgis.com/mOBPykOjAyBO2ZKk/arcgis/rest/services"
+    "/RKI_Landkreisdaten/FeatureServer/0/query?where=GEN%20%3D%20'{county}'"
+    "&outFields=cases7_per_100k,cases7_bl_per_100k,BL&outSR=4326&f=json"
+)
 
 
 def is_daytime(sunrise, sunset, now=None):
@@ -654,7 +662,8 @@ def init_callbacks(app):                    # noqa: C901
                 'fixedrange': True,
                 'showline': False, 'linewidth': 1,
                 'showgrid': False,
-            }
+            },
+            'xaxis': {'fixedrange': True},
         })
 
         data = sql.get_this_months_categories(current_user)
@@ -668,5 +677,100 @@ def init_callbacks(app):                    # noqa: C901
             x=list(data.keys()),
             y=list(data.values()),
             name='Categories this month',
+        ))
+        return fig
+    
+    def get_corona_local_data(county):
+        data = requests.get(RKI_LANDKREISDATEN.format(county=county))
+        if data.status_code != 200:
+            return (f"No data for '{county}' found.", "is-visible", "", "", "", "")
+
+        data = data.json()['features'][0]['attributes']
+        return (
+            "", "is-hidden",
+            f"{county}: ",
+            f"{data['cases7_per_100k']:.2f}",
+            f"{data['BL']}: ",
+            f"{data['cases7_bl_per_100k']:.2f}"
+        )
+
+    @app.callback(
+        [
+            Output("corona-local-data-1-error", "children"),
+            Output("corona-local-data-1-error", "className"),
+            Output("corona-local-data-1-header-county", "children"),
+            Output("corona-local-data-1-header-data", "children"),
+            Output("corona-local-data-1-footer-state", "children"),
+            Output("corona-local-data-1-footer-data", "children"),
+        ],
+        [Input("corona-local-data-1", "loading_state")]
+    )
+    def update_corona_local_data_1(_):
+        county = "Göttingen"
+        return get_corona_local_data(county)
+
+    @app.callback(
+        [
+            Output("corona-local-data-2-error", "children"),
+            Output("corona-local-data-2-error", "className"),
+            Output("corona-local-data-2-header-county", "children"),
+            Output("corona-local-data-2-header-data", "children"),
+            Output("corona-local-data-2-footer-state", "children"),
+            Output("corona-local-data-2-footer-data", "children"),
+        ],
+        [Input("corona-local-data-1", "loading_state")]
+    )
+    def update_corona_local_data_2(_):
+        county = "Nürnberg"
+        return get_corona_local_data(county)
+
+    @app.callback(
+        Output("corona-ger-data-graph", "figure"),
+        [Input("corona-ger-data-graph", "loading_state")]
+    )
+    def update_corona_ger_data(_):
+        fig = go.Figure()
+        fig.update_layout({
+            'autosize': True,
+            'barmode': 'overlay',
+            # 'colorway': [COLORS['colorway'][0]] + COLORS['colorway'][2:],
+            'font': {
+                'family': "Ubuntu",
+                'color': COLORS['font-foreground'],
+            },
+            'showlegend': False,
+            'margin': {
+                'l': 5, 'r': 5, 't': 10, 'b': 5, 'pad': 0,
+            },
+            'paper_bgcolor': COLORS['transparent'],
+            'plot_bgcolor': COLORS['transparent'],
+            'yaxis': {
+                'fixedrange': True,
+                'showline': False, 'linewidth': 1,
+                'showgrid': False,
+            },
+            'xaxis': {'fixedrange': True},
+        })
+        cases_num = requests.get(r"https://api.covid19api.com/dayone/country/germany/status/confirmed")
+        if cases_num.status_code != 200:
+            return fig
+
+        cases_num_df = pd.DataFrame(cases_num.json())
+        cases_num_df['Daily'] = cases_num_df.Cases.diff()
+        filter_order = 2    # Filter order
+        cutoff_freq = 0.2   # Cutoff frequency
+        B, A = signal.butter(filter_order, cutoff_freq, output='ba')
+
+        # Apply filter
+        temp = signal.filtfilt(B, A, cases_num_df['Daily'].iloc[1:])
+        cases_num_df['daily_filtered'] = np.insert(temp, 0, 0)
+
+        fig.add_trace(go.Scatter(
+            x=cases_num_df.Date,
+            y=cases_num_df['daily_filtered'],
+            mode='lines',
+            # name='temperature',
+            line={'color': COLORS['foreground']},
+            hovertemplate="%{x|%d.%m.%Y %X} : %{y:.2f}°C<extra></extra>",
         ))
         return fig

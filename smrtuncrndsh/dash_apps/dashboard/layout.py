@@ -309,6 +309,72 @@ layout = html.Div(
                         )
                     ],
                 ),
+                # start corona data
+                html.Div(
+                    className="corona-data card",
+                    children=[
+                        html.Div(
+                            className="corona-local-data",
+                            children=[html.H6("Current COVID19 data:")]
+                        ),
+                        html.Div(
+                            id="corona-local-data-1",
+                            className="corona-local-data",
+                            children=[
+                                html.P(id="corona-local-data-1-error"),
+                                html.Div(
+                                    id="corona-local-data-1-header",
+                                    className="corona-local-data-line",
+                                    children=[
+                                        html.H6(id="corona-local-data-1-header-county"),
+                                        html.H5(id="corona-local-data-1-header-data"),
+                                    ]
+                                ),
+                                html.Div(
+                                    id="corona-local-data-1-footer",
+                                    className="corona-local-data-line",
+                                    children=[
+                                        html.H6(id="corona-local-data-1-footer-state"),
+                                        html.H5(id="corona-local-data-1-footer-data"),
+                                    ]
+                                )
+                            ]
+                        ),
+                        html.Div(
+                            id="corona-local-data-2",
+                            className="corona-local-data",
+                            children=[
+                                html.P(id="corona-local-data-2-error"),
+                                html.Div(
+                                    id="corona-local-data-2-header",
+                                    className="corona-local-data-line",
+                                    children=[
+                                        html.H6(id="corona-local-data-2-header-county"),
+                                        html.H5(id="corona-local-data-2-header-data"),
+                                    ]
+                                ),
+                                html.Div(
+                                    id="corona-local-data-2-footer",
+                                    className="corona-local-data-line",
+                                    children=[
+                                        html.H6(id="corona-local-data-2-footer-state"),
+                                        html.H5(id="corona-local-data-2-footer-data"),
+                                    ]
+                                )
+                            ]
+                        ),
+                        dcc.Graph(
+                            id="corona-ger-data-graph",
+                            style={'height': '10vh', 'width': '300px'},
+                            config={
+                                'staticPlot': False,
+                                'displayModeBar': False,
+                            },
+                            className="dash-graph",
+                        ),
+                    ]
+                ),
+                # end corona data (for easier removing - hopefully soon)
             ],
         ),
     ]

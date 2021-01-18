@@ -8,7 +8,8 @@
         "day_hrs day_hrs day_hrs day_hrs day_hrs day_hrs day_hrs day_hrs tablet_place tablet_place tablet_place tablet_place"
         "shopping shopping shopping shopping weather weather weather weather weather weather weather weather"
         "shopping shopping shopping shopping weather weather weather weather weather weather weather weather"
-        "shopping shopping shopping shopping weather weather weather weather weather weather weather weather";
+        "shopping shopping shopping shopping weather weather weather weather weather weather weather weather"
+        "corona corona corona corona corona corona corona corona corona corona corona corona";
     /* shopping shopping_category_month */
     grid-gap: 10px;
 }
@@ -90,7 +91,7 @@
     display: flex;
     align-items: center;
 }
-.weather-container p, h6 {
+.weather-container p, .weather-container h6 {
     margin: 0;
 }
 .weather-container .weather-current-date {
@@ -252,3 +253,19 @@
 
 .shopping-info-row { display: flex; justify-content: space-evenly; }
 .row-space-around { justify-content: space-around; }
+
+.corona-data {
+    grid-area: corona;
+    display: flex;
+    justify-content: space-evenly;
+}
+
+.corona-local-data-line {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+}
+.corona-local-data-line > :first-child {
+    margin-right: 5px !important;
+}
