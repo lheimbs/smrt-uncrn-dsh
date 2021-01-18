@@ -88,32 +88,37 @@ layout = html.Div(
                     ]
                 ),
                 html.Div(
-                    className="altitide-current-container card",
+                    className="brightness-altitude-container",
                     children=[
-                        html.Img(
-                            src=url_for('static', filename='img/altitude_icon.svg.png'),
-                            style={
-                                'height': '50px',
-                                'width': '50px'
-                            },
+                        html.Div(
+                            className="altitide-current-container card",
+                            children=[
+                                html.Img(
+                                    src=url_for('static', filename='img/altitude_icon.svg.png'),
+                                    style={
+                                        'height': '50px',
+                                        'width': '50px'
+                                    },
+                                ),
+                                html.H5(
+                                    id='altitude-display',
+                                ),
+                            ]
                         ),
-                        html.H5(
-                            id='altitude-display',
-                        ),
-                    ]
-                ),
-                html.Div(
-                    className="brightness-current-container card",
-                    children=[
-                        html.Img(
-                            src=url_for('static', filename='img/brightness_icon.svg.png'),
-                            style={
-                                'height': '50px',
-                                'width': '50px'
-                            },
-                        ),
-                        html.H5(
-                            id='brightness-display',
+                        html.Div(
+                            className="brightness-current-container card",
+                            children=[
+                                html.Img(
+                                    src=url_for('static', filename='img/brightness_icon.svg.png'),
+                                    style={
+                                        'height': '50px',
+                                        'width': '50px'
+                                    },
+                                ),
+                                html.H5(
+                                    id='brightness-display',
+                                ),
+                            ]
                         ),
                     ]
                 ),
@@ -262,6 +267,114 @@ layout = html.Div(
                         ),
                     ]
                 ),
+                html.Div(
+                    id="shopping-info-container",
+                    className="card",
+                    children=[
+                        html.Div(
+                            className="shopping-info-text-container",
+                            children=[
+                                html.Div(
+                                    className="shopping-info-row row-space-around",
+                                    children=[
+                                        html.H6("This month:", id="shopping-info-descriptor-1"),
+                                        html.H6(id="shopping-info-current-month"),
+                                        html.Span(id="shopping-info-current-month-weight", className="material-icons"),
+                                    ]
+                                ),
+                                html.Div(
+                                    className="shopping-info-row",
+                                    children=[
+                                        html.P(id="shopping-info-last-month"),
+                                        html.P(id="shopping-info-last-6-months"),
+                                    ]
+                                )
+                            ]
+                        ),
+                        html.Div(
+                            id="shopping-info-graphs",
+                            className="shopping-info-graphs-container",
+                            children=[
+                                dcc.Graph(
+                                    id="shopping-info-category-month-graph",
+                                    style={'height': '12vh'},
+                                    config={
+                                        'staticPlot': False,
+                                        'displayModeBar': False,
+                                    },
+                                    className="dash-graph",
+                                    # figure=fig,
+                                ),
+                            ]
+                        )
+                    ],
+                ),
+                # start corona data
+                html.Div(
+                    className="corona-data card",
+                    children=[
+                        html.Div(
+                            className="corona-local-data",
+                            children=[html.H6("Current COVID19 data:")]
+                        ),
+                        html.Div(
+                            id="corona-local-data-1",
+                            className="corona-local-data",
+                            children=[
+                                html.P(id="corona-local-data-1-error"),
+                                html.Div(
+                                    id="corona-local-data-1-header",
+                                    className="corona-local-data-line",
+                                    children=[
+                                        html.H6(id="corona-local-data-1-header-county"),
+                                        html.H5(id="corona-local-data-1-header-data"),
+                                    ]
+                                ),
+                                html.Div(
+                                    id="corona-local-data-1-footer",
+                                    className="corona-local-data-line",
+                                    children=[
+                                        html.H6(id="corona-local-data-1-footer-state"),
+                                        html.H5(id="corona-local-data-1-footer-data"),
+                                    ]
+                                )
+                            ]
+                        ),
+                        html.Div(
+                            id="corona-local-data-2",
+                            className="corona-local-data",
+                            children=[
+                                html.P(id="corona-local-data-2-error"),
+                                html.Div(
+                                    id="corona-local-data-2-header",
+                                    className="corona-local-data-line",
+                                    children=[
+                                        html.H6(id="corona-local-data-2-header-county"),
+                                        html.H5(id="corona-local-data-2-header-data"),
+                                    ]
+                                ),
+                                html.Div(
+                                    id="corona-local-data-2-footer",
+                                    className="corona-local-data-line",
+                                    children=[
+                                        html.H6(id="corona-local-data-2-footer-state"),
+                                        html.H5(id="corona-local-data-2-footer-data"),
+                                    ]
+                                )
+                            ]
+                        ),
+                        dcc.Graph(
+                            id="corona-ger-data-graph",
+                            style={'height': '10vh', 'width': '300px'},
+                            config={
+                                'staticPlot': False,
+                                'displayModeBar': False,
+                            },
+                            className="dash-graph",
+                        ),
+                    ]
+                ),
+                # end corona data (for easier removing - hopefully soon)
             ],
         ),
     ]

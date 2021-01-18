@@ -1,15 +1,16 @@
 .dashboard-content {
     display: grid;
-    grid-template-columns: repeat(6, 1fr);
+    grid-template-columns: repeat(12, 1fr);
     grid-template-areas: 
-        "temp    temp    humid   humid   press        press"
-        "day_hrs day_hrs day_hrs day_hrs brightness   altitude"
-        "day_hrs day_hrs day_hrs day_hrs pc_status    rpi_status"
-        "day_hrs day_hrs day_hrs day_hrs bme_status   voiceassistant_status"
-        "weather weather weather weather tablet_place tablet_place"
-        "weather weather weather weather . ."
-        "weather weather weather weather . .";
-    
+        "temp temp temp humid humid humid press press press brightness_altitude brightness_altitude brightness_altitude"
+        "day_hrs day_hrs day_hrs day_hrs day_hrs day_hrs day_hrs day_hrs pc_status pc_status rpi_status rpi_status"
+        "day_hrs day_hrs day_hrs day_hrs day_hrs day_hrs day_hrs day_hrs bme_status bme_status voiceassistant_status voiceassistant_status"
+        "day_hrs day_hrs day_hrs day_hrs day_hrs day_hrs day_hrs day_hrs tablet_place tablet_place tablet_place tablet_place"
+        "shopping shopping shopping shopping weather weather weather weather weather weather weather weather"
+        "shopping shopping shopping shopping weather weather weather weather weather weather weather weather"
+        "shopping shopping shopping shopping weather weather weather weather weather weather weather weather"
+        "corona corona corona corona corona corona corona corona corona corona corona corona";
+    /* shopping shopping_category_month */
     grid-gap: 10px;
 }
 .weather-container {
@@ -45,14 +46,15 @@
             "temp"
             "humid"
             "press"
-            "brightness"
-            "altitude"
+            "brightness_altitude"
             "day_hrs"
             "pc_status"
             "rpi_status"
             "bme_status"
             "voiceassistant_status"
             "tablet_place"
+            "shopping"
+            "shpooing_category_month"
             "weather";
     }
     .weather-container {
@@ -89,7 +91,7 @@
     display: flex;
     align-items: center;
 }
-.weather-container p, h6 {
+.weather-container p, .weather-container h6 {
     margin: 0;
 }
 .weather-container .weather-current-date {
@@ -118,9 +120,9 @@
     align-items: normal !important;
 }
 .status-date {
-    margin-top: 5px;
+    margin: 0;
     text-align: center;
-    font-size: small;
+    font-size: x-small;
 }
 .tablet-status-battery-cntnr {
     display: flex;
@@ -165,9 +167,22 @@
     justify-content: space-around;
     align-items: center;
     flex-wrap: wrap;
+    flex-grow: 1;
+    margin-left: 5px !important;
+    height: 100%;
 }
 .altitide-current-container {
     grid-area: altitude;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    flex-wrap: wrap;
+    flex-grow: 1;
+    height: 100%;
+}
+
+.brightness-altitude-container {
+    grid-area: brightness_altitude;
     display: flex;
     justify-content: space-around;
     align-items: center;
@@ -222,11 +237,35 @@
 .device-state {
     color: var(--foreground-dark);
 
-    /* display: flex;
+    display: flex;
     justify-content: space-around;
-    align-items: center;
-    flex-wrap: wrap; */
+    flex-direction: column;
 }
-.device-state.gone { background-color: var(--colorway-2); }
-.device-state.on { background-color: var(--colorway-1); }
-.device-state.off { background-color: var(--colorway-0); }
+.device-state.gone, #shopping-info-container.same { background-color: var(--colorway-2); }
+.device-state.on, #shopping-info-container.lower { background-color: var(--colorway-1); }
+.device-state.off, #shopping-info-container.higher { background-color: var(--colorway-0); }
+#shopping-info-container.same, #shopping-info-container.lower, #shopping-info-container.higher  { color: var(--foreground-dark); }
+
+#shopping-info-container {
+    grid-area: shopping;
+}
+#shopping-info-category-month-container { grid-area: shopping_category_month }
+
+.shopping-info-row { display: flex; justify-content: space-evenly; }
+.row-space-around { justify-content: space-around; }
+
+.corona-data {
+    grid-area: corona;
+    display: flex;
+    justify-content: space-evenly;
+}
+
+.corona-local-data-line {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+}
+.corona-local-data-line > :first-child {
+    margin-right: 5px !important;
+}

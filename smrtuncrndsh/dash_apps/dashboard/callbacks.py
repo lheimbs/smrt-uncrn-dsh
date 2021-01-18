@@ -1,3 +1,4 @@
+import requests
 from datetime import datetime
 from math import ceil, floor
 from dateutil.relativedelta import relativedelta
@@ -7,13 +8,23 @@ import pandas as pd
 import scipy.signal as signal
 import plotly.graph_objects as go
 import dash_html_components as html
+# import dash_core_components as dcc
+
 from flask import current_app
+from flask_login import current_user
 from dash.dependencies import Input, Output, State, ClientsideFunction
 from dash.exceptions import PreventUpdate
 
 from .import sql
 from ..variables import COLORS
 from .weather import get_weather
+
+
+RKI_LANDKREISDATEN = (
+    "https://services7.arcgis.com/mOBPykOjAyBO2ZKk/arcgis/rest/services"
+    "/RKI_Landkreisdaten/FeatureServer/0/query?where=GEN%20%3D%20'{county}'"
+    "&outFields=cases7_per_100k,cases7_bl_per_100k,BL&outSR=4326&f=json"
+)
 
 
 def is_daytime(sunrise, sunset, now=None):
@@ -332,7 +343,7 @@ def init_callbacks(app):                    # noqa: C901
         [Input('data-overview-update', 'n_intervals')],
         [State('tablet-status-container', 'className')]
     )
-    def device_callback(n, className):
+    def tablet_callback(n, className):
         state, level, date = sql.get_latest_tablet_data()
 
         if not sql.is_data_in_tablet_table() or state == "?":
@@ -346,7 +357,10 @@ def init_callbacks(app):                    # noqa: C901
                 className = className.replace("gone", "").replace("off", "").replace("on", "")
                 className += " off"
 
-        return state, level, className, f"Last update: {date.strftime('%a, %d.%m.%Y %H:%M:%S')}" if date else "Last Update: Unknown"
+        return (
+            state, level, className,
+            f"Last update: {date.strftime('%a, %d.%m.%Y %H:%M:%S')}" if date else "Last Update: Unknown"
+        )
 
     @app.callback(
         Output('weather', 'data'),
@@ -397,6 +411,13 @@ def init_callbacks(app):                    # noqa: C901
         detail = data['result']['current']['detailed_status']
         wind_speed = data['result']['current']['wind']['speed']
         wind_rotation = data['result']['current']['wind']['deg']
+
+        visibility = data['result']['current']['visibility_distance']
+        if visibility > 1000:
+            unit = "km"
+            visibility /= 1000
+        else:
+            unit = "m"
         return (
             date,
             "Nürnberg",
@@ -411,9 +432,9 @@ def init_callbacks(app):                    # noqa: C901
             },
             f"Pressure: {data['result']['current']['pressure']['press']} hPa",
             f"Humidity: {data['result']['current']['humidity']} %",
-            f"Visibility: {data['result']['current']['visibility_distance']} m",
+            f"Visibility: {visibility} {unit}",
             f"Dew point: {data['result']['current']['dewpoint']:.1f}°C",
-            f"UV: {data['result']['current']['uvi']*100} %",
+            f"UV: {data['result']['current']['uvi']*100:.2f} %",
         )
 
     @app.callback(
@@ -423,6 +444,19 @@ def init_callbacks(app):                    # noqa: C901
     def update_hours_weather(data):
         data = data['result']
         fig = go.Figure()
+        fig.update_layout({
+            'autosize': True,
+            'barmode': 'overlay',
+            'font': {
+                'family': "Ubuntu",
+            },
+            'showlegend': False,
+            'margin': {
+                'l': 5, 'r': 5, 't': 10, 'b': 5, 'pad': 0,
+            },
+            'paper_bgcolor': COLORS['transparent'],
+            'plot_bgcolor': COLORS['transparent'],
+        })
 
         if not data:
             current_app.logger.warning("No hourly weather data available.")
@@ -453,17 +487,6 @@ def init_callbacks(app):                    # noqa: C901
             graph_color = COLORS['foreground']
 
         fig.update_layout({
-            'autosize': True,
-            'barmode': 'overlay',
-            'font': {
-                'family': "Ubuntu",
-            },
-            'showlegend': False,
-            'margin': {
-                'l': 5, 'r': 5, 't': 10, 'b': 5, 'pad': 0,
-            },
-            'paper_bgcolor': COLORS['transparent'],
-            'plot_bgcolor': COLORS['transparent'],
             'xaxis': {
                 'color': foreground_color,
                 'fixedrange': True,
@@ -521,7 +544,7 @@ def init_callbacks(app):                    # noqa: C901
         ))
         fig.add_trace(go.Bar(
             x=hourly_data['reference_time'],
-            y=hourly_data['rain'],
+            y=hourly_data['rain'] + hourly_data['snow'],
             marker={'color': COLORS['colorway'][8]},
             name='rain',
             # hovertemplate="%{x|%d.%m.%Y %X} : %{y:.2f}mm<extra></extra>",
@@ -568,3 +591,186 @@ def init_callbacks(app):                    # noqa: C901
                 ], className="weather-daily-day tooltip")
             )
         return children
+
+    @app.callback(
+        [
+            Output("shopping-info-current-month", "children"),
+            Output("shopping-info-current-month-weight", "children"),
+            Output("shopping-info-last-month", "children"),
+            Output("shopping-info-last-6-months", "children"),
+            Output("shopping-info-container", "className"),
+        ],
+        [Input("shopping-info-container", "loading_state")]
+    )
+    def shopping_info(loading_state):
+        now = datetime.now().date()
+        first_day = datetime(year=now.year, month=now.month, day=1)
+        last_month = now - relativedelta(months=1)
+        last_6_months = now - relativedelta(months=6)
+
+        sum_this_month, sum_last_month, lists_last_6_months = sql.get_shopping_info(
+            now, first_day, last_month, last_6_months, current_user
+        )
+
+        if lists_last_6_months.count() == 0:
+            last_6_months_avg = 0
+        else:
+            df = pd.DataFrame([liste.to_dict() for liste in lists_last_6_months.all()], columns=['date', 'price'])
+            df['month'] = df.date.apply(lambda x: x.month)
+            monthly = df.groupby('month').sum()
+            last_6_months_avg = monthly.price.sum() / monthly.price.count()
+
+        if sum_this_month < last_6_months_avg:
+            container_class = "card lower"
+            months_rating = "trending_down"
+        elif sum_this_month > last_6_months_avg:
+            container_class = "card higher"
+            months_rating = "trending_up"
+        else:
+            container_class = "card same"
+            months_rating = "remove"
+
+        return (
+            f"{float(sum_this_month):.2f} €",
+            months_rating,
+            f"Expenses last month: {sum_last_month:.2f}€",
+            f"Last six month's average: {last_6_months_avg:.2f}€",
+            container_class
+        )
+
+    @app.callback(
+        Output('shopping-info-category-month-graph', 'figure'),
+        # Output('shopping-info-graphs', 'children'),
+        [Input('shopping-info-graphs', 'loading_state')]
+    )
+    def update_shopping_info_category_month_graph(_):
+        fig = go.Figure()
+        fig.update_layout({
+            'autosize': True,
+            'barmode': 'overlay',
+            # 'colorway': [COLORS['colorway'][0]] + COLORS['colorway'][2:],
+            'font': {
+                'family': "Ubuntu",
+            },
+            'showlegend': False,
+            'margin': {
+                'l': 5, 'r': 5, 't': 10, 'b': 5, 'pad': 0,
+            },
+            'paper_bgcolor': COLORS['transparent'],
+            'plot_bgcolor': COLORS['transparent'],
+            'yaxis': {
+                'fixedrange': True,
+                'showline': False, 'linewidth': 1,
+                'showgrid': False,
+            },
+            'xaxis': {'fixedrange': True},
+        })
+
+        data = sql.get_this_months_categories(current_user)
+        if not data:
+            current_app.logger.warning("No category data for current month available.")
+            return fig
+        else:
+            current_app.logger.debug("Updating hourly weather data.")
+
+        fig.add_trace(go.Bar(
+            x=list(data.keys()),
+            y=list(data.values()),
+            name='Categories this month',
+        ))
+        return fig
+    
+    def get_corona_local_data(county):
+        data = requests.get(RKI_LANDKREISDATEN.format(county=county))
+        if data.status_code != 200:
+            return (f"No data for '{county}' found.", "is-visible", "", "", "", "")
+
+        data = data.json()['features'][0]['attributes']
+        return (
+            "", "is-hidden",
+            f"{county}: ",
+            f"{data['cases7_per_100k']:.2f}",
+            f"{data['BL']}: ",
+            f"{data['cases7_bl_per_100k']:.2f}"
+        )
+
+    @app.callback(
+        [
+            Output("corona-local-data-1-error", "children"),
+            Output("corona-local-data-1-error", "className"),
+            Output("corona-local-data-1-header-county", "children"),
+            Output("corona-local-data-1-header-data", "children"),
+            Output("corona-local-data-1-footer-state", "children"),
+            Output("corona-local-data-1-footer-data", "children"),
+        ],
+        [Input("corona-local-data-1", "loading_state")]
+    )
+    def update_corona_local_data_1(_):
+        county = "Göttingen"
+        return get_corona_local_data(county)
+
+    @app.callback(
+        [
+            Output("corona-local-data-2-error", "children"),
+            Output("corona-local-data-2-error", "className"),
+            Output("corona-local-data-2-header-county", "children"),
+            Output("corona-local-data-2-header-data", "children"),
+            Output("corona-local-data-2-footer-state", "children"),
+            Output("corona-local-data-2-footer-data", "children"),
+        ],
+        [Input("corona-local-data-1", "loading_state")]
+    )
+    def update_corona_local_data_2(_):
+        county = "Nürnberg"
+        return get_corona_local_data(county)
+
+    @app.callback(
+        Output("corona-ger-data-graph", "figure"),
+        [Input("corona-ger-data-graph", "loading_state")]
+    )
+    def update_corona_ger_data(_):
+        fig = go.Figure()
+        fig.update_layout({
+            'autosize': True,
+            'barmode': 'overlay',
+            # 'colorway': [COLORS['colorway'][0]] + COLORS['colorway'][2:],
+            'font': {
+                'family': "Ubuntu",
+                'color': COLORS['font-foreground'],
+            },
+            'showlegend': False,
+            'margin': {
+                'l': 5, 'r': 5, 't': 10, 'b': 5, 'pad': 0,
+            },
+            'paper_bgcolor': COLORS['transparent'],
+            'plot_bgcolor': COLORS['transparent'],
+            'yaxis': {
+                'fixedrange': True,
+                'showline': False, 'linewidth': 1,
+                'showgrid': False,
+            },
+            'xaxis': {'fixedrange': True},
+        })
+        cases_num = requests.get(r"https://api.covid19api.com/dayone/country/germany/status/confirmed")
+        if cases_num.status_code != 200:
+            return fig
+
+        cases_num_df = pd.DataFrame(cases_num.json())
+        cases_num_df['Daily'] = cases_num_df.Cases.diff()
+        filter_order = 2    # Filter order
+        cutoff_freq = 0.2   # Cutoff frequency
+        B, A = signal.butter(filter_order, cutoff_freq, output='ba')
+
+        # Apply filter
+        temp = signal.filtfilt(B, A, cases_num_df['Daily'].iloc[1:])
+        cases_num_df['daily_filtered'] = np.insert(temp, 0, 0)
+
+        fig.add_trace(go.Scatter(
+            x=cases_num_df.Date,
+            y=cases_num_df['daily_filtered'],
+            mode='lines',
+            # name='temperature',
+            line={'color': COLORS['foreground']},
+            hovertemplate="%{x|%d.%m.%Y %X} : %{y:.2f}°C<extra></extra>",
+        ))
+        return fig
