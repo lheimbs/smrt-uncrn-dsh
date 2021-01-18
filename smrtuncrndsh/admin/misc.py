@@ -251,9 +251,16 @@ def search_num_range(attr, query, search_val, searchable):
 
 def get_datatables_order_query(obj, req_dict, query):
     if req_dict and req_dict['columns'][req_dict['order_col']]['orderable']:
-        if req_dict['order'] == 'asc':
-            attr = getattr(obj, req_dict['columns'][req_dict['order_col']]['data']).asc()
-        else:
-            attr = getattr(obj, req_dict['columns'][req_dict['order_col']]['data']).desc()
-        query = query.order_by(attr)
+        attr = getattr(obj, req_dict['columns'][req_dict['order_col']]['data'])
+
+        if req_dict['columns'][req_dict['order_col']]['data'] == 'category':
+            attr = getattr(Category, 'name')
+            query = query.join(obj.category, isouter=True)
+
+        try:
+            attr_sorter = getattr(attr, req_dict['order'])
+        except AttributeError:
+            current_app.logger.warning(f"Can't sort by '{req_dict['order']}'. Sorting ascending instead.")
+            attr_sorter = attr.asc
+        query = query.order_by(attr_sorter())
     return query

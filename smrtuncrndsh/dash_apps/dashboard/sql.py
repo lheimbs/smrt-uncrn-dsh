@@ -6,6 +6,7 @@ from ...models import db
 from ...models.RoomData import RoomData
 from ...models.State import State
 from ...models.Tablet import TabletBattery
+from ...models.Shopping import Liste
 
 
 def is_data_in_roomdata_table():
@@ -68,13 +69,22 @@ def get_last_24_hrs(start, end):
 
 
 def get_latest_state(device):
-    state = State.query.filter_by(device=device).order_by(State.id.desc()).first()
     if device == 'esp_bme_rf' and is_data_in_roomdata_table():
         data = get_latest_roomdata()
-        if state.date > data['date']:
-            return state
+        if data['date'] > datetime.now() - timedelta(minutes=2):
+            state = State(device=device, state="online", date=data['date'])
         else:
-            return State(device=device, state="online", date=data['date'])
+            state = State(device=device, state="offline", date=data['date'])
+    elif device == "computer":
+        state = State.query.filter_by(device=device).order_by(State.id.desc()).first()
+        if state.date < datetime.now() - timedelta(minutes=16):
+            state.state = "offline"
+    elif device == "voice_assistant":
+        state = State.query.filter_by(device=device).order_by(State.id.desc()).first()
+        if state.date < datetime.now() - timedelta(minutes=16):
+            state.state = "offline"
+    else:
+        state = State.query.filter_by(device=device).order_by(State.id.desc()).first()
     return state
 
 
@@ -86,3 +96,42 @@ def get_latest_tablet_data():
             return "online", battery.level, battery.date
         return "offline", battery.level, battery.date
     return "?", -99, None
+
+
+def get_shopping_info(now, first_day, last_month, last_6_months, current_user):
+    sum_this_month_query = db.session.query(Liste.price).filter_by(
+        user=current_user
+    ).filter(Liste.date.between(first_day, now))
+    sum_this_month = sum([price[0] for price in sum_this_month_query])
+
+    sum_last_month_query = db.session.query(Liste.price).filter_by(
+        user=current_user
+    ).filter(Liste.date.between(last_month, first_day))
+    sum_last_month = sum([price[0] for price in sum_last_month_query])
+
+    lists_last_6_months = Liste.query.filter_by(user=current_user).filter(Liste.date.between(last_6_months, first_day))
+    return sum_this_month, sum_last_month, lists_last_6_months
+
+
+def get_this_months_categories(current_user):
+    """ Get bought items in the current month, sort by their categories and
+        summarize the respective categories sums
+    """
+    now = datetime.now()
+    first_of_month = datetime(year=now.year, month=now.month, day=1)
+    listen = Liste.query.filter_by(user=current_user).filter(Liste.date.between(first_of_month, now))
+
+    categories = {}
+    for lisste in listen:
+        for item in lisste.items:
+            if item.category and item.category.name in categories.keys():
+                # category already in, just add price
+                categories[item.category.name] += item.price
+            elif item.category:
+                categories.update({item.category.name: item.price})
+            else:
+                if 'unknown' in categories.keys():
+                    categories['unknown'] += item.price
+                else:
+                    categories.update({'unknown': item.price})
+    return categories

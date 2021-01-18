@@ -20,12 +20,15 @@ def shopping_item():
 @admin_bp.route('/shopping/item/query', methods=['POST'])
 def query_shopping_items():
     args = get_request_dict(request.form)
+    # print("ARGS: ", args)
 
     query = get_datatables_search_query(Item, args)
     query = get_datatables_order_query(Item, args, query)
+    print("\n", query, "\n")
     i_d = [
         i.to_ajax() for i in query.limit(args['length']).offset(args['start']).all()
     ]
+    # print("I_D________: ", i_d)
     return make_response(jsonify({
         'draw': args['draw'],
         'recordsTotal': Item.query.count(),
