@@ -136,7 +136,8 @@ only screen and (max-width: 900px),
 	#shopping-items-table td:nth-of-type(5):before { content: "Price per volume"; }
 	#shopping-items-table td:nth-of-type(6):before { content: "Sale"; }
 	#shopping-items-table td:nth-of-type(7):before { content: "Note"; }
-	#shopping-items-table td:nth-of-type(8):before { content: "Category"; }
+	#shopping-items-table td:nth-of-type(8):before { content: "Lists"; }
+	#shopping-items-table td:nth-of-type(9):before { content: "Category"; }
 
 	#shopping-shops-table td:nth-of-type(2):before { content: "Name"; }
     #shopping-shops-table td:nth-of-type(3):before { content: "Category"; }
