@@ -749,7 +749,7 @@ def init_callbacks(app):                    # noqa: C901
                 'showline': False, 'linewidth': 1,
                 'showgrid': False,
             },
-            'xaxis': {'fixedrange': True},
+            'xaxis': {'fixedrange': True, 'showgrid': False, 'showline': False},
         })
         cases_num = requests.get(r"https://api.covid19api.com/dayone/country/germany/status/confirmed")
         if cases_num.status_code != 200:
