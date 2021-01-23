@@ -82,7 +82,7 @@ only screen and (max-width: 900px),
 		border: none;
 		border-bottom: 1px solid var(--border-medium);
 		position: relative;
-		padding-left: 50%; 
+		padding-left: 50% !important; 
 		white-space: normal;
 		text-align:left;
 		min-height: 40px;
@@ -114,6 +114,10 @@ only screen and (max-width: 900px),
 		height: 0;
 		border: unset !important;
 		padding: 0 !important;
+	}
+
+	.data-table th.price-search-slider {
+		min-height: 25px;
 	}
 
     .data-table td:nth-last-of-type(2):before { content: "Edit"; }

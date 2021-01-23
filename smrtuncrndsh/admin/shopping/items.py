@@ -148,7 +148,7 @@ def delete_shopping_item(id=None, ids=None):
                 flash(str(exc), 'info')
                 db.session.rollback()
         else:
-            flash(f"No item like that exists in this database.", 'warning')
+            flash("No item like that exists in this database.", 'warning')
     return redirect(url_for('admin_bp.shopping_item'))
 
 

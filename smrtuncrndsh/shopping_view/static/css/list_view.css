@@ -2,3 +2,11 @@
     background: var(--background-card);
     max-width: 100%;
 }
+
+/* ul.flexdatalist-top {
+    top: calc(793.45px - 312px) !important;
+}
+
+ul#shopping-view-receipts-shop-flexdatalist-results {
+    top: calc(793.45px - 312px) !important;
+} */

@@ -17,7 +17,11 @@ $(function() {
             // 'blurable': true,
             'className': 'row-selected'
         },
+        // "dom": '<"card mb-5"<"data-table top"li>rt><"card-fill search-container"Q><"card-fill pager"p>',
         "dom": '<"card mb-5"<"data-table top"li>rt><"card-fill pager"p>',
+        // searchBuilder: {
+        //     columns: [0,1,2,3,4,5,6,8]
+        // },
         "columns": [
             {
                 "data": "id",
@@ -157,11 +161,6 @@ $(document).on('click', 'a[id^="delete-item-link-"]', function() {
     $(this).attr('href', url);
     console.log(this.href);
     $(this).click();
-});
-
-// Remove a modal's html after closing
-$(document).on($.modal.AFTER_CLOSE, function(event, modal) {
-    modal.elm[0].remove();
 });
 
 var csrf_token = "{{ csrf_token() }}";

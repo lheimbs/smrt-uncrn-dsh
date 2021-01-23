@@ -115,6 +115,8 @@ def get_bool_from_string(bool_string):
 
 
 def get_request_dict(request):
+    # from pprint import pprint
+    # pprint({key: value for key, value in request.items()}, indent=4)
     request_dict = {}
     for key, val in request.items():
         if key in ['start', 'draw', 'length']:

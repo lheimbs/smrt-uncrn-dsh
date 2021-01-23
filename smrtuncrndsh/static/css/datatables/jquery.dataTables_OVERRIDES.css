@@ -7,7 +7,8 @@
 table.dataTable tbody th, table.dataTable tbody td {
   padding: unset !important;
 } */
-table.dataTable tfoot th, table.dataTable tfoot td {
+table.dataTable tfoot th, table.dataTable tfoot td,
+table.dataTable thead th, table.dataTable thead td {
   padding: 2px !important;
 }
 .dataTables_wrapper .dataTables_processing {
@@ -178,4 +179,25 @@ table.dataTable.display tbody tr > .sorting_3 {
 .dataTables_wrapper .dataTables_processing,
 .dataTables_wrapper .dataTables_paginate {
   color: var(--font-foreground);
+}
+
+/* ************* */
+/* SEARCH PANES */
+/* ************* */
+div.dtsp-panesContainer {
+  font-family: inherit;
+  border: none;
+}
+div.dtsp-panesContainer div.dtsp-searchPanes div.dtsp-searchPane div.dtsp-topRow div.dtsp-searchCont input.dtsp-search::placeholder {
+  color: var(--font-foreground);
+}
+div.dtsp-panesContainer div.dtsp-searchPanes div.dtsp-searchPane input.dtsp-paneInputButton:hover, div.dtsp-panesContainer div.dtsp-searchPanes div.dtsp-searchPane button.dtsp-paneButton:hover {
+  background-color: var(--background-medium);
+}
+div.dtsp-panesContainer div.dtsp-searchPanes div.dtsp-searchPane div.dataTables_wrapper {
+  border-bottom: 2px solid var(--border-medium);
+  border: 2px solid var(--border-medium);
+}
+div.dataTables_scrollBody {
+  background: var(--background-card) !important;
 }
