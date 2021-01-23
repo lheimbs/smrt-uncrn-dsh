@@ -544,15 +544,25 @@ def init_callbacks(app):                    # noqa: C901
         ))
         fig.add_trace(go.Bar(
             x=hourly_data['reference_time'],
-            y=hourly_data['rain'] + hourly_data['snow'],
-            marker={'color': COLORS['colorway'][8]},
+            y=hourly_data['rain'],
+            marker_color=COLORS['foreground'],
             name='rain',
-            # hovertemplate="%{x|%d.%m.%Y %X} : %{y:.2f}mm<extra></extra>",
             yaxis='y2',
             opacity=0.5,
             hoverinfo='skip',
             width=1000000,
         ))
+        fig.add_trace(go.Bar(
+            x=hourly_data['reference_time'],
+            y=hourly_data['snow'],
+            marker_color=COLORS['colorway'][6],
+            name='rain',
+            yaxis='y2',
+            opacity=0.5,
+            hoverinfo='skip',
+            width=1000000,
+        ))
+        fig.update_layout(barmode='stack')
         return fig
 
     @app.callback(
@@ -677,12 +687,19 @@ def init_callbacks(app):                    # noqa: C901
             x=list(data.keys()),
             y=list(data.values()),
             name='Categories this month',
+            hovertemplate="%{x} : %{y:.2f} €<extra></extra>",
+            marker_color=COLORS['colorway'][2:],
         ))
+        fig.update_traces(textposition='outside')
         return fig
-    
+
     def get_corona_local_data(county):
-        data = requests.get(RKI_LANDKREISDATEN.format(county=county))
-        if data.status_code != 200:
+        try:
+            data = requests.get(RKI_LANDKREISDATEN.format(county=county))
+        except requests.ConnectionError:
+            current_app.logger.exception("ConnectionError getting current covid19 data from rki!")
+            data = None
+        if not data or data.status_code != 200:
             return (f"No data for '{county}' found.", "is-visible", "", "", "", "")
 
         data = data.json()['features'][0]['attributes']
@@ -751,8 +768,12 @@ def init_callbacks(app):                    # noqa: C901
             },
             'xaxis': {'fixedrange': True, 'showgrid': False, 'showline': False},
         })
-        cases_num = requests.get(r"https://api.covid19api.com/dayone/country/germany/status/confirmed")
-        if cases_num.status_code != 200:
+        try:
+            cases_num = requests.get(r"https://api.covid19api.com/dayone/country/germany/status/confirmed")
+        except requests.ConnectionError:
+            current_app.logger.exception("ConnectionError getting covid19 history data!")
+            cases_num = None
+        if not cases_num or cases_num.status_code != 200:
             return fig
 
         cases_num_df = pd.DataFrame(cases_num.json())
@@ -771,6 +792,6 @@ def init_callbacks(app):                    # noqa: C901
             mode='lines',
             # name='temperature',
             line={'color': COLORS['foreground']},
-            hovertemplate="%{x|%d.%m.%Y %X} : %{y:.2f}°C<extra></extra>",
+            hovertemplate="%{x|%d.%m.%Y} : %{y:.2f} Cases<extra></extra>",
         ))
         return fig
