@@ -269,3 +269,5 @@
 .corona-local-data-line > :first-child {
     margin-right: 5px !important;
 }
+
+#weather-current-wind { margin-left: 5px; }

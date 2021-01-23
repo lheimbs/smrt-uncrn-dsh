@@ -8,9 +8,22 @@
 {% assets "datatables_css" %}
     <link rel="stylesheet" href="{{ ASSET_URL }}" />
 {% endassets %}
+{% assets "flexdatalist_js" %}
+    <script type="text/javascript" src="{{ ASSET_URL }}"></script>
+{% endassets %}
+{% assets "flexdatalist_css" %}
+    <link rel="stylesheet" href="{{ ASSET_URL }}" />
+{% endassets %}
+{% assets "jquerymodal_js" %}
+    <script type="text/javascript" src="{{ ASSET_URL }}"></script>
+{% endassets %}
+{% assets "jquerymodal_css" %}
+    <link rel="stylesheet" href="{{ ASSET_URL }}" />
+{% endassets %}
 
 <script src="{{ url_for('admin_bp.item_js') }}"></script>
 <script src="{{ url_for('admin_bp.static', filename='js/search.js') }}"></script>
+<script src="{{ url_for('admin_bp.static', filename='js/dataTables_select.js') }}"></script>
 
 {% endblock %}
 
@@ -29,6 +42,7 @@
             <th>Price per volume</th>
             <th class="small">Sale</th>
             <th>Note</th>
+            <th>Lists</th>
             <th>Category</th>
             <th class="edit_delete_header"></th>
             <th class="edit_delete_header"></th>
@@ -43,6 +57,7 @@
             <th><input type="text" placeholder="Price per volume" /></th>
             <th><input type="checkbox" placeholder="Sale" /></th>
             <th><input type="text" placeholder="Note" /></th>
+            <th></th>
             <th><input type="text" placeholder="Category" /></th>
             <th class="edit_delete_footer"><button id="search-cancel" class="material-icons">clear</button></th>
             <th class="edit_delete_footer"><button id="search-go" class="material-icons">search</button></th>

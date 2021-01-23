@@ -106,6 +106,9 @@ def create_app():
     from .errors import register_handlers
     register_handlers(app)
 
+    from .converters import IntListConverter
+    app.url_map.converters['int_list'] = IntListConverter
+
     with app.app_context(), app.test_request_context():
         from .models import db
         migrate = Migrate(app, db)          # noqa: F841

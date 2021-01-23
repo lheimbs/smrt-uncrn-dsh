@@ -11,22 +11,6 @@ $(function() {
 
     var min_price = getMinPrice();
     var max_price = getMaxPrice();
-    $('.price-slider').jRange({
-        from: min_price,
-        to: max_price,
-        step: 1,
-        scale: [Math.floor(min_price), Math.round(max_price/4), Math.round(max_price/2), Math.round((max_price/4)*3), Math.ceil(max_price)],
-        format: '%s €',
-        width: 150,
-        showLabels: true,
-        isRange : true,
-        setValue: Math.floor(min_price)+','+Math.ceil(max_price),
-        theme: 'theme-blue',
-    });
-
-    $('.price-slider').jRange({
-        setValue: Math.floor(min_price)+','+Math.ceil(max_price),
-    });
 
     var table = $("#shopping-view-list-table").DataTable( {
         "processing": true,
@@ -105,8 +89,6 @@ $(function() {
         });
     }
 });
-
-
 
 // Remove a modal's html after closing
 $(document).on($.modal.AFTER_CLOSE, function(event, modal) {

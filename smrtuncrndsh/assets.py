@@ -36,6 +36,7 @@ def compile_assets(app):
     )
     datatables_css = Bundle(
         'css/datatables/jquery.dataTables.css',
+        'css/datatables/jquery.dataTables_OVERRIDES.css',
         filters='cssmin', output='gen/datatables.css'
     )
     datatables_js = Bundle(

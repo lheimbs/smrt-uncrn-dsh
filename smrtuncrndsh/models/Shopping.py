@@ -154,6 +154,7 @@ class Item(db.Model, BaseMixin):
             'sale': self.sale if self.sale else "-",
             'note': self.note if self.note else "-",
             'category': self.category.name if self.category else '-',
+            'lists': list(set([list_item.liste.id for list_item in self.lists])),
         }
 
     def exists(self):

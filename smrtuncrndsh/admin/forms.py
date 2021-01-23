@@ -3,9 +3,9 @@ from flask import current_app
 from flask_wtf import FlaskForm
 from wtforms import BooleanField
 from wtforms_alchemy import model_form_factory
-from wtforms.fields import HiddenField, StringField
+from wtforms.fields import HiddenField, StringField, SubmitField
 from wtforms.fields.html5 import DateField, DecimalField, DateTimeField
-from wtforms.validators import Required
+from wtforms.validators import Required, Optional
 from wtforms.ext.sqlalchemy.fields import QuerySelectField, QuerySelectMultipleField
 
 from ..models import db
@@ -76,6 +76,24 @@ class ItemForm(ModelForm):
         blank_text="Select a category",
         description="Category",
     )
+    # submit_item = SubmitField("Submit Item")
+
+
+class ItemsForm(FlaskForm):
+    category = QuerySelectField(
+        query_factory=lambda: Category.query,
+        get_label='name',
+        allow_blank=True,
+        blank_text="Select a category",
+        description="Category",
+    )
+    name = StringField(label="Name")
+    price = DecimalField(label="Price", validators=[Optional()])
+    volume = StringField(label="Volume")
+    price_per_volume = StringField(label="Price per Volume")
+    note = StringField(label="Note")
+    sale = BooleanField(label="Sale")
+    # submit_items = SubmitField("Submit Items")
 
 
 def get_item_label(item):

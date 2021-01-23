@@ -8,6 +8,10 @@
     padding: 0.5%;
 }
 
+div.card.modal {
+    background-color: var(--background-card);
+}
+
 .card-fill {
     box-shadow: 0 1px 2px 0 rgba(255,255,255,0.05);
     transition: 0.3s;

@@ -1,0 +1,40 @@
+<div class="card">
+    {% if items|length > 1 %}
+        {% set edit_url = url_for('admin_bp.edit_shopping_item', ids=items) %}
+        {% set delete_url = url_for('admin_bp.delete_shopping_item', ids=items) %}
+        <h3>Edit {{ items|length }} items</h3>
+    {% else %}
+        {% set edit_url = url_for('admin_bp.edit_shopping_item', id=items.0) %}
+        {% set delete_url = url_for('admin_bp.delete_shopping_item', id=items.0) %}
+        <h3>Edit item {{ items.0 }}</h3>
+    {% endif %}
+
+    <form id="item-edit-form" method="POST" action="{{ edit_url }}">
+        {{ form.csrf_token }}
+
+        <table class="admin-table" cellspacing="0" cellpadding="0">
+            {% for field in form if field.widget.input_type != 'hidden' %}
+            <tr>
+                <td>{{ field.label }}</td>
+                <td>
+                    <fieldset class="{{ field.type }}">
+                        {{ field }}
+                        {% if field.errors %}
+                        <ul class="errors">
+                            {% for error in field.errors %}
+                                <li>{{ error }}</li>
+                            {% endfor %}
+                        </ul>
+                        {% endif %}
+                    </fieldset>
+                </td>
+            </tr>
+            {% endfor %}
+        </table>
+        <div class="shopping submit-button">
+            <input class="material-icons" type="submit" value="send"/>
+            <a class="material-icons" href="{{ delete_url }}">delete</a>
+            <a class="material-icons" href="{{ url_for('admin_bp.new_shopping_item') }}">add_circle</a>
+        </div>
+    </form>
+</div>

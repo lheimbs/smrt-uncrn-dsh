@@ -49,6 +49,7 @@ def query_shopping_list():
     query = get_datatables_order_query(Liste, args, query)
 
     query = query.filter_by(user=current_user)
+    # print(query)
 
     i_d = [
         i.to_ajax() for i in query.limit(args['length']).offset(args['start']).all()
