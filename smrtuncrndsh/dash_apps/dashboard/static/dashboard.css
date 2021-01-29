@@ -55,7 +55,8 @@
             "tablet_place"
             "shopping"
             "shpooing_category_month"
-            "weather";
+            "weather"
+            "corona";
     }
     .weather-container {
         grid-template-columns: 1fr;
@@ -161,6 +162,15 @@
     flex-direction: column;
     align-items: center;
 }
+
+.brightness-altitude-container {
+    grid-area: brightness_altitude;
+    display: flex;
+    justify-content: space-around;
+    flex-direction: column;
+    /* align-items: center; */
+    /* flex-wrap: wrap; */
+}
 .brightness-current-container {
     grid-area: brightness;
     display: flex;
@@ -168,8 +178,8 @@
     align-items: center;
     flex-wrap: wrap;
     flex-grow: 1;
-    margin-left: 5px !important;
-    height: 100%;
+    margin-top: 5px !important;
+    /* height: 100%; */
 }
 .altitide-current-container {
     grid-area: altitude;
@@ -178,15 +188,7 @@
     align-items: center;
     flex-wrap: wrap;
     flex-grow: 1;
-    height: 100%;
-}
-
-.brightness-altitude-container {
-    grid-area: brightness_altitude;
-    display: flex;
-    justify-content: space-around;
-    align-items: center;
-    flex-wrap: wrap;
+    /* height: 100%; */
 }
 
 .dashboard-content .card {
@@ -253,6 +255,7 @@
 
 .shopping-info-row { display: flex; justify-content: space-evenly; }
 .row-space-around { justify-content: space-around; }
+.row-centered-items { align-items: center; }
 
 .corona-data {
     grid-area: corona;
