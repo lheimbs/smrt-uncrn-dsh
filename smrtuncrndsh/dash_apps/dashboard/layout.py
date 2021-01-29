@@ -275,7 +275,7 @@ layout = html.Div(
                             className="shopping-info-text-container",
                             children=[
                                 html.Div(
-                                    className="shopping-info-row row-space-around",
+                                    className="shopping-info-row row-space-around row-centered-items",
                                     children=[
                                         html.H6("This month:", id="shopping-info-descriptor-1"),
                                         html.H6(id="shopping-info-current-month"),
@@ -297,7 +297,7 @@ layout = html.Div(
                             children=[
                                 dcc.Graph(
                                     id="shopping-info-category-month-graph",
-                                    style={'height': '12vh'},
+                                    style={'height': '20vh'},
                                     config={
                                         'staticPlot': False,
                                         'displayModeBar': False,

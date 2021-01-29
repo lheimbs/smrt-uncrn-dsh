@@ -8,6 +8,7 @@ import pandas as pd
 import scipy.signal as signal
 import plotly.graph_objects as go
 import dash_html_components as html
+# import plotly.express as px
 # import dash_core_components as dcc
 
 from flask import current_app
@@ -31,7 +32,7 @@ def is_daytime(sunrise, sunset, now=None):
     if not now:
         now = datetime.now()
         if current_app.config['DEBUG']:
-            now = datetime(year=now.year, month=now.month, day=now.day, hour=22)
+            now = datetime(year=now.year, month=now.month, day=now.day, hour=12)
 
     if sunrise < now < sunset:
         return True
@@ -486,32 +487,6 @@ def init_callbacks(app):                    # noqa: C901
             foreground_color = COLORS['font-foreground']
             graph_color = COLORS['foreground']
 
-        fig.update_layout({
-            'xaxis': {
-                'color': foreground_color,
-                'fixedrange': True,
-                'showline': False, 'showgrid': False,
-                'tickformat': "%H:00\n%a",
-            },
-            'yaxis': {
-                'visible': False,
-                'fixedrange': True,
-                'overlaying': 'y2',
-                'range': [hourly_data.temperature.min() - 0.5, hourly_data.temperature.max() + 0.5],
-            },
-            'yaxis2': {
-                'fixedrange': True,
-                'showline': False, 'linewidth': 1,
-                'showgrid': False, 'gridwidth': 1,
-                'zeroline': True, 'zerolinewidth': 1,
-                'zerolinecolor': foreground_color,
-                'color': foreground_color,
-                'side': 'right',
-                'rangemode': 'tozero',
-                'ticksuffix': "mm",
-            }
-        })
-
         fig.add_trace(go.Scatter(
             x=hourly_data['reference_time'],
             y=hourly_data['temperature'],
@@ -545,7 +520,7 @@ def init_callbacks(app):                    # noqa: C901
         fig.add_trace(go.Bar(
             x=hourly_data['reference_time'],
             y=hourly_data['rain'],
-            marker_color=COLORS['foreground'],
+            marker_color=COLORS['colorway'][6],
             name='rain',
             yaxis='y2',
             opacity=0.5,
@@ -555,14 +530,39 @@ def init_callbacks(app):                    # noqa: C901
         fig.add_trace(go.Bar(
             x=hourly_data['reference_time'],
             y=hourly_data['snow'],
-            marker_color=COLORS['colorway'][6],
+            marker_color=COLORS['colorway'][13],
             name='rain',
             yaxis='y2',
             opacity=0.5,
             hoverinfo='skip',
             width=1000000,
         ))
-        fig.update_layout(barmode='stack')
+        fig.update_layout({
+            'barmode': 'stack',
+            'xaxis': {
+                'color': foreground_color,
+                'fixedrange': True,
+                'showline': False, 'showgrid': False,
+                'tickformat': "%H:00\n%a",
+            },
+            'yaxis': {
+                'visible': False,
+                'fixedrange': True,
+                'overlaying': 'y2',
+                'range': [hourly_data.temperature.min() - 0.5, hourly_data.temperature.max() + 0.5],
+            },
+            'yaxis2': {
+                'fixedrange': True,
+                'showline': False, 'linewidth': 1,
+                'showgrid': False, 'gridwidth': 1,
+                'zeroline': True, 'zerolinewidth': 1,
+                'zerolinecolor': foreground_color,
+                'color': foreground_color,
+                'side': 'right',
+                'rangemode': 'tozero',
+                'ticksuffix': "mm",
+            }
+        })
         return fig
 
     @app.callback(
@@ -615,7 +615,7 @@ def init_callbacks(app):                    # noqa: C901
     def shopping_info(loading_state):
         now = datetime.now().date()
         first_day = datetime(year=now.year, month=now.month, day=1)
-        last_month = now - relativedelta(months=1)
+        last_month = first_day - relativedelta(months=1)
         last_6_months = now - relativedelta(months=6)
 
         sum_this_month, sum_last_month, lists_last_6_months = sql.get_shopping_info(
@@ -657,7 +657,8 @@ def init_callbacks(app):                    # noqa: C901
         fig = go.Figure()
         fig.update_layout({
             'autosize': True,
-            'barmode': 'overlay',
+            # 'barmode': 'overlay',
+            'colorway': COLORS['colorway'][3:],
             # 'colorway': [COLORS['colorway'][0]] + COLORS['colorway'][2:],
             'font': {
                 'family': "Ubuntu",
@@ -688,9 +689,10 @@ def init_callbacks(app):                    # noqa: C901
             y=list(data.values()),
             name='Categories this month',
             hovertemplate="%{x} : %{y:.2f} €<extra></extra>",
-            marker_color=COLORS['colorway'][2:],
+            marker_color=COLORS['foreground-dark'],
+            textposition='auto',
         ))
-        fig.update_traces(textposition='outside')
+        fig.update_layout(colorway=COLORS['colorway'][3:])
         return fig
 
     def get_corona_local_data(county):
