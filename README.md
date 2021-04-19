@@ -24,6 +24,7 @@ pip3 install -r requirements.txt
  - [] fix jrange not resizing (minor)
  - [] unify input design (minor)
  - [] automatic shopping categories
+    - [] Detect category by item and list based on previous entries
  - [x] multiselect in admin panel (admin panel) [currently items only]
  - [x] get lists containing item (admin panel)
  - [x] change item - replace changed if new already exists (admin panel)
