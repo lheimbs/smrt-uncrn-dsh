@@ -100,7 +100,7 @@ testpath==0.4.4
 tornado==6.0.4
 tqdm==4.47.0
 traitlets==4.3.3
-urllib3==1.26.4
+urllib3==1.26.5
 validators==0.15.0
 visdcc==0.0.40
 wcwidth==0.1.9
