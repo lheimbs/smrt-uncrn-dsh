@@ -1,1 +1,9 @@
 *.ino filter=remove-pass
+smrtuncrndsh/static/js/chosen/* linguist-vendored
+smrtuncrndsh/static/js/datatables/* linguist-vendored
+smrtuncrndsh/static/js/daterangepicker/* linguist-vendored
+smrtuncrndsh/static/js/flexdatalist/* linguist-vendored
+smrtuncrndsh/static/js/jquery/* linguist-vendored
+smrtuncrndsh/static/js/jquerymodal/* linguist-vendored
+smrtuncrndsh/static/js/jrange/* linguist-vendored
+smrtuncrndsh/static/js/plotly/* linguist-vendored
